@@ -1,0 +1,35 @@
+{
+  "pages": {
+    "en": {
+      "Akquise": "Acquisition",
+      "Aktive Projekte": "Active Projects",
+      "Alle Rechnungen beglichen — keine offenen Posten.": "All invoices settled — no open items.",
+      "Als bezahlt markieren": "Mark as Paid",
+      "Berater": "Consultant",
+      "Bezahlt": "Paid",
+      "Ein Kunde": "A Customer",
+      "Letzte Zeiterfassung": "Last Time Entry",
+      "Neue Rechnung": "New Invoice",
+      "Neuer Kunde": "New Customer",
+      "Neues Angebot": "New Quote",
+      "Neues Projekt": "New Project",
+      "Noch keine Zeiteinträge — erfasse deine ersten Stunden.": "No time entries yet — log your first hours.",
+      "Noch keine aktiven Projekte — leg eines an.": "No active projects yet — create one.",
+      "Offen": "Open",
+      "Offene Rechnungen": "Open Invoices",
+      "Ohne Kennung": "Without Identifier",
+      "Projekt": "Project",
+      "Projekt nach \"{0}\" verschoben": "Project moved to \"{0}\"",
+      "Rechnung": "Invoice",
+      "Rechnung als bezahlt markiert": "Invoice marked as paid",
+      "Stunden diesen Monat": "Hours This Month",
+      "Zeit erfassen": "Log Time",
+      "{0} Projekte aktiv — Kunden: {1}.": "{0} projects active — customers: {1}.",
+      "{0} Projekte aktiv, {1} in Akquise.": "{0} projects active, {1} in acquisition.",
+      "{0} überfällige Rechnungen — älteste: {1} ({2}).": "{0} overdue invoices — oldest: {1} ({2}).",
+      "{0} — Rechnung {1} über {2} überfällig seit {3}.": "{0} — Invoice {1} of {2} overdue since {3}.",
+      "Überfällig": "Overdue"
+    }
+  },
+  "v": 1
+}
