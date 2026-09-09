@@ -86,14 +86,18 @@ export default function DashboardOverview({ data }: { data: DashboardData }) {
   // Nur für den Hauptnutzer "Klar" sichtbar
   const [isAdmin, setIsAdmin] = useState(false);
   useEffect(() => {
+    const ALLOWED = ['klar', 'fruehwaldjakob@gmx.de', 'jakob'];
+    const isAllowed = (s: string) => ALLOWED.includes(s.toLowerCase());
     try {
       const el = document.querySelector('la-header-bar-widget');
       const u: string = (el as any)?.username ?? (window as any).la_username ?? '';
-      if (u.toLowerCase() === 'klar') { setIsAdmin(true); return; }
+      if (isAllowed(u)) { setIsAdmin(true); return; }
     } catch { /* ignore */ }
     fetch('/rest/user/')
       .then(r => r.json())
-      .then(u => setIsAdmin((u?.username ?? u?.login ?? '').toLowerCase() === 'klar'))
+      .then(u => setIsAdmin(
+        isAllowed(u?.username ?? '') || isAllowed(u?.login ?? '') || isAllowed(u?.email ?? '')
+      ))
       .catch(() => {});
   }, []);
 
