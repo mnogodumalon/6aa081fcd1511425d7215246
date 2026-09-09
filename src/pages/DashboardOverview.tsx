@@ -1,6 +1,6 @@
 import type { DashboardData } from '@/hooks/useDashboardData';
 import { useEntityCrud } from '@/components/EntityCrud';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { tx, appLabel } from '@/i18n';
 import { useClock, gruss, namen, undoToast } from '@/lib/polish';
 import { formatDate, formatCurrency, lookupKey } from '@/lib/formatters';
@@ -20,6 +20,7 @@ import {
   IconUsers,
   IconBriefcase,
   IconPlus,
+  IconUserPlus,
 } from '@tabler/icons-react';
 
 function toneForProjektStatus(status: string | undefined): KanbanTone {
@@ -31,7 +32,7 @@ function toneForProjektStatus(status: string | undefined): KanbanTone {
 
 export default function DashboardOverview({ data }: { data: DashboardData }) {
   const {
-    beraterInnen, projekte, angebote, zeiterfassung, rechnungen,
+    beraterInnen, kunden, projekte, angebote, zeiterfassung, rechnungen,
     setProjekte, setRechnungen,
     fetchAll,
   } = data;
@@ -80,6 +81,21 @@ export default function DashboardOverview({ data }: { data: DashboardData }) {
 
   // Filter state
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [showKunden, setShowKunden] = useState(false);
+
+  // Nur für den Hauptnutzer "Klar" sichtbar
+  const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    try {
+      const el = document.querySelector('la-header-bar-widget');
+      const u: string = (el as any)?.username ?? (window as any).la_username ?? '';
+      if (u.toLowerCase() === 'klar') { setIsAdmin(true); return; }
+    } catch { /* ignore */ }
+    fetch('/rest/user/')
+      .then(r => r.json())
+      .then(u => setIsAdmin((u?.username ?? u?.login ?? '').toLowerCase() === 'klar'))
+      .catch(() => {});
+  }, []);
 
   // Kanban columns
   const COLUMNS = useMemo<KanbanColumn[]>(
@@ -204,6 +220,54 @@ export default function DashboardOverview({ data }: { data: DashboardData }) {
         </p>
       </div>
 
+      {/* Quick Actions */}
+      <div className="flex flex-wrap gap-3">
+        <button
+          onClick={() => crud.projekte.openCreate({})}
+          className="flex items-center gap-2 rounded-lg border border-dashed border-border px-4 py-2 text-sm text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+        >
+          <IconPlus size={16} className="shrink-0" />
+          {tx('Neues Projekt')}
+        </button>
+        <button
+          onClick={() => crud.zeiterfassung.openCreate({ datum: today })}
+          className="flex items-center gap-2 rounded-lg border border-dashed border-border px-4 py-2 text-sm text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+        >
+          <IconPlus size={16} className="shrink-0" />
+          {tx('Zeit erfassen')}
+        </button>
+        <button
+          onClick={() => crud.angebote.openCreate({ angebotsdatum: today, angebotsjahr: format(clock, 'yyyy') })}
+          className="flex items-center gap-2 rounded-lg border border-dashed border-border px-4 py-2 text-sm text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+        >
+          <IconPlus size={16} className="shrink-0" />
+          {tx('Neues Angebot')}
+        </button>
+        <button
+          onClick={() => crud.rechnungen.openCreate({ rechnungsdatum: today })}
+          className="flex items-center gap-2 rounded-lg border border-dashed border-border px-4 py-2 text-sm text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+        >
+          <IconPlus size={16} className="shrink-0" />
+          {tx('Neue Rechnung')}
+        </button>
+        <button
+          onClick={() => crud.kunden.openCreate({})}
+          className="flex items-center gap-2 rounded-lg border border-dashed border-border px-4 py-2 text-sm text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+        >
+          <IconPlus size={16} className="shrink-0" />
+          {tx('Neuer Kunde')}
+        </button>
+        {isAdmin && (
+          <button
+            onClick={() => crud.beraterInnen.openCreate({})}
+            className="flex items-center gap-2 rounded-lg border border-dashed border-primary/40 px-4 py-2 text-sm text-primary hover:border-primary hover:bg-primary/5 transition-colors"
+          >
+            <IconUserPlus size={16} className="shrink-0" />
+            {tx('Neue Berater:in')}
+          </button>
+        )}
+      </div>
+
       <DashboardGrid
         variant="wide"
         hero={heroBanner}
@@ -242,6 +306,14 @@ export default function DashboardOverview({ data }: { data: DashboardData }) {
               value={aktiveBerater.length}
               icon={<IconUsers size={16} className="shrink-0" />}
               tone="default"
+            />
+            <StatStripItem
+              title={tx('Kunden')}
+              value={kunden.length}
+              icon={<IconUsers size={16} className="shrink-0" />}
+              tone={kunden.length > 0 ? 'primary' : 'default'}
+              onClick={() => setShowKunden(f => !f)}
+              active={showKunden}
             />
           </StatStrip>
         }
@@ -298,6 +370,30 @@ export default function DashboardOverview({ data }: { data: DashboardData }) {
                 action: { label: tx('Neue Rechnung'), onClick: () => crud.rechnungen.openCreate({}) },
               }}
             />
+            {showKunden && (
+              <WorkList
+                title={tx('Kunden')}
+                items={kunden.map(k => ({
+                  id: k.record_id,
+                  title: k.fields.kundenname ?? tx('Unbekannt'),
+                  secondLine: k.fields.email
+                    ? <span className="text-muted-foreground">{k.fields.email}</span>
+                    : undefined,
+                  action: {
+                    label: tx('Bearbeiten'),
+                    onClick: () => crud.kunden.openEdit(k),
+                  },
+                }))}
+                onItemClick={id => {
+                  const k = kunden.find(k => k.record_id === id);
+                  if (k) crud.kunden.openDetail(k);
+                }}
+                empty={{
+                  text: tx('Noch keine Kunden — lege deinen ersten Kunden an.'),
+                  action: { label: tx('Neuer Kunde'), onClick: () => crud.kunden.openCreate({}) },
+                }}
+              />
+            )}
             <WorkList
               title={tx('Letzte Zeiterfassung')}
               items={letzteZeit.map(z => {
@@ -330,45 +426,6 @@ export default function DashboardOverview({ data }: { data: DashboardData }) {
           </>
         }
       />
-
-      {/* Quick Actions */}
-      <div className="flex flex-wrap gap-3">
-        <button
-          onClick={() => crud.projekte.openCreate({})}
-          className="flex items-center gap-2 rounded-lg border border-dashed border-border px-4 py-2 text-sm text-muted-foreground hover:border-primary hover:text-primary transition-colors"
-        >
-          <IconPlus size={16} className="shrink-0" />
-          {tx('Neues Projekt')}
-        </button>
-        <button
-          onClick={() => crud.zeiterfassung.openCreate({ datum: today })}
-          className="flex items-center gap-2 rounded-lg border border-dashed border-border px-4 py-2 text-sm text-muted-foreground hover:border-primary hover:text-primary transition-colors"
-        >
-          <IconPlus size={16} className="shrink-0" />
-          {tx('Zeit erfassen')}
-        </button>
-        <button
-          onClick={() => crud.angebote.openCreate({ angebotsdatum: today, angebotsjahr: format(clock, 'yyyy') })}
-          className="flex items-center gap-2 rounded-lg border border-dashed border-border px-4 py-2 text-sm text-muted-foreground hover:border-primary hover:text-primary transition-colors"
-        >
-          <IconPlus size={16} className="shrink-0" />
-          {tx('Neues Angebot')}
-        </button>
-        <button
-          onClick={() => crud.rechnungen.openCreate({ rechnungsdatum: today })}
-          className="flex items-center gap-2 rounded-lg border border-dashed border-border px-4 py-2 text-sm text-muted-foreground hover:border-primary hover:text-primary transition-colors"
-        >
-          <IconPlus size={16} className="shrink-0" />
-          {tx('Neue Rechnung')}
-        </button>
-        <button
-          onClick={() => crud.kunden.openCreate({})}
-          className="flex items-center gap-2 rounded-lg border border-dashed border-border px-4 py-2 text-sm text-muted-foreground hover:border-primary hover:text-primary transition-colors"
-        >
-          <IconPlus size={16} className="shrink-0" />
-          {tx('Neuer Kunde')}
-        </button>
-      </div>
 
       {crud.surfaces}
     </div>
