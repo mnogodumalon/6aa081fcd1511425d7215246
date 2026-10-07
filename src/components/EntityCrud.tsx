@@ -34,15 +34,17 @@
  * Built in (do NOT re-implement): optimistic update + Rückgängig counter-write
  * on edit, fetchAll-on-error, edit-from-overlay, and per-entity overlay bodies
  * (RecordHeader + <{Entity}Details> with every relation reachable and the
- * contextual "+" prefilled). Drag writes (onEventDrop/onCardMove) stay YOURS:
+ * contextual "+" prefilled; list-field back-references additionally get a
+ * "choose existing" picker that links an EXISTING record — built in, do not
+ * re-roll). Drag writes (onEventDrop/onCardMove) stay YOURS:
  * optimistic setter first, PATCH in background, undoToast with counter-write.
  *
  * Overlay content per entity (the host renders these — you never compose
  * Details blocks yourself):
- *   berater/innen: nachname, vorname, titel, strasse, hausnummer, plz, ort, email_beruflich, …  ·  → leistungskatalog · → projekte · ← leistungskatalog (list + contextual +) · ← projekte (list + contextual +) · ← zeiterfassung (list + contextual +) · ← rechnungen (list + contextual +)
+ *   berater/innen: nachname, vorname, titel, strasse, hausnummer, plz, ort, email_beruflich, …  ·  → leistungskatalog · → projekte · ← leistungskatalog (list + contextual + + choose existing) · ← projekte (list + contextual +) · ← zeiterfassung (list + contextual +) · ← rechnungen (list + contextual + + choose existing)
  *   kunden: kundenname, kundentyp, email, telefon, strasse, hausnummer, plz, ort, …  ·  → projekte · ← projekte (list + contextual +) · ← angebote (list + contextual +) · ← rechnungen (list + contextual +)
- *   leistungskatalog: berater, leistungsbezeichnung, leistungstyp, beschreibung, kostenvoranschlag, stundensatz_leistung, einheit, verfuegbarkeit  ·  → berater/innen · ← berater/innen (list + contextual +) · ← zeiterfassung (list + contextual +)
- *   projekte: projektkennung, projektnummer, projektart, projektstart_jahr, projektstart_monat, status, ansprechpartner_kunde, letzter_schritt, …  ·  → kunden · → berater/innen · ← berater/innen (list + contextual +) · ← kunden (list + contextual +) · ← angebote (list + contextual +) · ← zeiterfassung (list + contextual +) · ← rechnungen (list + contextual +)
+ *   leistungskatalog: berater, leistungsbezeichnung, leistungstyp, beschreibung, kostenvoranschlag, stundensatz_leistung, einheit, verfuegbarkeit  ·  → berater/innen · ← berater/innen (list + contextual + + choose existing) · ← zeiterfassung (list + contextual +)
+ *   projekte: projektkennung, projektnummer, projektart, projektstart_jahr, projektstart_monat, status, ansprechpartner_kunde, letzter_schritt, …  ·  → kunden · → berater/innen · ← berater/innen (list + contextual + + choose existing) · ← kunden (list + contextual + + choose existing) · ← angebote (list + contextual +) · ← zeiterfassung (list + contextual +) · ← rechnungen (list + contextual +)
  *   angebote: angebotsnummer, angebotsjahr, angebotstyp, angebotsdatum, gueltig_bis, zeitrahmen_anfang, zeitrahmen_ende, dauer, …  ·  → projekte · → kunden
  *   zeiterfassung: datum, stunden, monat, jahr, taetigkeitsbeschreibung, verrechenbar, notizen, berater, …  ·  → berater/innen · → projekte · → leistungskatalog
  *   rechnungen: rechnungsnummer, rechnungsdatum, faelligkeitsdatum, rechnungsstatus, abrechnungsmonat, abrechnungsjahr, nettobetrag, mehrwertsteuer, …  ·  → kunden · → projekte · → berater/innen
@@ -50,7 +52,7 @@
 import { useState, useMemo, type ReactNode } from 'react';
 import type { BeraterInnen, Kunden, Leistungskatalog, Projekte, Angebote, Zeiterfassung, Rechnungen } from '@/types/app';
 import { APP_IDS } from '@/types/app';
-import { LivingAppsService, createRecordUrl } from '@/services/livingAppsService';
+import { LivingAppsService, createRecordUrl, extractRecordIds } from '@/services/livingAppsService';
 import { enrichBeraterInnen, enrichKunden, enrichLeistungskatalog, enrichProjekte, enrichAngebote, enrichZeiterfassung, enrichRechnungen } from '@/lib/enrich';
 import type { EnrichedBeraterInnen, EnrichedKunden, EnrichedLeistungskatalog, EnrichedProjekte, EnrichedAngebote, EnrichedZeiterfassung, EnrichedRechnungen } from '@/types/enriched';
 import { useDashboardData } from '@/hooks/useDashboardData';
@@ -72,9 +74,12 @@ import { ZeiterfassungDialog, type ZeiterfassungDialogDefaults } from '@/compone
 import { ZeiterfassungDetails } from '@/components/details/ZeiterfassungDetails';
 import { RechnungenDialog, type RechnungenDialogDefaults } from '@/components/dialogs/RechnungenDialog';
 import { RechnungenDetails } from '@/components/details/RechnungenDetails';
+import { PickExistingDialog } from '@/components/PickExistingDialog';
 import { AI_PHOTO_SCAN, AI_PHOTO_LOCATION } from '@/config/ai-features';
 import { t, appLabel } from '@/i18n';
 import { undoToast } from '@/lib/polish';
+import { usePermissions } from '@/lib/permissions';
+import { toast } from 'sonner';
 import { formatDate } from '@/lib/formatters';
 
 // The overlay union — one branch per entity, `record` typed the way the data
@@ -106,6 +111,10 @@ export interface EntityCrudApi<TRecord, TDefaults> {
   openEdit: (record: TRecord) => void;
   /** Open the record overlay (raw record is fine — enrichment resolved inside). */
   openDetail: (record: TRecord) => void;
+  /** May the signed-in user create/change records of this list? (the
+   *  platform's rights — show a „+ Neu“ only when true; openCreate/openEdit
+   *  refuse with a notice otherwise). */
+  canWrite: boolean;
 }
 
 export interface EntityCrud {
@@ -128,6 +137,9 @@ export interface EntityCrud {
 
 export function useEntityCrud(data: EntityCrudData, options?: EntityCrudOptions): EntityCrud {
   const overlay = useRecordOverlayStack<OverlayItem>();
+  // the platform's rights of the signed-in user (lib/permissions.ts) — unknown = allowed
+  const perms = usePermissions();
+  const refuse = () => { toast.error(t('perm_denied_title'), { description: t('perm_denied_desc') }); };
   const [beraterInnenDialog, setBeraterInnenDialog] = useState<{ defaults?: BeraterInnenDialogDefaults; editing?: BeraterInnen } | null>(null);
   const [kundenDialog, setKundenDialog] = useState<{ defaults?: KundenDialogDefaults; editing?: Kunden } | null>(null);
   const [leistungskatalogDialog, setLeistungskatalogDialog] = useState<{ defaults?: LeistungskatalogDialogDefaults; editing?: Leistungskatalog } | null>(null);
@@ -135,6 +147,16 @@ export function useEntityCrud(data: EntityCrudData, options?: EntityCrudOptions)
   const [angeboteDialog, setAngeboteDialog] = useState<{ defaults?: AngeboteDialogDefaults; editing?: Angebote } | null>(null);
   const [zeiterfassungDialog, setZeiterfassungDialog] = useState<{ defaults?: ZeiterfassungDialogDefaults; editing?: Zeiterfassung } | null>(null);
   const [rechnungenDialog, setRechnungenDialog] = useState<{ defaults?: RechnungenDialogDefaults; editing?: Rechnungen } | null>(null);
+  // „Vorhandene wählen" für den Listenfeld-Rückbezug leistungskatalog.berater → berater/innen: hält die Hub-record_id.
+  const [pickBeraterInnenLeistungskatalogBerater, setPickBeraterInnenLeistungskatalogBerater] = useState<string | null>(null);
+  // „Vorhandene wählen" für den Listenfeld-Rückbezug rechnungen.berater → berater/innen: hält die Hub-record_id.
+  const [pickBeraterInnenRechnungen, setPickBeraterInnenRechnungen] = useState<string | null>(null);
+  // „Vorhandene wählen" für den Listenfeld-Rückbezug berater/innen.leistungen → leistungskatalog: hält die Hub-record_id.
+  const [pickLeistungskatalogBeraterInnenLeistungen, setPickLeistungskatalogBeraterInnenLeistungen] = useState<string | null>(null);
+  // „Vorhandene wählen" für den Listenfeld-Rückbezug berater/innen.projekte → projekte: hält die Hub-record_id.
+  const [pickProjekteBeraterInnenProjekte, setPickProjekteBeraterInnenProjekte] = useState<string | null>(null);
+  // „Vorhandene wählen" für den Listenfeld-Rückbezug kunden.laufende_projekte → projekte: hält die Hub-record_id.
+  const [pickProjekteKundenLaufendeProjekte, setPickProjekteKundenLaufendeProjekte] = useState<string | null>(null);
   const enrichedBeraterInnen = useMemo(() => enrichBeraterInnen(data.beraterInnen, { leistungskatalogMap: data.leistungskatalogMap, projekteMap: data.projekteMap }), [data.beraterInnen, data.leistungskatalogMap, data.projekteMap]);
   const enrichedKunden = useMemo(() => enrichKunden(data.kunden, { projekteMap: data.projekteMap }), [data.kunden, data.projekteMap]);
   const enrichedLeistungskatalog = useMemo(() => enrichLeistungskatalog(data.leistungskatalog, { beraterInnenMap: data.beraterInnenMap }), [data.leistungskatalog, data.beraterInnenMap]);
@@ -170,6 +192,50 @@ export function useEntityCrud(data: EntityCrudData, options?: EntityCrudOptions)
       undoToast(`${appLabel('berater/innen')} — ${t('crud_created')}`);
       data.fetchAll();
     }
+  }
+
+  // Link an EXISTING Leistungskatalog to the BeraterInnen hub: append the hub URL to the
+  // source's list field. Optimistic setter first, PATCH, undoToast counter-write.
+  async function linkBeraterInnenLeistungskatalogBerater(sourceId: string) {
+    const hub = pickBeraterInnenLeistungskatalogBerater;
+    const src = data.leistungskatalog.find(r => r.record_id === sourceId);
+    if (!hub || !src) return;
+    const ids = extractRecordIds(src.fields.berater);
+    if (ids.includes(hub)) return;
+    const next = [...ids, hub].map(id => createRecordUrl(APP_IDS.BERATERINNEN, id));
+    data.setLeistungskatalog(list => list.map(r => (r.record_id === sourceId ? { ...r, fields: { ...r.fields, berater: next } } : r)));
+    try {
+      await LivingAppsService.updateLeistungskatalogEntry(sourceId, { berater: next });
+    } catch (err) {
+      data.fetchAll();
+      throw err;
+    }
+    undoToast(`${appLabel('leistungskatalog')} — ${t('pick_linked')}`, async () => {
+      data.setLeistungskatalog(list => list.map(r => (r.record_id === sourceId ? src : r)));
+      try { await LivingAppsService.updateLeistungskatalogEntry(sourceId, { berater: src.fields.berater }); } catch { data.fetchAll(); }
+    });
+  }
+
+  // Link an EXISTING Rechnungen to the BeraterInnen hub: append the hub URL to the
+  // source's list field. Optimistic setter first, PATCH, undoToast counter-write.
+  async function linkBeraterInnenRechnungen(sourceId: string) {
+    const hub = pickBeraterInnenRechnungen;
+    const src = data.rechnungen.find(r => r.record_id === sourceId);
+    if (!hub || !src) return;
+    const ids = extractRecordIds(src.fields.berater);
+    if (ids.includes(hub)) return;
+    const next = [...ids, hub].map(id => createRecordUrl(APP_IDS.BERATERINNEN, id));
+    data.setRechnungen(list => list.map(r => (r.record_id === sourceId ? { ...r, fields: { ...r.fields, berater: next } } : r)));
+    try {
+      await LivingAppsService.updateRechnungenEntry(sourceId, { berater: next });
+    } catch (err) {
+      data.fetchAll();
+      throw err;
+    }
+    undoToast(`${appLabel('rechnungen')} — ${t('pick_linked')}`, async () => {
+      data.setRechnungen(list => list.map(r => (r.record_id === sourceId ? src : r)));
+      try { await LivingAppsService.updateRechnungenEntry(sourceId, { berater: src.fields.berater }); } catch { data.fetchAll(); }
+    });
   }
 
   function detailKunden(record: Kunden, push = false) {
@@ -230,6 +296,28 @@ export function useEntityCrud(data: EntityCrudData, options?: EntityCrudOptions)
     }
   }
 
+  // Link an EXISTING BeraterInnen to the Leistungskatalog hub: append the hub URL to the
+  // source's list field. Optimistic setter first, PATCH, undoToast counter-write.
+  async function linkLeistungskatalogBeraterInnenLeistungen(sourceId: string) {
+    const hub = pickLeistungskatalogBeraterInnenLeistungen;
+    const src = data.beraterInnen.find(r => r.record_id === sourceId);
+    if (!hub || !src) return;
+    const ids = extractRecordIds(src.fields.leistungen);
+    if (ids.includes(hub)) return;
+    const next = [...ids, hub].map(id => createRecordUrl(APP_IDS.LEISTUNGSKATALOG, id));
+    data.setBeraterInnen(list => list.map(r => (r.record_id === sourceId ? { ...r, fields: { ...r.fields, leistungen: next } } : r)));
+    try {
+      await LivingAppsService.updateBeraterInnenEntry(sourceId, { leistungen: next });
+    } catch (err) {
+      data.fetchAll();
+      throw err;
+    }
+    undoToast(`${appLabel('berater/innen')} — ${t('pick_linked')}`, async () => {
+      data.setBeraterInnen(list => list.map(r => (r.record_id === sourceId ? src : r)));
+      try { await LivingAppsService.updateBeraterInnenEntry(sourceId, { leistungen: src.fields.leistungen }); } catch { data.fetchAll(); }
+    });
+  }
+
   function detailProjekte(record: Projekte, push = false) {
     const rec = enrichedProjekte.find(r => r.record_id === record.record_id);
     if (!rec) return;
@@ -257,6 +345,50 @@ export function useEntityCrud(data: EntityCrudData, options?: EntityCrudOptions)
       undoToast(`${appLabel('projekte')} — ${t('crud_created')}`);
       data.fetchAll();
     }
+  }
+
+  // Link an EXISTING BeraterInnen to the Projekte hub: append the hub URL to the
+  // source's list field. Optimistic setter first, PATCH, undoToast counter-write.
+  async function linkProjekteBeraterInnenProjekte(sourceId: string) {
+    const hub = pickProjekteBeraterInnenProjekte;
+    const src = data.beraterInnen.find(r => r.record_id === sourceId);
+    if (!hub || !src) return;
+    const ids = extractRecordIds(src.fields.projekte);
+    if (ids.includes(hub)) return;
+    const next = [...ids, hub].map(id => createRecordUrl(APP_IDS.PROJEKTE, id));
+    data.setBeraterInnen(list => list.map(r => (r.record_id === sourceId ? { ...r, fields: { ...r.fields, projekte: next } } : r)));
+    try {
+      await LivingAppsService.updateBeraterInnenEntry(sourceId, { projekte: next });
+    } catch (err) {
+      data.fetchAll();
+      throw err;
+    }
+    undoToast(`${appLabel('berater/innen')} — ${t('pick_linked')}`, async () => {
+      data.setBeraterInnen(list => list.map(r => (r.record_id === sourceId ? src : r)));
+      try { await LivingAppsService.updateBeraterInnenEntry(sourceId, { projekte: src.fields.projekte }); } catch { data.fetchAll(); }
+    });
+  }
+
+  // Link an EXISTING Kunden to the Projekte hub: append the hub URL to the
+  // source's list field. Optimistic setter first, PATCH, undoToast counter-write.
+  async function linkProjekteKundenLaufendeProjekte(sourceId: string) {
+    const hub = pickProjekteKundenLaufendeProjekte;
+    const src = data.kunden.find(r => r.record_id === sourceId);
+    if (!hub || !src) return;
+    const ids = extractRecordIds(src.fields.laufende_projekte);
+    if (ids.includes(hub)) return;
+    const next = [...ids, hub].map(id => createRecordUrl(APP_IDS.PROJEKTE, id));
+    data.setKunden(list => list.map(r => (r.record_id === sourceId ? { ...r, fields: { ...r.fields, laufende_projekte: next } } : r)));
+    try {
+      await LivingAppsService.updateKundenEntry(sourceId, { laufende_projekte: next });
+    } catch (err) {
+      data.fetchAll();
+      throw err;
+    }
+    undoToast(`${appLabel('kunden')} — ${t('pick_linked')}`, async () => {
+      data.setKunden(list => list.map(r => (r.record_id === sourceId ? src : r)));
+      try { await LivingAppsService.updateKundenEntry(sourceId, { laufende_projekte: src.fields.laufende_projekte }); } catch { data.fetchAll(); }
+    });
   }
 
   function detailAngebote(record: Angebote, push = false) {
@@ -425,6 +557,51 @@ export function useEntityCrud(data: EntityCrudData, options?: EntityCrudOptions)
         enablePhotoScan={AI_PHOTO_SCAN['Rechnungen']}
         enablePhotoLocation={AI_PHOTO_LOCATION['Rechnungen']}
       />
+      <PickExistingDialog
+        open={pickBeraterInnenLeistungskatalogBerater !== null}
+        onClose={() => setPickBeraterInnenLeistungskatalogBerater(null)}
+        title={t('pick_title', { title: appLabel('leistungskatalog') })}
+        items={data.leistungskatalog
+          .filter(r => !extractRecordIds(r.fields.berater).includes(pickBeraterInnenLeistungskatalogBerater ?? ''))
+          .map(r => ({ id: r.record_id, label: String(r.fields.leistungsbezeichnung ?? appLabel('leistungskatalog')) }))}
+        onPick={linkBeraterInnenLeistungskatalogBerater}
+      />
+      <PickExistingDialog
+        open={pickBeraterInnenRechnungen !== null}
+        onClose={() => setPickBeraterInnenRechnungen(null)}
+        title={t('pick_title', { title: appLabel('rechnungen') })}
+        items={data.rechnungen
+          .filter(r => !extractRecordIds(r.fields.berater).includes(pickBeraterInnenRechnungen ?? ''))
+          .map(r => ({ id: r.record_id, label: String(r.fields.rechnungsnummer ?? appLabel('rechnungen')), hint: r.fields.rechnungsdatum ? String(r.fields.rechnungsdatum) : undefined }))}
+        onPick={linkBeraterInnenRechnungen}
+      />
+      <PickExistingDialog
+        open={pickLeistungskatalogBeraterInnenLeistungen !== null}
+        onClose={() => setPickLeistungskatalogBeraterInnenLeistungen(null)}
+        title={t('pick_title', { title: appLabel('berater/innen') })}
+        items={data.beraterInnen
+          .filter(r => !extractRecordIds(r.fields.leistungen).includes(pickLeistungskatalogBeraterInnenLeistungen ?? ''))
+          .map(r => ({ id: r.record_id, label: String(r.fields.nachname ?? appLabel('berater/innen')), hint: r.fields.einstiegsdatum ? String(r.fields.einstiegsdatum) : undefined }))}
+        onPick={linkLeistungskatalogBeraterInnenLeistungen}
+      />
+      <PickExistingDialog
+        open={pickProjekteBeraterInnenProjekte !== null}
+        onClose={() => setPickProjekteBeraterInnenProjekte(null)}
+        title={t('pick_title', { title: appLabel('berater/innen') })}
+        items={data.beraterInnen
+          .filter(r => !extractRecordIds(r.fields.projekte).includes(pickProjekteBeraterInnenProjekte ?? ''))
+          .map(r => ({ id: r.record_id, label: String(r.fields.nachname ?? appLabel('berater/innen')), hint: r.fields.einstiegsdatum ? String(r.fields.einstiegsdatum) : undefined }))}
+        onPick={linkProjekteBeraterInnenProjekte}
+      />
+      <PickExistingDialog
+        open={pickProjekteKundenLaufendeProjekte !== null}
+        onClose={() => setPickProjekteKundenLaufendeProjekte(null)}
+        title={t('pick_title', { title: appLabel('kunden') })}
+        items={data.kunden
+          .filter(r => !extractRecordIds(r.fields.laufende_projekte).includes(pickProjekteKundenLaufendeProjekte ?? ''))
+          .map(r => ({ id: r.record_id, label: String(r.fields.kundenname ?? appLabel('kunden')), hint: r.fields.anlagedatum ? String(r.fields.anlagedatum) : undefined }))}
+        onPick={linkProjekteKundenLaufendeProjekte}
+      />
       <RecordOverlayHost
         overlay={overlay}
         placement={options?.placement}
@@ -438,17 +615,21 @@ export function useEntityCrud(data: EntityCrudData, options?: EntityCrudOptions)
                 <BeraterInnenDetails
                   record={top.record}
                   leistungskatalogList={data.leistungskatalog}
-                  onOpenLeistungskatalog={(r) => detailLeistungskatalog(r, true)}
-                  onAddLeistungskatalog={() => setLeistungskatalogDialog({ defaults: { berater: [createRecordUrl(APP_IDS['BERATER/INNEN'], top.record.record_id)] } })}
                   projekteList={data.projekte}
-                  onOpenProjekte={(r) => detailProjekte(r, true)}
-                  onAddProjekte={() => setProjekteDialog({ defaults: { projektleitung: createRecordUrl(APP_IDS['BERATER/INNEN'], top.record.record_id) } })}
+                  leistungskatalogBeraterList={data.leistungskatalog}
+                  onOpenLeistungskatalogBerater={(r) => detailLeistungskatalog(r, true)}
+                  onAddLeistungskatalogBerater={perms.canWrite('leistungskatalog') ? () => setLeistungskatalogDialog({ defaults: { berater: [createRecordUrl(APP_IDS.BERATERINNEN, top.record.record_id)] } }) : undefined}
+                  onPickLeistungskatalogBerater={perms.canWrite('leistungskatalog') ? () => setPickBeraterInnenLeistungskatalogBerater(top.record.record_id) : undefined}
+                  projekteProjektleitungList={data.projekte}
+                  onOpenProjekteProjektleitung={(r) => detailProjekte(r, true)}
+                  onAddProjekteProjektleitung={perms.canWrite('projekte') ? () => setProjekteDialog({ defaults: { projektleitung: createRecordUrl(APP_IDS.BERATERINNEN, top.record.record_id) } }) : undefined}
                   zeiterfassungList={data.zeiterfassung}
                   onOpenZeiterfassung={(r) => detailZeiterfassung(r, true)}
-                  onAddZeiterfassung={() => setZeiterfassungDialog({ defaults: { berater: createRecordUrl(APP_IDS['BERATER/INNEN'], top.record.record_id) } })}
+                  onAddZeiterfassung={perms.canWrite('zeiterfassung') ? () => setZeiterfassungDialog({ defaults: { berater: createRecordUrl(APP_IDS.BERATERINNEN, top.record.record_id) } }) : undefined}
                   rechnungenList={data.rechnungen}
                   onOpenRechnungen={(r) => detailRechnungen(r, true)}
-                  onAddRechnungen={() => setRechnungenDialog({ defaults: { berater: [createRecordUrl(APP_IDS['BERATER/INNEN'], top.record.record_id)] } })}
+                  onAddRechnungen={perms.canWrite('rechnungen') ? () => setRechnungenDialog({ defaults: { berater: [createRecordUrl(APP_IDS.BERATERINNEN, top.record.record_id)] } }) : undefined}
+                  onPickRechnungen={perms.canWrite('rechnungen') ? () => setPickBeraterInnenRechnungen(top.record.record_id) : undefined}
                 />
               </>
             );
@@ -460,14 +641,15 @@ export function useEntityCrud(data: EntityCrudData, options?: EntityCrudOptions)
                 <KundenDetails
                   record={top.record}
                   projekteList={data.projekte}
-                  onOpenProjekte={(r) => detailProjekte(r, true)}
-                  onAddProjekte={() => setProjekteDialog({ defaults: { kunde: createRecordUrl(APP_IDS.KUNDEN, top.record.record_id) } })}
+                  projekteKundeList={data.projekte}
+                  onOpenProjekteKunde={(r) => detailProjekte(r, true)}
+                  onAddProjekteKunde={perms.canWrite('projekte') ? () => setProjekteDialog({ defaults: { kunde: createRecordUrl(APP_IDS.KUNDEN, top.record.record_id) } }) : undefined}
                   angeboteList={data.angebote}
                   onOpenAngebote={(r) => detailAngebote(r, true)}
-                  onAddAngebote={() => setAngeboteDialog({ defaults: { kunde: createRecordUrl(APP_IDS.KUNDEN, top.record.record_id) } })}
+                  onAddAngebote={perms.canWrite('angebote') ? () => setAngeboteDialog({ defaults: { kunde: createRecordUrl(APP_IDS.KUNDEN, top.record.record_id) } }) : undefined}
                   rechnungenList={data.rechnungen}
                   onOpenRechnungen={(r) => detailRechnungen(r, true)}
-                  onAddRechnungen={() => setRechnungenDialog({ defaults: { kunde: createRecordUrl(APP_IDS.KUNDEN, top.record.record_id) } })}
+                  onAddRechnungen={perms.canWrite('rechnungen') ? () => setRechnungenDialog({ defaults: { kunde: createRecordUrl(APP_IDS.KUNDEN, top.record.record_id) } }) : undefined}
                 />
               </>
             );
@@ -479,11 +661,13 @@ export function useEntityCrud(data: EntityCrudData, options?: EntityCrudOptions)
                 <LeistungskatalogDetails
                   record={top.record}
                   beraterInnenList={data.beraterInnen}
-                  onOpenBeraterInnen={(r) => detailBeraterInnen(r, true)}
-                  onAddBeraterInnen={() => setBeraterInnenDialog({ defaults: { leistungen: [createRecordUrl(APP_IDS.LEISTUNGSKATALOG, top.record.record_id)] } })}
+                  beraterInnenLeistungenList={data.beraterInnen}
+                  onOpenBeraterInnenLeistungen={(r) => detailBeraterInnen(r, true)}
+                  onAddBeraterInnenLeistungen={perms.canWrite('berater/innen') ? () => setBeraterInnenDialog({ defaults: { leistungen: [createRecordUrl(APP_IDS.LEISTUNGSKATALOG, top.record.record_id)] } }) : undefined}
+                  onPickBeraterInnenLeistungen={perms.canWrite('berater/innen') ? () => setPickLeistungskatalogBeraterInnenLeistungen(top.record.record_id) : undefined}
                   zeiterfassungList={data.zeiterfassung}
                   onOpenZeiterfassung={(r) => detailZeiterfassung(r, true)}
-                  onAddZeiterfassung={() => setZeiterfassungDialog({ defaults: { leistung: createRecordUrl(APP_IDS.LEISTUNGSKATALOG, top.record.record_id) } })}
+                  onAddZeiterfassung={perms.canWrite('zeiterfassung') ? () => setZeiterfassungDialog({ defaults: { leistung: createRecordUrl(APP_IDS.LEISTUNGSKATALOG, top.record.record_id) } }) : undefined}
                 />
               </>
             );
@@ -496,19 +680,25 @@ export function useEntityCrud(data: EntityCrudData, options?: EntityCrudOptions)
                   record={top.record}
                   kundenList={data.kunden}
                   onOpenKunden={(r) => detailKunden(r, true)}
-                  onAddKunden={() => setKundenDialog({ defaults: { laufende_projekte: [createRecordUrl(APP_IDS.PROJEKTE, top.record.record_id)] } })}
                   beraterInnenList={data.beraterInnen}
                   onOpenBeraterInnen={(r) => detailBeraterInnen(r, true)}
-                  onAddBeraterInnen={() => setBeraterInnenDialog({ defaults: { projekte: [createRecordUrl(APP_IDS.PROJEKTE, top.record.record_id)] } })}
+                  beraterInnenProjekteList={data.beraterInnen}
+                  onOpenBeraterInnenProjekte={(r) => detailBeraterInnen(r, true)}
+                  onAddBeraterInnenProjekte={perms.canWrite('berater/innen') ? () => setBeraterInnenDialog({ defaults: { projekte: [createRecordUrl(APP_IDS.PROJEKTE, top.record.record_id)] } }) : undefined}
+                  onPickBeraterInnenProjekte={perms.canWrite('berater/innen') ? () => setPickProjekteBeraterInnenProjekte(top.record.record_id) : undefined}
+                  kundenLaufendeProjekteList={data.kunden}
+                  onOpenKundenLaufendeProjekte={(r) => detailKunden(r, true)}
+                  onAddKundenLaufendeProjekte={perms.canWrite('kunden') ? () => setKundenDialog({ defaults: { laufende_projekte: [createRecordUrl(APP_IDS.PROJEKTE, top.record.record_id)] } }) : undefined}
+                  onPickKundenLaufendeProjekte={perms.canWrite('kunden') ? () => setPickProjekteKundenLaufendeProjekte(top.record.record_id) : undefined}
                   angeboteList={data.angebote}
                   onOpenAngebote={(r) => detailAngebote(r, true)}
-                  onAddAngebote={() => setAngeboteDialog({ defaults: { projekt: createRecordUrl(APP_IDS.PROJEKTE, top.record.record_id) } })}
+                  onAddAngebote={perms.canWrite('angebote') ? () => setAngeboteDialog({ defaults: { projekt: createRecordUrl(APP_IDS.PROJEKTE, top.record.record_id) } }) : undefined}
                   zeiterfassungList={data.zeiterfassung}
                   onOpenZeiterfassung={(r) => detailZeiterfassung(r, true)}
-                  onAddZeiterfassung={() => setZeiterfassungDialog({ defaults: { projekt: createRecordUrl(APP_IDS.PROJEKTE, top.record.record_id) } })}
+                  onAddZeiterfassung={perms.canWrite('zeiterfassung') ? () => setZeiterfassungDialog({ defaults: { projekt: createRecordUrl(APP_IDS.PROJEKTE, top.record.record_id) } }) : undefined}
                   rechnungenList={data.rechnungen}
                   onOpenRechnungen={(r) => detailRechnungen(r, true)}
-                  onAddRechnungen={() => setRechnungenDialog({ defaults: { projekt: createRecordUrl(APP_IDS.PROJEKTE, top.record.record_id) } })}
+                  onAddRechnungen={perms.canWrite('rechnungen') ? () => setRechnungenDialog({ defaults: { projekt: createRecordUrl(APP_IDS.PROJEKTE, top.record.record_id) } }) : undefined}
                 />
               </>
             );
@@ -560,6 +750,16 @@ export function useEntityCrud(data: EntityCrudData, options?: EntityCrudOptions)
           }
           return null;
         }}
+        canEdit={(top) => {
+          if (top.type === 'beraterInnen') return perms.canWrite('berater/innen');
+          if (top.type === 'kunden') return perms.canWrite('kunden');
+          if (top.type === 'leistungskatalog') return perms.canWrite('leistungskatalog');
+          if (top.type === 'projekte') return perms.canWrite('projekte');
+          if (top.type === 'angebote') return perms.canWrite('angebote');
+          if (top.type === 'zeiterfassung') return perms.canWrite('zeiterfassung');
+          if (top.type === 'rechnungen') return perms.canWrite('rechnungen');
+          return true;
+        }}
         onEdit={(top) => {
           overlay.close();
           if (top.type === 'beraterInnen') setBeraterInnenDialog({ editing: top.record, defaults: top.record.fields });
@@ -578,39 +778,46 @@ export function useEntityCrud(data: EntityCrudData, options?: EntityCrudOptions)
     overlay,
     surfaces,
     beraterInnen: {
-      openCreate: (defaults?: BeraterInnenDialogDefaults) => setBeraterInnenDialog({ defaults }),
-      openEdit: (record: BeraterInnen) => setBeraterInnenDialog({ editing: record, defaults: record.fields }),
+      openCreate: (defaults?: BeraterInnenDialogDefaults) => (perms.canWrite('berater/innen') ? setBeraterInnenDialog({ defaults }) : refuse()),
+      openEdit: (record: BeraterInnen) => (perms.canWrite('berater/innen') ? setBeraterInnenDialog({ editing: record, defaults: record.fields }) : refuse()),
       openDetail: (record: BeraterInnen) => detailBeraterInnen(record, false),
+      canWrite: perms.canWrite('berater/innen'),
     },
     kunden: {
-      openCreate: (defaults?: KundenDialogDefaults) => setKundenDialog({ defaults }),
-      openEdit: (record: Kunden) => setKundenDialog({ editing: record, defaults: record.fields }),
+      openCreate: (defaults?: KundenDialogDefaults) => (perms.canWrite('kunden') ? setKundenDialog({ defaults }) : refuse()),
+      openEdit: (record: Kunden) => (perms.canWrite('kunden') ? setKundenDialog({ editing: record, defaults: record.fields }) : refuse()),
       openDetail: (record: Kunden) => detailKunden(record, false),
+      canWrite: perms.canWrite('kunden'),
     },
     leistungskatalog: {
-      openCreate: (defaults?: LeistungskatalogDialogDefaults) => setLeistungskatalogDialog({ defaults }),
-      openEdit: (record: Leistungskatalog) => setLeistungskatalogDialog({ editing: record, defaults: record.fields }),
+      openCreate: (defaults?: LeistungskatalogDialogDefaults) => (perms.canWrite('leistungskatalog') ? setLeistungskatalogDialog({ defaults }) : refuse()),
+      openEdit: (record: Leistungskatalog) => (perms.canWrite('leistungskatalog') ? setLeistungskatalogDialog({ editing: record, defaults: record.fields }) : refuse()),
       openDetail: (record: Leistungskatalog) => detailLeistungskatalog(record, false),
+      canWrite: perms.canWrite('leistungskatalog'),
     },
     projekte: {
-      openCreate: (defaults?: ProjekteDialogDefaults) => setProjekteDialog({ defaults }),
-      openEdit: (record: Projekte) => setProjekteDialog({ editing: record, defaults: record.fields }),
+      openCreate: (defaults?: ProjekteDialogDefaults) => (perms.canWrite('projekte') ? setProjekteDialog({ defaults }) : refuse()),
+      openEdit: (record: Projekte) => (perms.canWrite('projekte') ? setProjekteDialog({ editing: record, defaults: record.fields }) : refuse()),
       openDetail: (record: Projekte) => detailProjekte(record, false),
+      canWrite: perms.canWrite('projekte'),
     },
     angebote: {
-      openCreate: (defaults?: AngeboteDialogDefaults) => setAngeboteDialog({ defaults }),
-      openEdit: (record: Angebote) => setAngeboteDialog({ editing: record, defaults: record.fields }),
+      openCreate: (defaults?: AngeboteDialogDefaults) => (perms.canWrite('angebote') ? setAngeboteDialog({ defaults }) : refuse()),
+      openEdit: (record: Angebote) => (perms.canWrite('angebote') ? setAngeboteDialog({ editing: record, defaults: record.fields }) : refuse()),
       openDetail: (record: Angebote) => detailAngebote(record, false),
+      canWrite: perms.canWrite('angebote'),
     },
     zeiterfassung: {
-      openCreate: (defaults?: ZeiterfassungDialogDefaults) => setZeiterfassungDialog({ defaults }),
-      openEdit: (record: Zeiterfassung) => setZeiterfassungDialog({ editing: record, defaults: record.fields }),
+      openCreate: (defaults?: ZeiterfassungDialogDefaults) => (perms.canWrite('zeiterfassung') ? setZeiterfassungDialog({ defaults }) : refuse()),
+      openEdit: (record: Zeiterfassung) => (perms.canWrite('zeiterfassung') ? setZeiterfassungDialog({ editing: record, defaults: record.fields }) : refuse()),
       openDetail: (record: Zeiterfassung) => detailZeiterfassung(record, false),
+      canWrite: perms.canWrite('zeiterfassung'),
     },
     rechnungen: {
-      openCreate: (defaults?: RechnungenDialogDefaults) => setRechnungenDialog({ defaults }),
-      openEdit: (record: Rechnungen) => setRechnungenDialog({ editing: record, defaults: record.fields }),
+      openCreate: (defaults?: RechnungenDialogDefaults) => (perms.canWrite('rechnungen') ? setRechnungenDialog({ defaults }) : refuse()),
+      openEdit: (record: Rechnungen) => (perms.canWrite('rechnungen') ? setRechnungenDialog({ editing: record, defaults: record.fields }) : refuse()),
       openDetail: (record: Rechnungen) => detailRechnungen(record, false),
+      canWrite: perms.canWrite('rechnungen'),
     },
     enriched: { beraterInnen: enrichedBeraterInnen, kunden: enrichedKunden, leistungskatalog: enrichedLeistungskatalog, projekte: enrichedProjekte, angebote: enrichedAngebote, zeiterfassung: enrichedZeiterfassung, rechnungen: enrichedRechnungen },
   };

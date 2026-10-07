@@ -29,6 +29,7 @@ import type { ComputedContext } from '@/config/form-enhancements/types';
 import { applyFieldOrder, flattenFieldOrder, applyDefaults, evalComputed, numberInputProps, clampNumberValue, classifyComputed, extractApplookupRefs, mergeApplookupRefs, resolveApplookupRef } from '@/config/form-enhancements/types';
 import { formEnhancements, computedDeps, computedApplookupRefs } from '@/config/form-enhancements/Angebote';
 import { AttachmentsSection } from '@/components/AttachmentsSection';
+import { requiredMessage } from '@/lib/journey/messages';
 import { t, appLabel, fieldLabel, lookupLabel, localeTag, CURRENCY } from '@/i18n';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -144,6 +145,8 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
     setCreateKundenInitial(q);
     setCreateKundenOpen(true);
   }
+  // Fields the plan assigns to a tool (empty without a plan).
+  const SYSTEM_ASSIGNED: string[] = [];
   const [showErrors, setShowErrors] = useState(false);
   const REQUIRED_FIELDS = ['angebotsnummer', 'angebotsjahr', 'angebotstyp', 'angebotsdatum'] as const;
   const missingRequired = REQUIRED_FIELDS.filter(k => {
@@ -391,13 +394,13 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="angebotsnummer">{fieldLabel('angebote', 'angebotsnummer')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="angebotsnummer"
-          placeholder="z. B. AG-2024-001"
+          placeholder=""
           value={fields.angebotsnummer ?? ''}
           onChange={e => setFields(f => ({ ...f, angebotsnummer: e.target.value }))}
           required
         />
         {showErrors && !fields.angebotsnummer && (
-          <p className="text-xs text-destructive mt-1">{t('required_hint')}</p>
+          <p className="text-xs text-destructive mt-1" role="alert">{requiredMessage('angebote', 'angebotsnummer')}</p>
         )}
       </div>
     ),
@@ -406,13 +409,13 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="angebotsjahr">{fieldLabel('angebote', 'angebotsjahr')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="angebotsjahr"
-          placeholder="z. B. 2024"
+          placeholder=""
           value={fields.angebotsjahr ?? ''}
           onChange={e => setFields(f => ({ ...f, angebotsjahr: e.target.value }))}
           required
         />
         {showErrors && !fields.angebotsjahr && (
-          <p className="text-xs text-destructive mt-1">{t('required_hint')}</p>
+          <p className="text-xs text-destructive mt-1" role="alert">{requiredMessage('angebote', 'angebotsjahr')}</p>
         )}
       </div>
     ),
@@ -487,7 +490,7 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
           </button>
         </div>
         {showErrors && !fields.angebotstyp && (
-          <p className="text-xs text-destructive mt-1">{t('required_hint')}</p>
+          <p className="text-xs text-destructive mt-1" role="alert">{requiredMessage('angebote', 'angebotstyp')}</p>
         )}
       </div>
     ),
@@ -496,14 +499,14 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="angebotsdatum">{fieldLabel('angebote', 'angebotsdatum')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <DatePicker
           id="angebotsdatum"
-          placeholder="Heute, oder wann?"
+          placeholder=""
           mode="date"
           value={fields.angebotsdatum ?? null}
           onChange={v => setFields(f => ({ ...f, angebotsdatum: v ?? undefined }))}
           required
         />
         {showErrors && !fields.angebotsdatum && (
-          <p className="text-xs text-destructive mt-1">{t('required_hint')}</p>
+          <p className="text-xs text-destructive mt-1" role="alert">{requiredMessage('angebote', 'angebotsdatum')}</p>
         )}
       </div>
     ),
@@ -512,7 +515,7 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="gueltig_bis">{fieldLabel('angebote', 'gueltig_bis')}</Label>
         <DatePicker
           id="gueltig_bis"
-          placeholder="Bis wann gültig?"
+          placeholder=""
           mode="date"
           value={fields.gueltig_bis ?? null}
           onChange={v => setFields(f => ({ ...f, gueltig_bis: v ?? undefined }))}
@@ -524,7 +527,7 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="zeitrahmen_anfang">{fieldLabel('angebote', 'zeitrahmen_anfang')}</Label>
         <DatePicker
           id="zeitrahmen_anfang"
-          placeholder="Wann startet?"
+          placeholder=""
           mode="date"
           value={fields.zeitrahmen_anfang ?? null}
           onChange={v => setFields(f => ({ ...f, zeitrahmen_anfang: v ?? undefined }))}
@@ -536,7 +539,7 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="zeitrahmen_ende">{fieldLabel('angebote', 'zeitrahmen_ende')}</Label>
         <DatePicker
           id="zeitrahmen_ende"
-          placeholder="Wann endet?"
+          placeholder=""
           mode="date"
           value={fields.zeitrahmen_ende ?? null}
           onChange={v => setFields(f => ({ ...f, zeitrahmen_ende: v ?? undefined }))}
@@ -548,7 +551,7 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="dauer">{fieldLabel('angebote', 'dauer')}</Label>
         <Input
           id="dauer"
-          placeholder="z. B. 3 Monate, 40 Stunden"
+          placeholder=""
           value={fields.dauer ?? ''}
           onChange={e => setFields(f => ({ ...f, dauer: e.target.value }))}
         />
@@ -561,7 +564,7 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
           value={lookupKey(fields.kostentyp) ?? ''}
           onValueChange={v => setFields(f => ({ ...f, kostentyp: v === 'none' ? undefined : v as any }))}
         >
-          <SelectTrigger id="kostentyp" className="max-sm:h-11"><SelectValue placeholder="z. B. Einmalig, Monatlich" /></SelectTrigger>
+          <SelectTrigger id="kostentyp" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="einmalig">{lookupLabel('angebote', 'kostentyp', 'einmalig') ?? 'Einmalig'}</SelectItem>
@@ -580,9 +583,10 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Input
           id="kostenbetrag"
           type="number"
+          inputMode="decimal"
           step="any"
           {...numberInputProps(formEnhancements, 'kostenbetrag')}
-          placeholder="z. B. 5000"
+          placeholder=""
           value={fields.kostenbetrag !== undefined ? fields.kostenbetrag : (computedValues['kostenbetrag'] ?? '')}
           onChange={e => setFields(f => ({ ...f, kostenbetrag: clampNumberValue(formEnhancements, 'kostenbetrag', e.target.value) }))}
         />
@@ -593,7 +597,7 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="kosten_beschreibung">{fieldLabel('angebote', 'kosten_beschreibung')}</Label>
         <Textarea
           id="kosten_beschreibung"
-          placeholder="Was kostet wie viel..."
+          placeholder=""
           value={fields.kosten_beschreibung ?? ''}
           onChange={e => setFields(f => ({ ...f, kosten_beschreibung: e.target.value }))}
           rows={3}
@@ -605,7 +609,7 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="angebotsbeschreibung">{fieldLabel('angebote', 'angebotsbeschreibung')}</Label>
         <Textarea
           id="angebotsbeschreibung"
-          placeholder="Was wird angeboten..."
+          placeholder=""
           value={fields.angebotsbeschreibung ?? ''}
           onChange={e => setFields(f => ({ ...f, angebotsbeschreibung: e.target.value }))}
           rows={3}
@@ -617,7 +621,7 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="leistungspositionen">{fieldLabel('angebote', 'leistungspositionen')}</Label>
         <Textarea
           id="leistungspositionen"
-          placeholder="Eine Position pro Zeile"
+          placeholder=""
           value={fields.leistungspositionen ?? ''}
           onChange={e => setFields(f => ({ ...f, leistungspositionen: e.target.value }))}
           rows={3}
@@ -629,7 +633,7 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="anmerkungen">{fieldLabel('angebote', 'anmerkungen')}</Label>
         <Textarea
           id="anmerkungen"
-          placeholder="Besonderheiten, Hinweise..."
+          placeholder=""
           value={fields.anmerkungen ?? ''}
           onChange={e => setFields(f => ({ ...f, anmerkungen: e.target.value }))}
           rows={3}
@@ -711,7 +715,7 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="projekt">{fieldLabel('angebote', 'projekt')}</Label>
         <Combobox
           id="projekt"
-          placeholder="Zugeordnetes Projekt"
+          placeholder=""
           items={projekteListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.projektkennung ?? r.record_id),
@@ -728,7 +732,7 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="kunde">{fieldLabel('angebote', 'kunde')}</Label>
         <Combobox
           id="kunde"
-          placeholder="Für welchen Kunden?"
+          placeholder=""
           items={kundenListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.kundenname ?? r.record_id),
@@ -1014,9 +1018,25 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
               const renderField = (k: string) => {
                 const inlineHints = computedLayout.anchors[k] ?? [];
                 const refs = applookupRefs[k] ?? [];
+                // A field the plan gives to a TOOL. On CREATE it is not shown
+                // at all — the value does not exist yet and typing one only
+                // gets overwritten. On EDIT it stays a normal input with a
+                // note: when a tool could not compose its value (a missing
+                // ingredient), this is the only place to repair the record.
+                if (SYSTEM_ASSIGNED.includes(k) && !recordId) {
+                  return (
+                    <div key={k} className="space-y-1.5 min-w-0">
+                      <Label>{fieldLabel('angebote', k)}</Label>
+                      <p className="text-sm text-muted-foreground">{t('assigned_by_system')}</p>
+                    </div>
+                  );
+                }
                 return (
                   <div key={k} className="space-y-1.5 min-w-0">
                     {fieldBlocks[k]}
+                    {SYSTEM_ASSIGNED.includes(k) && (
+                      <p className="text-xs text-muted-foreground">{t('assigned_by_system')}</p>
+                    )}
                     {refs.map(({ lookupKey }) => {
                       // Show the live numeric value the formula will pull from
                       // the selected lookup target (e.g. "Monatspreis: 34,90 €"

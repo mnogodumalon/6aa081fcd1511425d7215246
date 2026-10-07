@@ -198,9 +198,6 @@ export default function StundenErfassenPage() {
             status: b.fields.status
               ? { key: b.fields.status.key, label: b.fields.status.label }
               : undefined,
-            stats: b.fields.stunden_aktueller_monat != null
-              ? [{ label: tx('Std. diesen Monat'), value: String(b.fields.stunden_aktueller_monat) }]
-              : undefined,
             icon: <IconUser size={20} className="text-primary" />,
           }))}
           onSelect={(id) => {

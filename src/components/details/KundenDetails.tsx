@@ -6,35 +6,41 @@ import {
 } from '@/components/widgets/RecordView';
 import { t, appLabel, fieldLabel } from '@/i18n';
 import { SatelliteSection } from '@/components/SatelliteSection';
+import { usePermissions } from '@/lib/permissions';
 
 export interface KundenDetailsProps {
   /** Der Record — enriched oder roh; alle Felder werden hier gerendert. */
   record: Kunden;
-  /** Liste für Projekte-Zuordnungen und Satelliten. */
+  /** N:1-Ziel „Projekte": volle Liste (Hook-Array) — der Block löst Name + Schlüsselfelder selbst auf. */
   projekteList: Projekte[];
-  /** Zeilen-Klick → overlay.push auf das Projekte-Detail. */
-  onOpenProjekte: (record: Projekte) => void;
+  /** Reserviert — Projekte ist hier nur über ein Mehrfach-Feld verknüpft (Text-Join, keine Einzel-Relation); Übergabe erlaubt, aber ohne Wirkung. */
+  onOpenProjekte?: (record: Projekte) => void;
+  /** 1:N „Projekte" (kunde): VOLLE Liste — der Block filtert auf diesen Record. */
+  projekteKundeList: Projekte[];
+  /** Zeilen-Klick → overlay.push auf das Projekte-Detail (nie der Edit-Dialog). */
+  onOpenProjekteKunde: (record: Projekte) => void;
   /** Kontextuelles „+": öffnet den Projekte-Dialog mit diesem Record vorgesetzt. */
-  onAddProjekte: () => void;
+  onAddProjekteKunde?: () => void;
   /** 1:N „Angebote" (kunde): VOLLE Liste — der Block filtert auf diesen Record. */
   angeboteList: Angebote[];
   /** Zeilen-Klick → overlay.push auf das Angebote-Detail (nie der Edit-Dialog). */
   onOpenAngebote: (record: Angebote) => void;
   /** Kontextuelles „+": öffnet den Angebote-Dialog mit diesem Record vorgesetzt. */
-  onAddAngebote: () => void;
+  onAddAngebote?: () => void;
   /** 1:N „Rechnungen" (kunde): VOLLE Liste — der Block filtert auf diesen Record. */
   rechnungenList: Rechnungen[];
   /** Zeilen-Klick → overlay.push auf das Rechnungen-Detail (nie der Edit-Dialog). */
   onOpenRechnungen: (record: Rechnungen) => void;
   /** Kontextuelles „+": öffnet den Rechnungen-Dialog mit diesem Record vorgesetzt. */
-  onAddRechnungen: () => void;
+  onAddRechnungen?: () => void;
 }
 
 export function KundenDetails({
   record,
   projekteList,
-  onOpenProjekte,
-  onAddProjekte,
+  projekteKundeList,
+  onOpenProjekteKunde,
+  onAddProjekteKunde,
   angeboteList,
   onOpenAngebote,
   onAddAngebote,
@@ -42,6 +48,8 @@ export function KundenDetails({
   onOpenRechnungen,
   onAddRechnungen,
 }: KundenDetailsProps) {
+  // attachments are a write to this record — read-only without the platform right
+  const perms = usePermissions();
   return (
     <>
       <RecordSection title={t('details')} cols={2}>
@@ -71,11 +79,11 @@ export function KundenDetails({
       </RecordSection>
 
       <SatelliteSection
-        title={appLabel('projekte')}
-        items={projekteList.filter(r => extractRecordId(r.fields.kunde) === record.record_id)}
+        title={`${appLabel('projekte')} · ${fieldLabel('projekte', 'kunde')}`}
+        items={projekteKundeList.filter(r => extractRecordId(r.fields.kunde) === record.record_id)}
         map={r => ({ name: r.fields.projektkennung ?? appLabel('projekte'), meta: r.fields.projektende })}
-        onOpen={onOpenProjekte}
-        onAdd={onAddProjekte}
+        onOpen={onOpenProjekteKunde}
+        onAdd={onAddProjekteKunde}
         getKey={r => r.record_id}
       />
 
@@ -97,7 +105,7 @@ export function KundenDetails({
         getKey={r => r.record_id}
       />
 
-      <RecordAttachments appId={APP_IDS.KUNDEN} recordId={record.record_id} />
+      <RecordAttachments appId={APP_IDS.KUNDEN} recordId={record.record_id} readOnly={!perms.canWrite('kunden')} />
     </>
   );
 }

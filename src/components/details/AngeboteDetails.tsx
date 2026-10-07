@@ -6,6 +6,7 @@ import {
 } from '@/components/widgets/RecordView';
 import { t, appLabel, fieldLabel } from '@/i18n';
 import { MediaThumbnail } from '@/components/widgets/MediaViewer';
+import { usePermissions } from '@/lib/permissions';
 
 export interface AngeboteDetailsProps {
   /** Der Record — enriched oder roh; alle Felder werden hier gerendert. */
@@ -27,6 +28,8 @@ export function AngeboteDetails({
   kundenList,
   onOpenKunden,
 }: AngeboteDetailsProps) {
+  // attachments are a write to this record — read-only without the platform right
+  const perms = usePermissions();
   const projektTarget = projekteList.find(r => r.record_id === extractRecordId(record.fields.projekt));
   const kundeTarget = kundenList.find(r => r.record_id === extractRecordId(record.fields.kunde));
   return (
@@ -69,7 +72,7 @@ export function AngeboteDetails({
         />
       </RecordSection>
 
-      <RecordAttachments appId={APP_IDS.ANGEBOTE} recordId={record.record_id} />
+      <RecordAttachments appId={APP_IDS.ANGEBOTE} recordId={record.record_id} readOnly={!perms.canWrite('angebote')} />
     </>
   );
 }

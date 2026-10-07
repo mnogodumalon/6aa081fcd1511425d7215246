@@ -55,12 +55,6 @@ export interface BeraterInnen {
     stundensatz?: number;
     sonstiges_1?: string;
     sonstiges_2?: string;
-    stunden_aktueller_monat?: number;
-    stunden_aktuelles_quartal?: number;
-    stunden_aktuelles_jahr?: number;
-    stunden_letzter_monat?: number;
-    stunden_letztes_quartal?: number;
-    stunden_letztes_jahr?: number;
     leistungen?: RecordUrl[];
     projekte?: RecordUrl[];
   };
@@ -237,7 +231,7 @@ export interface Rechnungen {
 }
 
 export const APP_IDS = {
-  'BERATER/INNEN': '6aa081c0c506683d75c76a89',
+  BERATERINNEN: '6aa081c0c506683d75c76a89',
   KUNDEN: '6aa081c7132fedb98dca2728',
   LEISTUNGSKATALOG: '6aa081c82238262fa0d4700e',
   PROJEKTE: '6aa081c907043fa96898c8ca',
@@ -302,12 +296,6 @@ export const FIELD_TYPES: Record<string, Record<string, string>> = {
     'stundensatz': 'number',
     'sonstiges_1': 'string/textarea',
     'sonstiges_2': 'string/textarea',
-    'stunden_aktueller_monat': 'number',
-    'stunden_aktuelles_quartal': 'number',
-    'stunden_aktuelles_jahr': 'number',
-    'stunden_letzter_monat': 'number',
-    'stunden_letztes_quartal': 'number',
-    'stunden_letztes_jahr': 'number',
     'leistungen': 'multipleapplookup/select',
     'projekte': 'multipleapplookup/select',
   },

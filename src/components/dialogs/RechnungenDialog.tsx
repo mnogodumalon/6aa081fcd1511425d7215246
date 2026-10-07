@@ -30,6 +30,7 @@ import type { ComputedContext } from '@/config/form-enhancements/types';
 import { applyFieldOrder, flattenFieldOrder, applyDefaults, evalComputed, numberInputProps, clampNumberValue, classifyComputed, extractApplookupRefs, mergeApplookupRefs, resolveApplookupRef } from '@/config/form-enhancements/types';
 import { formEnhancements, computedDeps, computedApplookupRefs } from '@/config/form-enhancements/Rechnungen';
 import { AttachmentsSection } from '@/components/AttachmentsSection';
+import { requiredMessage } from '@/lib/journey/messages';
 import { t, appLabel, fieldLabel, lookupLabel, localeTag, CURRENCY } from '@/i18n';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -79,7 +80,7 @@ const NORMALIZE_LOOKUPS: Record<string, readonly { key: string; label: string }[
 const NORMALIZE_APPLOOKUPS: Record<string, string> = {
   kunde: APP_IDS.KUNDEN,
   projekt: APP_IDS.PROJEKTE,
-  berater: APP_IDS['BERATER/INNEN'],
+  berater: APP_IDS.BERATERINNEN,
 };
 function normalizeDefaults(values: Record<string, unknown>): Record<string, unknown> {
   const out: Record<string, unknown> = { ...values };
@@ -165,6 +166,8 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
     setCreateBeraterInnenInitial(q);
     setCreateBeraterInnenOpen(true);
   }
+  // Fields the plan assigns to a tool (empty without a plan).
+  const SYSTEM_ASSIGNED: string[] = [];
   const [showErrors, setShowErrors] = useState(false);
   const REQUIRED_FIELDS = ['rechnungsnummer', 'rechnungsdatum', 'rechnungsstatus', 'gesamtbetrag', 'kunde', 'projekt'] as const;
   const missingRequired = REQUIRED_FIELDS.filter(k => {
@@ -358,7 +361,7 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
           const beraterUrls = (beraterNames as unknown[])
             .map(n => beraterInnenList.find(r => matchName(String(n), [[r.fields.vorname ?? '', r.fields.nachname ?? ''].filter(Boolean).join(' ')])))
             .filter((r): r is NonNullable<typeof r> => Boolean(r))
-            .map(r => createRecordUrl(APP_IDS['BERATER/INNEN'], r.record_id));
+            .map(r => createRecordUrl(APP_IDS.BERATERINNEN, r.record_id));
           if (beraterUrls.length > 0) merged['berater'] = beraterUrls;
         }
         return merged as Partial<Rechnungen['fields']>;
@@ -422,13 +425,13 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
         <Label htmlFor="rechnungsnummer">{fieldLabel('rechnungen', 'rechnungsnummer')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="rechnungsnummer"
-          placeholder="z. B. RE-2024-001"
+          placeholder=""
           value={fields.rechnungsnummer ?? ''}
           onChange={e => setFields(f => ({ ...f, rechnungsnummer: e.target.value }))}
           required
         />
         {showErrors && !fields.rechnungsnummer && (
-          <p className="text-xs text-destructive mt-1">{t('required_hint')}</p>
+          <p className="text-xs text-destructive mt-1" role="alert">{requiredMessage('rechnungen', 'rechnungsnummer')}</p>
         )}
       </div>
     ),
@@ -437,14 +440,14 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
         <Label htmlFor="rechnungsdatum">{fieldLabel('rechnungen', 'rechnungsdatum')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <DatePicker
           id="rechnungsdatum"
-          placeholder="Heute, oder wann?"
+          placeholder=""
           mode="date"
           value={fields.rechnungsdatum ?? null}
           onChange={v => setFields(f => ({ ...f, rechnungsdatum: v ?? undefined }))}
           required
         />
         {showErrors && !fields.rechnungsdatum && (
-          <p className="text-xs text-destructive mt-1">{t('required_hint')}</p>
+          <p className="text-xs text-destructive mt-1" role="alert">{requiredMessage('rechnungen', 'rechnungsdatum')}</p>
         )}
       </div>
     ),
@@ -453,7 +456,7 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
         <Label htmlFor="faelligkeitsdatum">{fieldLabel('rechnungen', 'faelligkeitsdatum')}</Label>
         <DatePicker
           id="faelligkeitsdatum"
-          placeholder="Zahlungsfrist wählen"
+          placeholder=""
           mode="date"
           value={fields.faelligkeitsdatum ?? null}
           onChange={v => setFields(f => ({ ...f, faelligkeitsdatum: v ?? undefined }))}
@@ -518,7 +521,7 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
           </button>
         </div>
         {showErrors && !fields.rechnungsstatus && (
-          <p className="text-xs text-destructive mt-1">{t('required_hint')}</p>
+          <p className="text-xs text-destructive mt-1" role="alert">{requiredMessage('rechnungen', 'rechnungsstatus')}</p>
         )}
       </div>
     ),
@@ -529,7 +532,7 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
           value={lookupKey(fields.abrechnungsmonat) ?? ''}
           onValueChange={v => setFields(f => ({ ...f, abrechnungsmonat: v === 'none' ? undefined : v as any }))}
         >
-          <SelectTrigger id="abrechnungsmonat" className="max-sm:h-11"><SelectValue placeholder="z. B. Januar, Februar" /></SelectTrigger>
+          <SelectTrigger id="abrechnungsmonat" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="januar">{lookupLabel('rechnungen', 'abrechnungsmonat', 'januar') ?? 'Januar'}</SelectItem>
@@ -553,7 +556,7 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
         <Label htmlFor="abrechnungsjahr">{fieldLabel('rechnungen', 'abrechnungsjahr')}</Label>
         <Input
           id="abrechnungsjahr"
-          placeholder="z. B. 2024"
+          placeholder=""
           value={fields.abrechnungsjahr ?? ''}
           onChange={e => setFields(f => ({ ...f, abrechnungsjahr: e.target.value }))}
         />
@@ -565,9 +568,10 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
         <Input
           id="nettobetrag"
           type="number"
+          inputMode="decimal"
           step="any"
           {...numberInputProps(formEnhancements, 'nettobetrag')}
-          placeholder="z. B. 10000"
+          placeholder=""
           value={fields.nettobetrag !== undefined ? fields.nettobetrag : (computedValues['nettobetrag'] ?? '')}
           onChange={e => setFields(f => ({ ...f, nettobetrag: clampNumberValue(formEnhancements, 'nettobetrag', e.target.value) }))}
         />
@@ -579,9 +583,10 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
         <Input
           id="mehrwertsteuer"
           type="number"
+          inputMode="decimal"
           step="any"
           {...numberInputProps(formEnhancements, 'mehrwertsteuer')}
-          placeholder="z. B. 19"
+          placeholder=""
           value={fields.mehrwertsteuer !== undefined ? fields.mehrwertsteuer : (computedValues['mehrwertsteuer'] ?? '')}
           onChange={e => setFields(f => ({ ...f, mehrwertsteuer: clampNumberValue(formEnhancements, 'mehrwertsteuer', e.target.value) }))}
         />
@@ -593,14 +598,15 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
         <Input
           id="gesamtbetrag"
           type="number"
+          inputMode="decimal"
           step="any"
           {...numberInputProps(formEnhancements, 'gesamtbetrag')}
-          placeholder="Wird berechnet, ggf. überschreiben"
+          placeholder=""
           value={fields.gesamtbetrag !== undefined ? fields.gesamtbetrag : (computedValues['gesamtbetrag'] ?? '')}
           onChange={e => setFields(f => ({ ...f, gesamtbetrag: clampNumberValue(formEnhancements, 'gesamtbetrag', e.target.value) }))}
         />
         {showErrors && !fields.gesamtbetrag && (
-          <p className="text-xs text-destructive mt-1">{t('required_hint')}</p>
+          <p className="text-xs text-destructive mt-1" role="alert">{requiredMessage('rechnungen', 'gesamtbetrag')}</p>
         )}
       </div>
     ),
@@ -609,7 +615,7 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
         <Label htmlFor="zahlungseingang">{fieldLabel('rechnungen', 'zahlungseingang')}</Label>
         <DatePicker
           id="zahlungseingang"
-          placeholder="Wenn bezahlt wählen"
+          placeholder=""
           mode="date"
           value={fields.zahlungseingang ?? null}
           onChange={v => setFields(f => ({ ...f, zahlungseingang: v ?? undefined }))}
@@ -621,7 +627,7 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
         <Label htmlFor="leistungspositionen">{fieldLabel('rechnungen', 'leistungspositionen')}</Label>
         <Textarea
           id="leistungspositionen"
-          placeholder="Eine Position pro Zeile"
+          placeholder=""
           value={fields.leistungspositionen ?? ''}
           onChange={e => setFields(f => ({ ...f, leistungspositionen: e.target.value }))}
           rows={3}
@@ -633,7 +639,7 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
         <Label htmlFor="notizen">{fieldLabel('rechnungen', 'notizen')}</Label>
         <Textarea
           id="notizen"
-          placeholder="Besonderheiten, Hinweise..."
+          placeholder=""
           value={fields.notizen ?? ''}
           onChange={e => setFields(f => ({ ...f, notizen: e.target.value }))}
           rows={3}
@@ -715,7 +721,7 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
         <Label htmlFor="kunde">{fieldLabel('rechnungen', 'kunde')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Combobox
           id="kunde"
-          placeholder="Welcher Kunde?"
+          placeholder=""
           items={kundenListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.kundenname ?? r.record_id),
@@ -726,7 +732,7 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
           createLabel={t('create_in', { entity: appLabel('kunden') })}
         />
         {showErrors && !fields.kunde && (
-          <p className="text-xs text-destructive mt-1">{t('required_hint')}</p>
+          <p className="text-xs text-destructive mt-1" role="alert">{requiredMessage('rechnungen', 'kunde')}</p>
         )}
       </div>
     ),
@@ -735,7 +741,7 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
         <Label htmlFor="projekt">{fieldLabel('rechnungen', 'projekt')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Combobox
           id="projekt"
-          placeholder="Zugeordnetes Projekt"
+          placeholder=""
           items={projekteListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.projektkennung ?? r.record_id),
@@ -746,7 +752,7 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
           createLabel={t('create_in', { entity: appLabel('projekte') })}
         />
         {showErrors && !fields.projekt && (
-          <p className="text-xs text-destructive mt-1">{t('required_hint')}</p>
+          <p className="text-xs text-destructive mt-1" role="alert">{requiredMessage('rechnungen', 'projekt')}</p>
         )}
       </div>
     ),
@@ -755,13 +761,13 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
         <Label htmlFor="berater">{fieldLabel('rechnungen', 'berater')}</Label>
         <MultiCombobox
           id="berater"
-          placeholder="Beteiligte Berater/innen"
+          placeholder=""
           items={beraterInnenListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.nachname ?? r.record_id),
           }))}
           values={extractRecordIds(fields.berater)}
-          onChange={ids => setFields(f => ({ ...f, berater: ids.length ? ids.map(id => createRecordUrl(APP_IDS['BERATER/INNEN'], id)) as any : undefined }))}
+          onChange={ids => setFields(f => ({ ...f, berater: ids.length ? ids.map(id => createRecordUrl(APP_IDS.BERATERINNEN, id)) as any : undefined }))}
           onCreateNew={(q) => openCreateBeraterInnen("berater", q)}
           createLabel={t('create_in', { entity: appLabel('berater/innen') })}
         />
@@ -787,7 +793,7 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
   // eine Map { lookupKey: label } für ALLE Felder des Target-Schemas. Wird
   // beim Render-Walk gefiltert auf die in der computed-Formel tatsächlich
   // referenzierten lookupKeys (siehe applookupRefs unten).
-  const APPLOOKUP_LABELS: Record<string, Record<string, string>> = {"kunde": {"kundenname": "Name / Firmenname", "kundentyp": "Kundentyp", "email": "E-Mail", "telefon": "Telefon", "strasse": "Straße", "hausnummer": "Hausnummer", "plz": "Postleitzahl", "ort": "Ort", "re_strasse": "Rechnungsstraße", "re_hausnummer": "Rechnungs-Hausnummer", "re_plz": "Rechnungs-Postleitzahl", "re_ort": "Rechnungs-Ort", "anlagedatum": "Anlagedatum", "ap_titel": "Titel Ansprechpartner", "ap_vorname": "Vorname Ansprechpartner", "ap_nachname": "Nachname Ansprechpartner", "ap_email": "E-Mail Ansprechpartner", "ap_telefon": "Telefon Ansprechpartner", "bevorzugte_kontaktart": "Bevorzugte Kontaktart", "letzter_kontakt_datum": "Datum letzter Kontakt", "letzter_kontakt_ansprechpartner": "Ansprechpartner beim letzten Kontakt", "notizen": "Notizen", "laufende_projekte": "Aktuell laufende Projekte"}, "projekt": {"projektkennung": "Projektkennung", "projektnummer": "Projektnummer", "projektart": "Projektart", "projektstart_jahr": "Startjahr", "projektstart_monat": "Startmonat", "status": "Projektstatus", "ansprechpartner_kunde": "Ansprechpartner beim Kunden", "letzter_schritt": "Letzter Schritt / aktueller Stand", "projektende": "Geplantes Projektende", "notizen": "Notizen", "kunde": "Kunde", "projektleitung": "Projektleitung"}, "berater": {"nachname": "Nachname", "vorname": "Vorname", "titel": "Titel (optional)", "strasse": "Straße", "hausnummer": "Hausnummer", "plz": "Postleitzahl", "ort": "Ort", "email_beruflich": "E-Mail (beruflich)", "email_privat": "E-Mail (privat)", "telefon": "Telefon", "einstiegsdatum": "Einstiegsdatum", "status": "Status", "stundensatz": "Stundensatz (€/h)", "sonstiges_1": "Sonstige Anmerkungen (1)", "sonstiges_2": "Sonstige Anmerkungen (2)", "stunden_aktueller_monat": "Gebuchte Stunden – aktueller Monat", "stunden_aktuelles_quartal": "Gebuchte Stunden – aktuelles Quartal", "stunden_aktuelles_jahr": "Gebuchte Stunden – aktuelles Jahr", "stunden_letzter_monat": "Gebuchte Stunden – letzter Monat", "stunden_letztes_quartal": "Gebuchte Stunden – letztes Quartal", "stunden_letztes_jahr": "Gebuchte Stunden – letztes Jahr", "leistungen": "Erbringbare Leistungen", "projekte": "Aktuell zugewiesene Projekte"}};
+  const APPLOOKUP_LABELS: Record<string, Record<string, string>> = {"kunde": {"kundenname": "Name / Firmenname", "kundentyp": "Kundentyp", "email": "E-Mail", "telefon": "Telefon", "strasse": "Straße", "hausnummer": "Hausnummer", "plz": "Postleitzahl", "ort": "Ort", "re_strasse": "Rechnungsstraße", "re_hausnummer": "Rechnungs-Hausnummer", "re_plz": "Rechnungs-Postleitzahl", "re_ort": "Rechnungs-Ort", "anlagedatum": "Anlagedatum", "ap_titel": "Titel Ansprechpartner", "ap_vorname": "Vorname Ansprechpartner", "ap_nachname": "Nachname Ansprechpartner", "ap_email": "E-Mail Ansprechpartner", "ap_telefon": "Telefon Ansprechpartner", "bevorzugte_kontaktart": "Bevorzugte Kontaktart", "letzter_kontakt_datum": "Datum letzter Kontakt", "letzter_kontakt_ansprechpartner": "Ansprechpartner beim letzten Kontakt", "notizen": "Notizen", "laufende_projekte": "Aktuell laufende Projekte"}, "projekt": {"projektkennung": "Projektkennung", "projektnummer": "Projektnummer", "projektart": "Projektart", "projektstart_jahr": "Startjahr", "projektstart_monat": "Startmonat", "status": "Projektstatus", "ansprechpartner_kunde": "Ansprechpartner beim Kunden", "letzter_schritt": "Letzter Schritt / aktueller Stand", "projektende": "Geplantes Projektende", "notizen": "Notizen", "kunde": "Kunde", "projektleitung": "Projektleitung"}, "berater": {"nachname": "Nachname", "vorname": "Vorname", "titel": "Titel (optional)", "strasse": "Straße", "hausnummer": "Hausnummer", "plz": "Postleitzahl", "ort": "Ort", "email_beruflich": "E-Mail (beruflich)", "email_privat": "E-Mail (privat)", "telefon": "Telefon", "einstiegsdatum": "Einstiegsdatum", "status": "Status", "stundensatz": "Stundensatz (€/h)", "sonstiges_1": "Sonstige Anmerkungen (1)", "sonstiges_2": "Sonstige Anmerkungen (2)", "leistungen": "Erbringbare Leistungen", "projekte": "Aktuell zugewiesene Projekte"}};
   const inputFields = useMemo(() => flattenFieldOrder(orderedFields), [orderedFieldsKey]);
   const backendFieldSet = useMemo(() => new Set(inputFields), [inputFields.join(',')]);
   const virtualComputed = useMemo(
@@ -1041,9 +1047,25 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
               const renderField = (k: string) => {
                 const inlineHints = computedLayout.anchors[k] ?? [];
                 const refs = applookupRefs[k] ?? [];
+                // A field the plan gives to a TOOL. On CREATE it is not shown
+                // at all — the value does not exist yet and typing one only
+                // gets overwritten. On EDIT it stays a normal input with a
+                // note: when a tool could not compose its value (a missing
+                // ingredient), this is the only place to repair the record.
+                if (SYSTEM_ASSIGNED.includes(k) && !recordId) {
+                  return (
+                    <div key={k} className="space-y-1.5 min-w-0">
+                      <Label>{fieldLabel('rechnungen', k)}</Label>
+                      <p className="text-sm text-muted-foreground">{t('assigned_by_system')}</p>
+                    </div>
+                  );
+                }
                 return (
                   <div key={k} className="space-y-1.5 min-w-0">
                     {fieldBlocks[k]}
+                    {SYSTEM_ASSIGNED.includes(k) && (
+                      <p className="text-xs text-muted-foreground">{t('assigned_by_system')}</p>
+                    )}
                     {refs.map(({ lookupKey }) => {
                       // Show the live numeric value the formula will pull from
                       // the selected lookup target (e.g. "Monatspreis: 34,90 €"
@@ -1202,7 +1224,7 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
           if (result?.id) {
             const newRec = { record_id: result.id, fields: newFields } as unknown as BeraterInnen;
             setExtraBeraterInnen(prev => [...prev, newRec]);
-            const url = createRecordUrl(APP_IDS['BERATER/INNEN'], result.id);
+            const url = createRecordUrl(APP_IDS.BERATERINNEN, result.id);
             setFields(prev => ({ ...prev, [createBeraterInnenField]: url } as any));
           }
           setCreateBeraterInnenOpen(false);

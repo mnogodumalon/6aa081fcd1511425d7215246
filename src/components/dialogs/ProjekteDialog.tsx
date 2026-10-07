@@ -29,6 +29,7 @@ import type { ComputedContext } from '@/config/form-enhancements/types';
 import { applyFieldOrder, flattenFieldOrder, applyDefaults, evalComputed, numberInputProps, clampNumberValue, classifyComputed, extractApplookupRefs, mergeApplookupRefs, resolveApplookupRef } from '@/config/form-enhancements/types';
 import { formEnhancements, computedDeps, computedApplookupRefs } from '@/config/form-enhancements/Projekte';
 import { AttachmentsSection } from '@/components/AttachmentsSection';
+import { requiredMessage } from '@/lib/journey/messages';
 import { t, appLabel, fieldLabel, lookupLabel, localeTag, CURRENCY } from '@/i18n';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -77,7 +78,7 @@ const NORMALIZE_LOOKUPS: Record<string, readonly { key: string; label: string }[
 };
 const NORMALIZE_APPLOOKUPS: Record<string, string> = {
   kunde: APP_IDS.KUNDEN,
-  projektleitung: APP_IDS['BERATER/INNEN'],
+  projektleitung: APP_IDS.BERATERINNEN,
 };
 function normalizeDefaults(values: Record<string, unknown>): Record<string, unknown> {
   const out: Record<string, unknown> = { ...values };
@@ -146,6 +147,8 @@ export function ProjekteDialog({ open, onClose, onSubmit, defaultValues, recordI
     setCreateBeraterInnenInitial(q);
     setCreateBeraterInnenOpen(true);
   }
+  // Fields the plan assigns to a tool (empty without a plan).
+  const SYSTEM_ASSIGNED: string[] = [];
   const [showErrors, setShowErrors] = useState(false);
   const REQUIRED_FIELDS = ['projektkennung', 'projektnummer', 'projektart', 'projektstart_jahr', 'status', 'kunde'] as const;
   const missingRequired = REQUIRED_FIELDS.filter(k => {
@@ -330,7 +333,7 @@ export function ProjekteDialog({ open, onClose, onSubmit, defaultValues, recordI
         const projektleitungName = raw['projektleitung'] as string | null;
         if (projektleitungName) {
           const projektleitungMatch = beraterInnenList.find(r => matchName(projektleitungName!, [[r.fields.vorname ?? '', r.fields.nachname ?? ''].filter(Boolean).join(' ')]));
-          if (projektleitungMatch) merged['projektleitung'] = createRecordUrl(APP_IDS['BERATER/INNEN'], projektleitungMatch.record_id);
+          if (projektleitungMatch) merged['projektleitung'] = createRecordUrl(APP_IDS.BERATERINNEN, projektleitungMatch.record_id);
         }
         return merged as Partial<Projekte['fields']>;
       });
@@ -383,13 +386,13 @@ export function ProjekteDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="projektkennung">{fieldLabel('projekte', 'projektkennung')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="projektkennung"
-          placeholder="z. B. PRJ-2024-001"
+          placeholder=""
           value={fields.projektkennung ?? ''}
           onChange={e => setFields(f => ({ ...f, projektkennung: e.target.value }))}
           required
         />
         {showErrors && !fields.projektkennung && (
-          <p className="text-xs text-destructive mt-1">{t('required_hint')}</p>
+          <p className="text-xs text-destructive mt-1" role="alert">{requiredMessage('projekte', 'projektkennung')}</p>
         )}
       </div>
     ),
@@ -399,14 +402,15 @@ export function ProjekteDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Input
           id="projektnummer"
           type="number"
+          inputMode="decimal"
           step="any"
           {...numberInputProps(formEnhancements, 'projektnummer')}
-          placeholder="z. B. 42"
+          placeholder=""
           value={fields.projektnummer !== undefined ? fields.projektnummer : (computedValues['projektnummer'] ?? '')}
           onChange={e => setFields(f => ({ ...f, projektnummer: clampNumberValue(formEnhancements, 'projektnummer', e.target.value) }))}
         />
         {showErrors && !fields.projektnummer && (
-          <p className="text-xs text-destructive mt-1">{t('required_hint')}</p>
+          <p className="text-xs text-destructive mt-1" role="alert">{requiredMessage('projekte', 'projektnummer')}</p>
         )}
       </div>
     ),
@@ -417,7 +421,7 @@ export function ProjekteDialog({ open, onClose, onSubmit, defaultValues, recordI
           value={lookupKey(fields.projektart) ?? ''}
           onValueChange={v => setFields(f => ({ ...f, projektart: v === 'none' ? undefined : v as any }))}
         >
-          <SelectTrigger id="projektart" className="max-sm:h-11"><SelectValue placeholder="z. B. IT-Beratung, Entwicklung" /></SelectTrigger>
+          <SelectTrigger id="projektart" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="it_beratung">{lookupLabel('projekte', 'projektart', 'it_beratung') ?? 'IT-Beratung'}</SelectItem>
@@ -429,7 +433,7 @@ export function ProjekteDialog({ open, onClose, onSubmit, defaultValues, recordI
           </SelectContent>
         </Select>
         {showErrors && !fields.projektart && (
-          <p className="text-xs text-destructive mt-1">{t('required_hint')}</p>
+          <p className="text-xs text-destructive mt-1" role="alert">{requiredMessage('projekte', 'projektart')}</p>
         )}
       </div>
     ),
@@ -438,13 +442,13 @@ export function ProjekteDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="projektstart_jahr">{fieldLabel('projekte', 'projektstart_jahr')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="projektstart_jahr"
-          placeholder="z. B. 2024"
+          placeholder=""
           value={fields.projektstart_jahr ?? ''}
           onChange={e => setFields(f => ({ ...f, projektstart_jahr: e.target.value }))}
           required
         />
         {showErrors && !fields.projektstart_jahr && (
-          <p className="text-xs text-destructive mt-1">{t('required_hint')}</p>
+          <p className="text-xs text-destructive mt-1" role="alert">{requiredMessage('projekte', 'projektstart_jahr')}</p>
         )}
       </div>
     ),
@@ -455,7 +459,7 @@ export function ProjekteDialog({ open, onClose, onSubmit, defaultValues, recordI
           value={lookupKey(fields.projektstart_monat) ?? ''}
           onValueChange={v => setFields(f => ({ ...f, projektstart_monat: v === 'none' ? undefined : v as any }))}
         >
-          <SelectTrigger id="projektstart_monat" className="max-sm:h-11"><SelectValue placeholder="z. B. Januar, Februar" /></SelectTrigger>
+          <SelectTrigger id="projektstart_monat" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="januar">{lookupLabel('projekte', 'projektstart_monat', 'januar') ?? 'Januar'}</SelectItem>
@@ -519,7 +523,7 @@ export function ProjekteDialog({ open, onClose, onSubmit, defaultValues, recordI
           </button>
         </div>
         {showErrors && !fields.status && (
-          <p className="text-xs text-destructive mt-1">{t('required_hint')}</p>
+          <p className="text-xs text-destructive mt-1" role="alert">{requiredMessage('projekte', 'status')}</p>
         )}
       </div>
     ),
@@ -528,7 +532,7 @@ export function ProjekteDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="ansprechpartner_kunde">{fieldLabel('projekte', 'ansprechpartner_kunde')}</Label>
         <Input
           id="ansprechpartner_kunde"
-          placeholder="Name der Person"
+          placeholder=""
           value={fields.ansprechpartner_kunde ?? ''}
           onChange={e => setFields(f => ({ ...f, ansprechpartner_kunde: e.target.value }))}
         />
@@ -539,7 +543,7 @@ export function ProjekteDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="letzter_schritt">{fieldLabel('projekte', 'letzter_schritt')}</Label>
         <Textarea
           id="letzter_schritt"
-          placeholder="Was wurde zuletzt gemacht..."
+          placeholder=""
           value={fields.letzter_schritt ?? ''}
           onChange={e => setFields(f => ({ ...f, letzter_schritt: e.target.value }))}
           rows={3}
@@ -551,7 +555,7 @@ export function ProjekteDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="projektende">{fieldLabel('projekte', 'projektende')}</Label>
         <DatePicker
           id="projektende"
-          placeholder="Geplantes Ende wählen"
+          placeholder=""
           mode="date"
           value={fields.projektende ?? null}
           onChange={v => setFields(f => ({ ...f, projektende: v ?? undefined }))}
@@ -563,7 +567,7 @@ export function ProjekteDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="notizen">{fieldLabel('projekte', 'notizen')}</Label>
         <Textarea
           id="notizen"
-          placeholder="Besonderheiten, Meilensteine..."
+          placeholder=""
           value={fields.notizen ?? ''}
           onChange={e => setFields(f => ({ ...f, notizen: e.target.value }))}
           rows={3}
@@ -575,7 +579,7 @@ export function ProjekteDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="kunde">{fieldLabel('projekte', 'kunde')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Combobox
           id="kunde"
-          placeholder="Welcher Kunde?"
+          placeholder=""
           items={kundenListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.kundenname ?? r.record_id),
@@ -586,7 +590,7 @@ export function ProjekteDialog({ open, onClose, onSubmit, defaultValues, recordI
           createLabel={t('create_in', { entity: appLabel('kunden') })}
         />
         {showErrors && !fields.kunde && (
-          <p className="text-xs text-destructive mt-1">{t('required_hint')}</p>
+          <p className="text-xs text-destructive mt-1" role="alert">{requiredMessage('projekte', 'kunde')}</p>
         )}
       </div>
     ),
@@ -595,13 +599,13 @@ export function ProjekteDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="projektleitung">{fieldLabel('projekte', 'projektleitung')}</Label>
         <Combobox
           id="projektleitung"
-          placeholder="Projektleiter/in wählen"
+          placeholder=""
           items={beraterInnenListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.nachname ?? r.record_id),
           }))}
           value={extractRecordId(fields.projektleitung)}
-          onChange={id => setFields(f => ({ ...f, projektleitung: id ? createRecordUrl(APP_IDS['BERATER/INNEN'], id) : undefined }))}
+          onChange={id => setFields(f => ({ ...f, projektleitung: id ? createRecordUrl(APP_IDS.BERATERINNEN, id) : undefined }))}
           onCreateNew={(q) => openCreateBeraterInnen("projektleitung", q)}
           createLabel={t('create_in', { entity: appLabel('berater/innen') })}
         />
@@ -627,7 +631,7 @@ export function ProjekteDialog({ open, onClose, onSubmit, defaultValues, recordI
   // eine Map { lookupKey: label } für ALLE Felder des Target-Schemas. Wird
   // beim Render-Walk gefiltert auf die in der computed-Formel tatsächlich
   // referenzierten lookupKeys (siehe applookupRefs unten).
-  const APPLOOKUP_LABELS: Record<string, Record<string, string>> = {"kunde": {"kundenname": "Name / Firmenname", "kundentyp": "Kundentyp", "email": "E-Mail", "telefon": "Telefon", "strasse": "Straße", "hausnummer": "Hausnummer", "plz": "Postleitzahl", "ort": "Ort", "re_strasse": "Rechnungsstraße", "re_hausnummer": "Rechnungs-Hausnummer", "re_plz": "Rechnungs-Postleitzahl", "re_ort": "Rechnungs-Ort", "anlagedatum": "Anlagedatum", "ap_titel": "Titel Ansprechpartner", "ap_vorname": "Vorname Ansprechpartner", "ap_nachname": "Nachname Ansprechpartner", "ap_email": "E-Mail Ansprechpartner", "ap_telefon": "Telefon Ansprechpartner", "bevorzugte_kontaktart": "Bevorzugte Kontaktart", "letzter_kontakt_datum": "Datum letzter Kontakt", "letzter_kontakt_ansprechpartner": "Ansprechpartner beim letzten Kontakt", "notizen": "Notizen", "laufende_projekte": "Aktuell laufende Projekte"}, "projektleitung": {"nachname": "Nachname", "vorname": "Vorname", "titel": "Titel (optional)", "strasse": "Straße", "hausnummer": "Hausnummer", "plz": "Postleitzahl", "ort": "Ort", "email_beruflich": "E-Mail (beruflich)", "email_privat": "E-Mail (privat)", "telefon": "Telefon", "einstiegsdatum": "Einstiegsdatum", "status": "Status", "stundensatz": "Stundensatz (€/h)", "sonstiges_1": "Sonstige Anmerkungen (1)", "sonstiges_2": "Sonstige Anmerkungen (2)", "stunden_aktueller_monat": "Gebuchte Stunden – aktueller Monat", "stunden_aktuelles_quartal": "Gebuchte Stunden – aktuelles Quartal", "stunden_aktuelles_jahr": "Gebuchte Stunden – aktuelles Jahr", "stunden_letzter_monat": "Gebuchte Stunden – letzter Monat", "stunden_letztes_quartal": "Gebuchte Stunden – letztes Quartal", "stunden_letztes_jahr": "Gebuchte Stunden – letztes Jahr", "leistungen": "Erbringbare Leistungen", "projekte": "Aktuell zugewiesene Projekte"}};
+  const APPLOOKUP_LABELS: Record<string, Record<string, string>> = {"kunde": {"kundenname": "Name / Firmenname", "kundentyp": "Kundentyp", "email": "E-Mail", "telefon": "Telefon", "strasse": "Straße", "hausnummer": "Hausnummer", "plz": "Postleitzahl", "ort": "Ort", "re_strasse": "Rechnungsstraße", "re_hausnummer": "Rechnungs-Hausnummer", "re_plz": "Rechnungs-Postleitzahl", "re_ort": "Rechnungs-Ort", "anlagedatum": "Anlagedatum", "ap_titel": "Titel Ansprechpartner", "ap_vorname": "Vorname Ansprechpartner", "ap_nachname": "Nachname Ansprechpartner", "ap_email": "E-Mail Ansprechpartner", "ap_telefon": "Telefon Ansprechpartner", "bevorzugte_kontaktart": "Bevorzugte Kontaktart", "letzter_kontakt_datum": "Datum letzter Kontakt", "letzter_kontakt_ansprechpartner": "Ansprechpartner beim letzten Kontakt", "notizen": "Notizen", "laufende_projekte": "Aktuell laufende Projekte"}, "projektleitung": {"nachname": "Nachname", "vorname": "Vorname", "titel": "Titel (optional)", "strasse": "Straße", "hausnummer": "Hausnummer", "plz": "Postleitzahl", "ort": "Ort", "email_beruflich": "E-Mail (beruflich)", "email_privat": "E-Mail (privat)", "telefon": "Telefon", "einstiegsdatum": "Einstiegsdatum", "status": "Status", "stundensatz": "Stundensatz (€/h)", "sonstiges_1": "Sonstige Anmerkungen (1)", "sonstiges_2": "Sonstige Anmerkungen (2)", "leistungen": "Erbringbare Leistungen", "projekte": "Aktuell zugewiesene Projekte"}};
   const inputFields = useMemo(() => flattenFieldOrder(orderedFields), [orderedFieldsKey]);
   const backendFieldSet = useMemo(() => new Set(inputFields), [inputFields.join(',')]);
   const virtualComputed = useMemo(
@@ -881,9 +885,25 @@ export function ProjekteDialog({ open, onClose, onSubmit, defaultValues, recordI
               const renderField = (k: string) => {
                 const inlineHints = computedLayout.anchors[k] ?? [];
                 const refs = applookupRefs[k] ?? [];
+                // A field the plan gives to a TOOL. On CREATE it is not shown
+                // at all — the value does not exist yet and typing one only
+                // gets overwritten. On EDIT it stays a normal input with a
+                // note: when a tool could not compose its value (a missing
+                // ingredient), this is the only place to repair the record.
+                if (SYSTEM_ASSIGNED.includes(k) && !recordId) {
+                  return (
+                    <div key={k} className="space-y-1.5 min-w-0">
+                      <Label>{fieldLabel('projekte', k)}</Label>
+                      <p className="text-sm text-muted-foreground">{t('assigned_by_system')}</p>
+                    </div>
+                  );
+                }
                 return (
                   <div key={k} className="space-y-1.5 min-w-0">
                     {fieldBlocks[k]}
+                    {SYSTEM_ASSIGNED.includes(k) && (
+                      <p className="text-xs text-muted-foreground">{t('assigned_by_system')}</p>
+                    )}
                     {refs.map(({ lookupKey }) => {
                       // Show the live numeric value the formula will pull from
                       // the selected lookup target (e.g. "Monatspreis: 34,90 €"
@@ -1021,7 +1041,7 @@ export function ProjekteDialog({ open, onClose, onSubmit, defaultValues, recordI
           if (result?.id) {
             const newRec = { record_id: result.id, fields: newFields } as unknown as BeraterInnen;
             setExtraBeraterInnen(prev => [...prev, newRec]);
-            const url = createRecordUrl(APP_IDS['BERATER/INNEN'], result.id);
+            const url = createRecordUrl(APP_IDS.BERATERINNEN, result.id);
             setFields(prev => ({ ...prev, [createBeraterInnenField]: url } as any));
           }
           setCreateBeraterInnenOpen(false);

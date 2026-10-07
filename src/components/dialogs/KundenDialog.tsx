@@ -28,6 +28,7 @@ import type { ComputedContext } from '@/config/form-enhancements/types';
 import { applyFieldOrder, flattenFieldOrder, applyDefaults, evalComputed, numberInputProps, clampNumberValue, classifyComputed, extractApplookupRefs, mergeApplookupRefs, resolveApplookupRef } from '@/config/form-enhancements/types';
 import { formEnhancements, computedDeps, computedApplookupRefs } from '@/config/form-enhancements/Kunden';
 import { AttachmentsSection } from '@/components/AttachmentsSection';
+import { requiredMessage } from '@/lib/journey/messages';
 import { t, appLabel, fieldLabel, lookupLabel, localeTag, CURRENCY } from '@/i18n';
 import { Textarea } from '@/components/ui/textarea';
 import { Combobox, MultiCombobox } from '@/components/Combobox';
@@ -119,6 +120,8 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
     setCreateProjekteInitial(q);
     setCreateProjekteOpen(true);
   }
+  // Fields the plan assigns to a tool (empty without a plan).
+  const SYSTEM_ASSIGNED: string[] = [];
   const [showErrors, setShowErrors] = useState(false);
   const REQUIRED_FIELDS = ['kundenname', 'kundentyp', 'email'] as const;
   const missingRequired = REQUIRED_FIELDS.filter(k => {
@@ -352,13 +355,13 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
         <Label htmlFor="kundenname">{fieldLabel('kunden', 'kundenname')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="kundenname"
-          placeholder="z. B. Müller GmbH"
+          placeholder=""
           value={fields.kundenname ?? ''}
           onChange={e => setFields(f => ({ ...f, kundenname: e.target.value }))}
           required
         />
         {showErrors && !fields.kundenname && (
-          <p className="text-xs text-destructive mt-1">{t('required_hint')}</p>
+          <p className="text-xs text-destructive mt-1" role="alert">{requiredMessage('kunden', 'kundenname')}</p>
         )}
       </div>
     ),
@@ -420,7 +423,7 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
           </button>
         </div>
         {showErrors && !fields.kundentyp && (
-          <p className="text-xs text-destructive mt-1">{t('required_hint')}</p>
+          <p className="text-xs text-destructive mt-1" role="alert">{requiredMessage('kunden', 'kundentyp')}</p>
         )}
       </div>
     ),
@@ -430,12 +433,14 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
         <Input
           id="email"
           type="email"
-          placeholder="kontakt@firma.de"
+          inputMode="email"
+          placeholder=""
           value={fields.email ?? ''}
           onChange={e => setFields(f => ({ ...f, email: e.target.value }))}
+          required
         />
         {showErrors && !fields.email && (
-          <p className="text-xs text-destructive mt-1">{t('required_hint')}</p>
+          <p className="text-xs text-destructive mt-1" role="alert">{requiredMessage('kunden', 'email')}</p>
         )}
       </div>
     ),
@@ -444,6 +449,9 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
         <Label htmlFor="telefon">{fieldLabel('kunden', 'telefon')}</Label>
         <Input
           id="telefon"
+          type="tel"
+          inputMode="tel"
+          placeholder=""
           value={fields.telefon ?? ''}
           onChange={e => setFields(f => ({ ...f, telefon: e.target.value }))}
         />
@@ -454,7 +462,7 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
         <Label htmlFor="strasse">{fieldLabel('kunden', 'strasse')}</Label>
         <Input
           id="strasse"
-          placeholder="z. B. Hauptstraße"
+          placeholder=""
           value={fields.strasse ?? ''}
           onChange={e => setFields(f => ({ ...f, strasse: e.target.value }))}
         />
@@ -465,7 +473,7 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
         <Label htmlFor="hausnummer">{fieldLabel('kunden', 'hausnummer')}</Label>
         <Input
           id="hausnummer"
-          placeholder="z. B. 42"
+          placeholder=""
           value={fields.hausnummer ?? ''}
           onChange={e => setFields(f => ({ ...f, hausnummer: e.target.value }))}
         />
@@ -476,7 +484,7 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
         <Label htmlFor="plz">{fieldLabel('kunden', 'plz')}</Label>
         <Input
           id="plz"
-          placeholder="z. B. 10115"
+          placeholder=""
           value={fields.plz ?? ''}
           onChange={e => setFields(f => ({ ...f, plz: e.target.value }))}
         />
@@ -487,7 +495,7 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
         <Label htmlFor="ort">{fieldLabel('kunden', 'ort')}</Label>
         <Input
           id="ort"
-          placeholder="z. B. Berlin"
+          placeholder=""
           value={fields.ort ?? ''}
           onChange={e => setFields(f => ({ ...f, ort: e.target.value }))}
         />
@@ -498,7 +506,7 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
         <Label htmlFor="re_strasse">{fieldLabel('kunden', 're_strasse')}</Label>
         <Input
           id="re_strasse"
-          placeholder="z. B. Rechnungsstraße"
+          placeholder=""
           value={fields.re_strasse ?? ''}
           onChange={e => setFields(f => ({ ...f, re_strasse: e.target.value }))}
         />
@@ -509,7 +517,7 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
         <Label htmlFor="re_hausnummer">{fieldLabel('kunden', 're_hausnummer')}</Label>
         <Input
           id="re_hausnummer"
-          placeholder="z. B. 99"
+          placeholder=""
           value={fields.re_hausnummer ?? ''}
           onChange={e => setFields(f => ({ ...f, re_hausnummer: e.target.value }))}
         />
@@ -520,7 +528,7 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
         <Label htmlFor="re_plz">{fieldLabel('kunden', 're_plz')}</Label>
         <Input
           id="re_plz"
-          placeholder="z. B. 10115"
+          placeholder=""
           value={fields.re_plz ?? ''}
           onChange={e => setFields(f => ({ ...f, re_plz: e.target.value }))}
         />
@@ -531,7 +539,7 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
         <Label htmlFor="re_ort">{fieldLabel('kunden', 're_ort')}</Label>
         <Input
           id="re_ort"
-          placeholder="z. B. Berlin"
+          placeholder=""
           value={fields.re_ort ?? ''}
           onChange={e => setFields(f => ({ ...f, re_ort: e.target.value }))}
         />
@@ -542,7 +550,7 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
         <Label htmlFor="anlagedatum">{fieldLabel('kunden', 'anlagedatum')}</Label>
         <DatePicker
           id="anlagedatum"
-          placeholder="Wann hinzugefügt?"
+          placeholder=""
           mode="date"
           value={fields.anlagedatum ?? null}
           onChange={v => setFields(f => ({ ...f, anlagedatum: v ?? undefined }))}
@@ -554,7 +562,7 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
         <Label htmlFor="ap_titel">{fieldLabel('kunden', 'ap_titel')}</Label>
         <Input
           id="ap_titel"
-          placeholder="z. B. Dr., Dipl.-Ing."
+          placeholder=""
           value={fields.ap_titel ?? ''}
           onChange={e => setFields(f => ({ ...f, ap_titel: e.target.value }))}
         />
@@ -565,7 +573,7 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
         <Label htmlFor="ap_vorname">{fieldLabel('kunden', 'ap_vorname')}</Label>
         <Input
           id="ap_vorname"
-          placeholder="z. B. Klaus"
+          placeholder=""
           value={fields.ap_vorname ?? ''}
           onChange={e => setFields(f => ({ ...f, ap_vorname: e.target.value }))}
         />
@@ -576,7 +584,7 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
         <Label htmlFor="ap_nachname">{fieldLabel('kunden', 'ap_nachname')}</Label>
         <Input
           id="ap_nachname"
-          placeholder="z. B. Schmidt"
+          placeholder=""
           value={fields.ap_nachname ?? ''}
           onChange={e => setFields(f => ({ ...f, ap_nachname: e.target.value }))}
         />
@@ -588,7 +596,8 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
         <Input
           id="ap_email"
           type="email"
-          placeholder="klaus.schmidt@firma.de"
+          inputMode="email"
+          placeholder=""
           value={fields.ap_email ?? ''}
           onChange={e => setFields(f => ({ ...f, ap_email: e.target.value }))}
         />
@@ -599,6 +608,9 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
         <Label htmlFor="ap_telefon">{fieldLabel('kunden', 'ap_telefon')}</Label>
         <Input
           id="ap_telefon"
+          type="tel"
+          inputMode="tel"
+          placeholder=""
           value={fields.ap_telefon ?? ''}
           onChange={e => setFields(f => ({ ...f, ap_telefon: e.target.value }))}
         />
@@ -668,7 +680,7 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
         <Label htmlFor="letzter_kontakt_datum">{fieldLabel('kunden', 'letzter_kontakt_datum')}</Label>
         <DatePicker
           id="letzter_kontakt_datum"
-          placeholder="Wann war der Kontakt?"
+          placeholder=""
           mode="date"
           value={fields.letzter_kontakt_datum ?? null}
           onChange={v => setFields(f => ({ ...f, letzter_kontakt_datum: v ?? undefined }))}
@@ -680,7 +692,7 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
         <Label htmlFor="letzter_kontakt_ansprechpartner">{fieldLabel('kunden', 'letzter_kontakt_ansprechpartner')}</Label>
         <Input
           id="letzter_kontakt_ansprechpartner"
-          placeholder="Name der Person"
+          placeholder=""
           value={fields.letzter_kontakt_ansprechpartner ?? ''}
           onChange={e => setFields(f => ({ ...f, letzter_kontakt_ansprechpartner: e.target.value }))}
         />
@@ -691,7 +703,7 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
         <Label htmlFor="notizen">{fieldLabel('kunden', 'notizen')}</Label>
         <Textarea
           id="notizen"
-          placeholder="Besonderheiten, Vereinbarungen..."
+          placeholder=""
           value={fields.notizen ?? ''}
           onChange={e => setFields(f => ({ ...f, notizen: e.target.value }))}
           rows={3}
@@ -703,7 +715,7 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
         <Label htmlFor="laufende_projekte">{fieldLabel('kunden', 'laufende_projekte')}</Label>
         <MultiCombobox
           id="laufende_projekte"
-          placeholder="Welche Projekte?"
+          placeholder=""
           items={projekteListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.projektkennung ?? r.record_id),
@@ -989,9 +1001,25 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
               const renderField = (k: string) => {
                 const inlineHints = computedLayout.anchors[k] ?? [];
                 const refs = applookupRefs[k] ?? [];
+                // A field the plan gives to a TOOL. On CREATE it is not shown
+                // at all — the value does not exist yet and typing one only
+                // gets overwritten. On EDIT it stays a normal input with a
+                // note: when a tool could not compose its value (a missing
+                // ingredient), this is the only place to repair the record.
+                if (SYSTEM_ASSIGNED.includes(k) && !recordId) {
+                  return (
+                    <div key={k} className="space-y-1.5 min-w-0">
+                      <Label>{fieldLabel('kunden', k)}</Label>
+                      <p className="text-sm text-muted-foreground">{t('assigned_by_system')}</p>
+                    </div>
+                  );
+                }
                 return (
                   <div key={k} className="space-y-1.5 min-w-0">
                     {fieldBlocks[k]}
+                    {SYSTEM_ASSIGNED.includes(k) && (
+                      <p className="text-xs text-muted-foreground">{t('assigned_by_system')}</p>
+                    )}
                     {refs.map(({ lookupKey }) => {
                       // Show the live numeric value the formula will pull from
                       // the selected lookup target (e.g. "Monatspreis: 34,90 €"

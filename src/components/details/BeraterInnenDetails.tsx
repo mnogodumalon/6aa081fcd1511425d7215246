@@ -6,51 +6,70 @@ import {
 } from '@/components/widgets/RecordView';
 import { t, appLabel, fieldLabel } from '@/i18n';
 import { SatelliteSection } from '@/components/SatelliteSection';
+import { usePermissions } from '@/lib/permissions';
 
 export interface BeraterInnenDetailsProps {
   /** Der Record — enriched oder roh; alle Felder werden hier gerendert. */
   record: BeraterInnen;
-  /** Liste für Leistungskatalog-Zuordnungen und Satelliten. */
+  /** N:1-Ziel „Leistungskatalog": volle Liste (Hook-Array) — der Block löst Name + Schlüsselfelder selbst auf. */
   leistungskatalogList: Leistungskatalog[];
-  /** Zeilen-Klick → overlay.push auf das Leistungskatalog-Detail. */
-  onOpenLeistungskatalog: (record: Leistungskatalog) => void;
-  /** Kontextuelles „+": öffnet den Leistungskatalog-Dialog mit diesem Record vorgesetzt. */
-  onAddLeistungskatalog: () => void;
-  /** Liste für Projekte-Zuordnungen und Satelliten. */
+  /** Reserviert — Leistungskatalog ist hier nur über ein Mehrfach-Feld verknüpft (Text-Join, keine Einzel-Relation); Übergabe erlaubt, aber ohne Wirkung. */
+  onOpenLeistungskatalog?: (record: Leistungskatalog) => void;
+  /** N:1-Ziel „Projekte": volle Liste (Hook-Array) — der Block löst Name + Schlüsselfelder selbst auf. */
   projekteList: Projekte[];
-  /** Zeilen-Klick → overlay.push auf das Projekte-Detail. */
-  onOpenProjekte: (record: Projekte) => void;
+  /** Reserviert — Projekte ist hier nur über ein Mehrfach-Feld verknüpft (Text-Join, keine Einzel-Relation); Übergabe erlaubt, aber ohne Wirkung. */
+  onOpenProjekte?: (record: Projekte) => void;
+  /** 1:N „Leistungskatalog" (berater): VOLLE Liste — der Block filtert auf diesen Record. */
+  leistungskatalogBeraterList: Leistungskatalog[];
+  /** Zeilen-Klick → overlay.push auf das Leistungskatalog-Detail (nie der Edit-Dialog). */
+  onOpenLeistungskatalogBerater: (record: Leistungskatalog) => void;
+  /** Kontextuelles „+": öffnet den Leistungskatalog-Dialog mit diesem Record vorgesetzt. */
+  onAddLeistungskatalogBerater?: () => void;
+  /** „Vorhandene wählen": Listenfeld-Rückbezug — hängt diesen Record an einen bestehenden Leistungskatalog-Datensatz. */
+  onPickLeistungskatalogBerater?: () => void;
+  /** 1:N „Projekte" (projektleitung): VOLLE Liste — der Block filtert auf diesen Record. */
+  projekteProjektleitungList: Projekte[];
+  /** Zeilen-Klick → overlay.push auf das Projekte-Detail (nie der Edit-Dialog). */
+  onOpenProjekteProjektleitung: (record: Projekte) => void;
   /** Kontextuelles „+": öffnet den Projekte-Dialog mit diesem Record vorgesetzt. */
-  onAddProjekte: () => void;
+  onAddProjekteProjektleitung?: () => void;
   /** 1:N „Zeiterfassung" (berater): VOLLE Liste — der Block filtert auf diesen Record. */
   zeiterfassungList: Zeiterfassung[];
   /** Zeilen-Klick → overlay.push auf das Zeiterfassung-Detail (nie der Edit-Dialog). */
   onOpenZeiterfassung: (record: Zeiterfassung) => void;
   /** Kontextuelles „+": öffnet den Zeiterfassung-Dialog mit diesem Record vorgesetzt. */
-  onAddZeiterfassung: () => void;
+  onAddZeiterfassung?: () => void;
   /** 1:N „Rechnungen" (berater): VOLLE Liste — der Block filtert auf diesen Record. */
   rechnungenList: Rechnungen[];
   /** Zeilen-Klick → overlay.push auf das Rechnungen-Detail (nie der Edit-Dialog). */
   onOpenRechnungen: (record: Rechnungen) => void;
   /** Kontextuelles „+": öffnet den Rechnungen-Dialog mit diesem Record vorgesetzt. */
-  onAddRechnungen: () => void;
+  onAddRechnungen?: () => void;
+  /** „Vorhandene wählen": Listenfeld-Rückbezug — hängt diesen Record an einen bestehenden Rechnungen-Datensatz. */
+  onPickRechnungen?: () => void;
 }
 
 export function BeraterInnenDetails({
   record,
   leistungskatalogList,
-  onOpenLeistungskatalog,
-  onAddLeistungskatalog,
   projekteList,
-  onOpenProjekte,
-  onAddProjekte,
+  leistungskatalogBeraterList,
+  onOpenLeistungskatalogBerater,
+  onAddLeistungskatalogBerater,
+  onPickLeistungskatalogBerater,
+  projekteProjektleitungList,
+  onOpenProjekteProjektleitung,
+  onAddProjekteProjektleitung,
   zeiterfassungList,
   onOpenZeiterfassung,
   onAddZeiterfassung,
   rechnungenList,
   onOpenRechnungen,
   onAddRechnungen,
+  onPickRechnungen,
 }: BeraterInnenDetailsProps) {
+  // attachments are a write to this record — read-only without the platform right
+  const perms = usePermissions();
   return (
     <>
       <RecordSection title={t('details')} cols={2}>
@@ -69,31 +88,26 @@ export function BeraterInnenDetails({
         <RecordField label={fieldLabel('berater/innen', 'stundensatz')} value={record.fields.stundensatz} format="text" />
         <RecordField label={fieldLabel('berater/innen', 'sonstiges_1')} value={record.fields.sonstiges_1} format="longtext" className="md:col-span-2" />
         <RecordField label={fieldLabel('berater/innen', 'sonstiges_2')} value={record.fields.sonstiges_2} format="longtext" className="md:col-span-2" />
-        <RecordField label={fieldLabel('berater/innen', 'stunden_aktueller_monat')} value={record.fields.stunden_aktueller_monat} format="text" />
-        <RecordField label={fieldLabel('berater/innen', 'stunden_aktuelles_quartal')} value={record.fields.stunden_aktuelles_quartal} format="text" />
-        <RecordField label={fieldLabel('berater/innen', 'stunden_aktuelles_jahr')} value={record.fields.stunden_aktuelles_jahr} format="text" />
-        <RecordField label={fieldLabel('berater/innen', 'stunden_letzter_monat')} value={record.fields.stunden_letzter_monat} format="text" />
-        <RecordField label={fieldLabel('berater/innen', 'stunden_letztes_quartal')} value={record.fields.stunden_letztes_quartal} format="text" />
-        <RecordField label={fieldLabel('berater/innen', 'stunden_letztes_jahr')} value={record.fields.stunden_letztes_jahr} format="text" />
         <RecordField label={fieldLabel('berater/innen', 'leistungen')} value={Array.isArray(record.fields.leistungen) ? record.fields.leistungen.map((u: unknown) => leistungskatalogList.find(t => t.record_id === extractRecordId(u))?.fields.leistungsbezeichnung ?? '—').join(', ') : null} format="text" />
         <RecordField label={fieldLabel('berater/innen', 'projekte')} value={Array.isArray(record.fields.projekte) ? record.fields.projekte.map((u: unknown) => projekteList.find(t => t.record_id === extractRecordId(u))?.fields.projektkennung ?? '—').join(', ') : null} format="text" />
       </RecordSection>
 
       <SatelliteSection
-        title={appLabel('leistungskatalog')}
-        items={leistungskatalogList.filter(r => Array.isArray(r.fields.berater) && r.fields.berater.some((u: unknown) => extractRecordId(u) === record.record_id))}
+        title={`${appLabel('leistungskatalog')} · ${fieldLabel('leistungskatalog', 'berater')}`}
+        items={leistungskatalogBeraterList.filter(r => Array.isArray(r.fields.berater) && r.fields.berater.some((u: unknown) => extractRecordId(u) === record.record_id))}
         map={r => ({ name: r.fields.leistungsbezeichnung ?? appLabel('leistungskatalog'), meta: undefined })}
-        onOpen={onOpenLeistungskatalog}
-        onAdd={onAddLeistungskatalog}
+        onOpen={onOpenLeistungskatalogBerater}
+        onAdd={onAddLeistungskatalogBerater}
+        onPick={onPickLeistungskatalogBerater}
         getKey={r => r.record_id}
       />
 
       <SatelliteSection
-        title={appLabel('projekte')}
-        items={projekteList.filter(r => extractRecordId(r.fields.projektleitung) === record.record_id)}
+        title={`${appLabel('projekte')} · ${fieldLabel('projekte', 'projektleitung')}`}
+        items={projekteProjektleitungList.filter(r => extractRecordId(r.fields.projektleitung) === record.record_id)}
         map={r => ({ name: r.fields.projektkennung ?? appLabel('projekte'), meta: r.fields.projektende })}
-        onOpen={onOpenProjekte}
-        onAdd={onAddProjekte}
+        onOpen={onOpenProjekteProjektleitung}
+        onAdd={onAddProjekteProjektleitung}
         getKey={r => r.record_id}
       />
 
@@ -112,10 +126,11 @@ export function BeraterInnenDetails({
         map={r => ({ name: r.fields.rechnungsnummer ?? appLabel('rechnungen'), meta: r.fields.rechnungsdatum })}
         onOpen={onOpenRechnungen}
         onAdd={onAddRechnungen}
+        onPick={onPickRechnungen}
         getKey={r => r.record_id}
       />
 
-      <RecordAttachments appId={APP_IDS['BERATER/INNEN']} recordId={record.record_id} />
+      <RecordAttachments appId={APP_IDS.BERATERINNEN} recordId={record.record_id} readOnly={!perms.canWrite('berater/innen')} />
     </>
   );
 }

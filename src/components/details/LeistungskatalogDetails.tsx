@@ -6,33 +6,44 @@ import {
 } from '@/components/widgets/RecordView';
 import { t, appLabel, fieldLabel } from '@/i18n';
 import { SatelliteSection } from '@/components/SatelliteSection';
+import { usePermissions } from '@/lib/permissions';
 
 export interface LeistungskatalogDetailsProps {
   /** Der Record — enriched oder roh; alle Felder werden hier gerendert. */
   record: Leistungskatalog;
-  /** Liste für BeraterInnen-Zuordnungen und Satelliten. */
+  /** N:1-Ziel „BeraterInnen": volle Liste (Hook-Array) — der Block löst Name + Schlüsselfelder selbst auf. */
   beraterInnenList: BeraterInnen[];
-  /** Zeilen-Klick → overlay.push auf das BeraterInnen-Detail. */
-  onOpenBeraterInnen: (record: BeraterInnen) => void;
+  /** Reserviert — BeraterInnen ist hier nur über ein Mehrfach-Feld verknüpft (Text-Join, keine Einzel-Relation); Übergabe erlaubt, aber ohne Wirkung. */
+  onOpenBeraterInnen?: (record: BeraterInnen) => void;
+  /** 1:N „Berater/innen" (leistungen): VOLLE Liste — der Block filtert auf diesen Record. */
+  beraterInnenLeistungenList: BeraterInnen[];
+  /** Zeilen-Klick → overlay.push auf das BeraterInnen-Detail (nie der Edit-Dialog). */
+  onOpenBeraterInnenLeistungen: (record: BeraterInnen) => void;
   /** Kontextuelles „+": öffnet den BeraterInnen-Dialog mit diesem Record vorgesetzt. */
-  onAddBeraterInnen: () => void;
+  onAddBeraterInnenLeistungen?: () => void;
+  /** „Vorhandene wählen": Listenfeld-Rückbezug — hängt diesen Record an einen bestehenden BeraterInnen-Datensatz. */
+  onPickBeraterInnenLeistungen?: () => void;
   /** 1:N „Zeiterfassung" (leistung): VOLLE Liste — der Block filtert auf diesen Record. */
   zeiterfassungList: Zeiterfassung[];
   /** Zeilen-Klick → overlay.push auf das Zeiterfassung-Detail (nie der Edit-Dialog). */
   onOpenZeiterfassung: (record: Zeiterfassung) => void;
   /** Kontextuelles „+": öffnet den Zeiterfassung-Dialog mit diesem Record vorgesetzt. */
-  onAddZeiterfassung: () => void;
+  onAddZeiterfassung?: () => void;
 }
 
 export function LeistungskatalogDetails({
   record,
   beraterInnenList,
-  onOpenBeraterInnen,
-  onAddBeraterInnen,
+  beraterInnenLeistungenList,
+  onOpenBeraterInnenLeistungen,
+  onAddBeraterInnenLeistungen,
+  onPickBeraterInnenLeistungen,
   zeiterfassungList,
   onOpenZeiterfassung,
   onAddZeiterfassung,
 }: LeistungskatalogDetailsProps) {
+  // attachments are a write to this record — read-only without the platform right
+  const perms = usePermissions();
   return (
     <>
       <RecordSection title={t('details')} cols={2}>
@@ -47,11 +58,12 @@ export function LeistungskatalogDetails({
       </RecordSection>
 
       <SatelliteSection
-        title={appLabel('berater/innen')}
-        items={beraterInnenList.filter(r => Array.isArray(r.fields.leistungen) && r.fields.leistungen.some((u: unknown) => extractRecordId(u) === record.record_id))}
+        title={`${appLabel('berater/innen')} · ${fieldLabel('berater/innen', 'leistungen')}`}
+        items={beraterInnenLeistungenList.filter(r => Array.isArray(r.fields.leistungen) && r.fields.leistungen.some((u: unknown) => extractRecordId(u) === record.record_id))}
         map={r => ({ name: r.fields.nachname ?? appLabel('berater/innen'), meta: r.fields.einstiegsdatum })}
-        onOpen={onOpenBeraterInnen}
-        onAdd={onAddBeraterInnen}
+        onOpen={onOpenBeraterInnenLeistungen}
+        onAdd={onAddBeraterInnenLeistungen}
+        onPick={onPickBeraterInnenLeistungen}
         getKey={r => r.record_id}
       />
 
@@ -64,7 +76,7 @@ export function LeistungskatalogDetails({
         getKey={r => r.record_id}
       />
 
-      <RecordAttachments appId={APP_IDS.LEISTUNGSKATALOG} recordId={record.record_id} />
+      <RecordAttachments appId={APP_IDS.LEISTUNGSKATALOG} recordId={record.record_id} readOnly={!perms.canWrite('leistungskatalog')} />
     </>
   );
 }

@@ -80,3 +80,5 @@ Erfassung aller Stunden der Mitarbeitenden, die monatlich in den Projekten abger
 
 Rechnungen
 Auf der Basis der Berater, der Zeiterfassung und der Projekte sollen Rechnungen generiert werden, die in einer zeitlich strukturierten Exceltabelle erfasst und dargestellt werden
+
+Die Gebuchten Stunden die bei Beratern angezeigt werden (Aktueller Zeitraum, Vergangener Zeitraum) müssen Manuell eingetragen werden. So macht die Funktionalität keinen Sinn. Würdest du sie ganz entfernen und nur Berichte im Dashboard erzeugen lassen? Oder gibt es eine bessere Idee?

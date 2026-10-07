@@ -5,6 +5,7 @@ import {
   RecordSection, RecordField, RecordRelation, RecordAttachments,
 } from '@/components/widgets/RecordView';
 import { t, appLabel, fieldLabel } from '@/i18n';
+import { usePermissions } from '@/lib/permissions';
 
 export interface ZeiterfassungDetailsProps {
   /** Der Record — enriched oder roh; alle Felder werden hier gerendert. */
@@ -32,6 +33,8 @@ export function ZeiterfassungDetails({
   leistungskatalogList,
   onOpenLeistungskatalog,
 }: ZeiterfassungDetailsProps) {
+  // attachments are a write to this record — read-only without the platform right
+  const perms = usePermissions();
   const beraterTarget = beraterInnenList.find(r => r.record_id === extractRecordId(record.fields.berater));
   const projektTarget = projekteList.find(r => r.record_id === extractRecordId(record.fields.projekt));
   const leistungTarget = leistungskatalogList.find(r => r.record_id === extractRecordId(record.fields.leistung));
@@ -69,7 +72,7 @@ export function ZeiterfassungDetails({
         />
       </RecordSection>
 
-      <RecordAttachments appId={APP_IDS.ZEITERFASSUNG} recordId={record.record_id} />
+      <RecordAttachments appId={APP_IDS.ZEITERFASSUNG} recordId={record.record_id} readOnly={!perms.canWrite('zeiterfassung')} />
     </>
   );
 }
