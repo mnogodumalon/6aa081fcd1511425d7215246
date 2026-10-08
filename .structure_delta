@@ -2,50 +2,26 @@
   "version": 1,
   "changes": [
     {
-      "kind": "field_removed",
-      "entity": "berater/innen",
-      "field": "stunden_aktueller_monat",
-      "fulltype": "number",
-      "label": "Gebuchte Stunden – aktueller Monat"
-    },
-    {
-      "kind": "field_removed",
-      "entity": "berater/innen",
-      "field": "stunden_aktuelles_jahr",
-      "fulltype": "number",
-      "label": "Gebuchte Stunden – aktuelles Jahr"
-    },
-    {
-      "kind": "field_removed",
-      "entity": "berater/innen",
-      "field": "stunden_aktuelles_quartal",
-      "fulltype": "number",
-      "label": "Gebuchte Stunden – aktuelles Quartal"
-    },
-    {
-      "kind": "field_removed",
-      "entity": "berater/innen",
-      "field": "stunden_letzter_monat",
-      "fulltype": "number",
-      "label": "Gebuchte Stunden – letzter Monat"
-    },
-    {
-      "kind": "field_removed",
-      "entity": "berater/innen",
-      "field": "stunden_letztes_jahr",
-      "fulltype": "number",
-      "label": "Gebuchte Stunden – letztes Jahr"
-    },
-    {
-      "kind": "field_removed",
-      "entity": "berater/innen",
-      "field": "stunden_letztes_quartal",
-      "fulltype": "number",
-      "label": "Gebuchte Stunden – letztes Quartal"
+      "kind": "options_changed",
+      "entity": "projekte",
+      "field": "projektart",
+      "added": [
+        "coaching",
+        "immobilienprojekte",
+        "inklusionsbetriebe",
+        "interimsgeschaeftsfuehrung",
+        "it_projekte",
+        "personalprojekte",
+        "projekte_inklusion",
+        "sonstige_projekte",
+        "strategieberatung",
+        "workshops_seminare"
+      ],
+      "removed": []
     }
   ],
   "counts": {
-    "field_removed": 6
+    "options_changed": 1
   },
   "harmless_only": false
 }

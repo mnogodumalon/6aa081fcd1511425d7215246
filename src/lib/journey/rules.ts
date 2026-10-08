@@ -654,12 +654,22 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "label": "Projektart",
       "writable": true,
       "options": [
-        "it_beratung",
         "entwicklung",
         "schulung",
         "konzeption",
         "support",
-        "sonstiges"
+        "it_beratung",
+        "sonstiges",
+        "interimsgeschaeftsfuehrung",
+        "projekte_inklusion",
+        "strategieberatung",
+        "coaching",
+        "personalprojekte",
+        "sonstige_projekte",
+        "workshops_seminare",
+        "inklusionsbetriebe",
+        "immobilienprojekte",
+        "it_projekte"
       ]
     },
     "projektstart_jahr": {
@@ -1239,11 +1249,6 @@ export const SHAPES: Record<EntityKey, Shape[]> = {
     }
   ],
   "projekte": [
-    {
-      "kind": "choice",
-      "field": "projektart",
-      "count": 6
-    },
     {
       "kind": "choice",
       "field": "status",

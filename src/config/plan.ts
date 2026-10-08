@@ -17,11 +17,18 @@ export const SYSTEM_ASSIGNED: Record<string, string[]> = {};
 export const PLAN_SENTENCES: Record<string, string[]> = {
   "stunden-erfassen": [],
   "angebot-erstellen": [],
-  "rechnung-erstellen": []
+  "rechnung-erstellen": [],
+  "kunde-bearbeiten": [
+    "Ändert: kunden"
+  ]
 };
 
 export const PLAN_SUMMARY = "inclou. ERP";
 
 /** slug → the lists a flow writes (the plan's Schreibliste). The nav leaves a
  *  flow out for a user who may not write one of them (lib/permissions.ts). */
-export const FLOW_ENTITIES: Record<string, string[]> = {};
+export const FLOW_ENTITIES: Record<string, string[]> = {
+  "kunde-bearbeiten": [
+    "kunden"
+  ]
+};

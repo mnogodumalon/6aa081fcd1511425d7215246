@@ -85,12 +85,22 @@ const VALID_KEYS = {
     "september"
   ],
   "projektart": [
+    "coaching",
     "entwicklung",
+    "immobilienprojekte",
+    "inklusionsbetriebe",
+    "interimsgeschaeftsfuehrung",
     "it_beratung",
+    "it_projekte",
     "konzeption",
+    "personalprojekte",
+    "projekte_inklusion",
     "schulung",
+    "sonstige_projekte",
     "sonstiges",
-    "support"
+    "strategieberatung",
+    "support",
+    "workshops_seminare"
   ],
   "projektstart_monat": [
     "april",

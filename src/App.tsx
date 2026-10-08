@@ -17,9 +17,12 @@ import AppMap from '@/pages/AppMap';
 const IntentStundenErfassenPage = lazy(() => import('@/pages/intents/StundenErfassenPage'));
 const IntentAngebotErstellenPage = lazy(() => import('@/pages/intents/AngebotErstellenPage'));
 const IntentRechnungErstellenPage = lazy(() => import('@/pages/intents/RechnungErstellenPage'));
+const IntentKundeBearbeitenPage = lazy(() => import('@/pages/intents/KundeBearbeitenPage'));
+import { DashboardSkeleton } from '@/components/DashboardStates';
 
 // Lazy: public pages live outside <Layout> and only load on /#/public/:slug —
 // dashboard users never pay for them, anonymous visitors skip the dashboard.
+
 
 // Language switch = full remount below the router: every t()/label lookup
 // re-evaluates, the la-* widgets re-read <html lang>. Sits inside HashRouter
@@ -33,8 +36,6 @@ const IntentRechnungErstellenPage = lazy(() => import('@/pages/intents/RechnungE
 // arrival) must not tear the element down mid-chat; the element follows
 // <html lang> itself. Hidden on anonymous public routes; its 401 guard is
 // the backstop, not the mechanism.
-const IntentKundeBearbeitenPage = lazy(() => import('@/pages/intents/KundeBearbeitenPage'));
-import { DashboardSkeleton } from '@/components/DashboardStates';
 // </custom:imports>
 
 // Lazy: public pages live outside <Layout> and only load on /#/public/:slug —

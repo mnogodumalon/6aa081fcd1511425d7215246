@@ -695,12 +695,14 @@
           "label": "Projektart",
           "type": "lookup/select",
           "options": [
-            "IT-Beratung",
             "Entwicklung",
             "Schulung",
             "Konzeption",
             "Support",
-            "Sonstiges"
+            "IT-Beratung",
+            "Sonstiges",
+            "Interimsgeschäftsführung",
+            "Projekte Inklusion"
           ]
         },
         {
@@ -778,10 +780,6 @@
             "required": true,
             "options": [
               {
-                "key": "it_beratung",
-                "label": "IT-Beratung"
-              },
-              {
                 "key": "entwicklung",
                 "label": "Entwicklung"
               },
@@ -798,8 +796,20 @@
                 "label": "Support"
               },
               {
+                "key": "it_beratung",
+                "label": "IT-Beratung"
+              },
+              {
                 "key": "sonstiges",
                 "label": "Sonstiges"
+              },
+              {
+                "key": "interimsgeschaeftsfuehrung",
+                "label": "Interimsgeschäftsführung"
+              },
+              {
+                "key": "projekte_inklusion",
+                "label": "Projekte Inklusion"
               }
             ]
           },

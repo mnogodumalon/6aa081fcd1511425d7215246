@@ -1721,12 +1721,22 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         },
         "lookups": {
           "projektart": {
-            "it_beratung": "IT-Beratung",
             "entwicklung": "Entwicklung",
             "schulung": "Schulung",
             "konzeption": "Konzeption",
             "support": "Support",
-            "sonstiges": "Sonstiges"
+            "it_beratung": "IT-Beratung",
+            "sonstiges": "Sonstiges",
+            "interimsgeschaeftsfuehrung": "Interimsgeschäftsführung",
+            "projekte_inklusion": "Projekte Inklusion",
+            "strategieberatung": "Strategieberatung",
+            "coaching": "Coaching",
+            "personalprojekte": "Personalprojekte",
+            "sonstige_projekte": "Sonstiges / Andere Projekte",
+            "workshops_seminare": "Workshops / Seminare",
+            "inklusionsbetriebe": "Inklusionsbetriebe",
+            "immobilienprojekte": "Immobilienprojekte",
+            "it_projekte": "IT-Projekte"
           },
           "projektstart_monat": {
             "januar": "Januar",
@@ -1881,7 +1891,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "hausnummer": "House Number",
           "plz": "Postal Code",
           "ort": "City",
-          "email_beruflich": "Email (business)",
+          "email_beruflich": "Email (work)",
           "email_privat": "Email (private)",
           "telefon": "Phone",
           "einstiegsdatum": "Start Date",
@@ -1924,16 +1934,16 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "ap_email": "Contact Person Email",
           "ap_telefon": "Contact Person Phone",
           "bevorzugte_kontaktart": "Preferred Contact Method",
-          "letzter_kontakt_datum": "Last Contact Date",
+          "letzter_kontakt_datum": "Date of Last Contact",
           "letzter_kontakt_ansprechpartner": "Contact Person at Last Contact",
           "notizen": "Notes",
-          "laufende_projekte": "Currently Active Projects"
+          "laufende_projekte": "Currently Running Projects"
         },
         "lookups": {
           "kundentyp": {
             "einzelperson": "Individual",
             "firma": "Company",
-            "behoerde": "Authority",
+            "behoerde": "Public Authority",
             "sonstiges": "Other"
           },
           "bevorzugte_kontaktart": {
@@ -1978,13 +1988,13 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         "name": "Projects",
         "app_id": "6aa081c907043fa96898c8ca",
         "fields": {
-          "projektkennung": "Project Identifier",
+          "projektkennung": "Project ID",
           "projektnummer": "Project Number",
           "projektart": "Project Type",
           "projektstart_jahr": "Start Year",
           "projektstart_monat": "Start Month",
           "status": "Project Status",
-          "ansprechpartner_kunde": "Contact Person at Customer",
+          "ansprechpartner_kunde": "Customer Contact Person",
           "letzter_schritt": "Last Step / Current Status",
           "projektende": "Planned Project End",
           "notizen": "Notes",
@@ -1993,12 +2003,22 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         },
         "lookups": {
           "projektart": {
-            "it_beratung": "IT Consulting",
             "entwicklung": "Development",
             "schulung": "Training",
             "konzeption": "Conceptual Design",
             "support": "Support",
-            "sonstiges": "Other"
+            "it_beratung": "IT Consulting",
+            "sonstiges": "Other",
+            "interimsgeschaeftsfuehrung": "Interim Management",
+            "projekte_inklusion": "Inclusion Projects",
+            "strategieberatung": "Strategy Consulting",
+            "coaching": "Coaching",
+            "personalprojekte": "HR Projects",
+            "sonstige_projekte": "Other Projects",
+            "workshops_seminare": "Workshops / Seminars",
+            "inklusionsbetriebe": "Inclusive Businesses",
+            "immobilienprojekte": "Real Estate Projects",
+            "it_projekte": "IT Projects"
           },
           "projektstart_monat": {
             "januar": "January",
@@ -2112,7 +2132,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "rechnungsdatei": "Invoice Document (PDF)",
           "kunde": "Customer",
           "projekt": "Project",
-          "berater": "Consultants Involved"
+          "berater": "Involved Consultants"
         },
         "lookups": {
           "rechnungsstatus": {

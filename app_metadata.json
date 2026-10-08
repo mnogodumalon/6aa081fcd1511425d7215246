@@ -833,12 +833,22 @@
           "in_fulltext_search": true,
           "in_expert_search": true,
           "lookup_data": {
-            "it_beratung": "IT-Beratung",
             "entwicklung": "Entwicklung",
             "schulung": "Schulung",
             "konzeption": "Konzeption",
             "support": "Support",
-            "sonstiges": "Sonstiges"
+            "it_beratung": "IT-Beratung",
+            "sonstiges": "Sonstiges",
+            "interimsgeschaeftsfuehrung": "Interimsgeschäftsführung",
+            "projekte_inklusion": "Projekte Inklusion",
+            "strategieberatung": "Strategieberatung",
+            "coaching": "Coaching",
+            "personalprojekte": "Personalprojekte",
+            "sonstige_projekte": "Sonstiges / Andere Projekte",
+            "workshops_seminare": "Workshops / Seminare",
+            "inklusionsbetriebe": "Inklusionsbetriebe",
+            "immobilienprojekte": "Immobilienprojekte",
+            "it_projekte": "IT-Projekte"
           }
         },
         "projektstart_jahr": {
