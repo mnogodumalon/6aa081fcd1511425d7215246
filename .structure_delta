@@ -1,17 +1,6 @@
 {
   "version": 1,
-  "changes": [
-    {
-      "kind": "label_changed",
-      "scope": "field",
-      "entity": "projekte",
-      "field": "projektnummer",
-      "old_label": "Projektnummer",
-      "new_label": "Projektnummer (ganze Zahl)"
-    }
-  ],
-  "counts": {
-    "label_changed": 1
-  },
+  "changes": [],
+  "counts": {},
   "harmless_only": true
 }
