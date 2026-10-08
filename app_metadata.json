@@ -953,7 +953,7 @@
           "in_list": true,
           "in_mobile_list": true,
           "in_text": false,
-          "in_structured_search": "extended",
+          "in_structured_search": "simple",
           "in_fulltext_search": true,
           "in_expert_search": true
         },

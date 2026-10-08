@@ -1983,7 +1983,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "leistungstyp": "Service Type",
           "beschreibung": "Description",
           "kostenvoranschlag": "Standard Cost Estimate (€)",
-          "stundensatz_leistung": "Hourly Rate for This Service (€/h)",
+          "stundensatz_leistung": "Hourly Rate for this Service (€/h)",
           "einheit": "Billing Unit",
           "verfuegbarkeit": "Availability / Notes",
           "kuerzel": "Abbreviation",
@@ -2021,7 +2021,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "projektende": "Planned Project End",
           "notizen": "Notes",
           "kunde": "Customer",
-          "projektleitung": "Project Manager"
+          "projektleitung": "Project Lead"
         },
         "lookups": {
           "projektart": {
@@ -2097,7 +2097,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "kostentyp": {
             "einmalig": "One-time",
             "monatlich": "Monthly",
-            "jaehrlich": "Annual",
+            "jaehrlich": "Yearly",
             "nach_aufwand": "Time and Materials",
             "pauschal": "Flat Rate",
             "sonstiges": "Other"
