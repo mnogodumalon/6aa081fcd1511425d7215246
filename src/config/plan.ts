@@ -17,9 +17,6 @@ export const SYSTEM_ASSIGNED: Record<string, string[]> = {};
 export const PLAN_SENTENCES: Record<string, string[]> = {
   "kunde-bearbeiten": [
     "Ändert: kunden"
-  ],
-  "leistungen-zuweisen": [
-    "Ändert: berater/innen"
   ]
 };
 
@@ -30,8 +27,5 @@ export const PLAN_SUMMARY = "inclou. ERP";
 export const FLOW_ENTITIES: Record<string, string[]> = {
   "kunde-bearbeiten": [
     "kunden"
-  ],
-  "leistungen-zuweisen": [
-    "berater/innen"
   ]
 };

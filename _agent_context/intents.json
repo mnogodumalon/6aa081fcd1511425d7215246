@@ -91,6 +91,23 @@
         "WizardStep"
       ],
       "writes": []
+    },
+    {
+      "path": "/intents/leistungen-zuweisen",
+      "label": "Berater/in Leistungen zuweisen",
+      "description": "Beratern durchführbare Leistungen aus dem Katalog zuweisen",
+      "file": "src/pages/intents/LeistungenZuweisenPage.tsx",
+      "summary": "/**\n * Leistungen zuweisen — 3-Schritt-Wizard.\n * Steps: 1) Berater/in wählen → 2) Durchführbare Leistungen wählen → 3) Prüfen & speichern.\n * Reads: berater/innen, leistungskatalog. Writes: berater/innen.leistungen (update des gewählten Datensatzes).\n * Composes: IntentWizardShell, EntitySelectStep, Field, StepNav, SummaryStep, SuccessStep.\n */",
+      "components": [
+        "EntitySelectStep",
+        "Field",
+        "IntentWizardShell",
+        "StepNav",
+        "SuccessStep",
+        "SummaryStep",
+        "WizardStep"
+      ],
+      "writes": []
     }
   ],
   "unregistered_pages": []

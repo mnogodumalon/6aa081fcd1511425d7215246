@@ -65,7 +65,7 @@ createRecordUrl from the service. Note the lowercase `l` in the service path.
   ✚ EnrichedKunden adds ONLY laufende_projekteName — via enrichKunden(kunden, { projekteMap }), all maps required
   → laufende_projekte links to app_id 6aa081c907043fa96898c8ca
 - Leistungskatalog (leistungskatalog): leistungsbezeichnung!^[string/text], leistungstyp![lookup/select: beratung|entwicklung|schulung|support|konzeption|sonstiges], beschreibung[string/textarea], kostenvoranschlag[number] "Normaler Kostenvoranschlag (€)", stundensatz_leistung[number] "Stundensatz für diese Leistung (€/h)", einheit[lookup/select: stunde|tag|pauschal|monat] "Abrechnungseinheit", verfuegbarkeit[string/textarea] "Verfügbarkeit / Hinweise", kuerzel[string/text], berater_innen[multipleapplookup/select] "Zuständige Berater/innen"
-  ≡ 10 records at build time
+  ≡ 7 records at build time
   ◈ leistungstyp → choice (6 options, ChoiceGroup) · einheit → choice (4 options, ChoiceGroup) · berater_innen → record (berater/innen, EntitySelectStep)
   ⚙ getLeistungskatalog() · getLeistungskatalogEntry(id) · createLeistungskatalogEntry(fields) · updateLeistungskatalogEntry(id, fields) · deleteLeistungskatalogEntry(id) · queryLeistungskatalog({ filter, orderby, limit, offset, fields }) · countLeistungskatalog(filter?)
   ✚ EnrichedLeistungskatalog adds ONLY berater_innenName — via enrichLeistungskatalog(leistungskatalog, { beraterInnenMap }), all maps required
@@ -85,7 +85,7 @@ createRecordUrl from the service. Note the lowercase `l` in the service path.
   → projekt links to app_id 6aa081c907043fa96898c8ca
   → kunde links to app_id 6aa081c7132fedb98dca2728
 - Zeiterfassung (zeiterfassung): datum!^[date/date], stunden!^[number] "Geleistete Stunden", monat![lookup/select: januar|februar|maerz|april|mai|juni|juli|august|september|oktober|november|dezember] "Abrechnungsmonat", jahr![string/text] "Abrechnungsjahr", taetigkeitsbeschreibung[string/textarea], verrechenbar[bool], notizen[string/textarea], berater!^[applookup/select] "Berater/in", projekt!^[applookup/select], leistung^[applookup/select] "Erbrachte Leistung"
-  ≡ 7 records at build time
+  ≡ 2 records at build time
   ◈ berater → record (berater/innen, EntitySelectStep) · projekt → record (projekte, EntitySelectStep) · leistung → record (leistungskatalog, EntitySelectStep)
   ⚙ getZeiterfassung() · getZeiterfassungEntry(id) · createZeiterfassungEntry(fields) · updateZeiterfassungEntry(id, fields) · deleteZeiterfassungEntry(id) · queryZeiterfassung({ filter, orderby, limit, offset, fields }) · countZeiterfassung(filter?)
   ✚ EnrichedZeiterfassung adds ONLY beraterName, projektName, leistungName — via enrichZeiterfassung(zeiterfassung, { beraterInnenMap, projekteMap, leistungskatalogMap }), all maps required

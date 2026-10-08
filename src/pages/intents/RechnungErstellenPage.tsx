@@ -1,499 +1,349 @@
 /**
  * Rechnung erstellen — 3-Schritt-Wizard.
- * Steps: 1) Projekt + Kunde wählen → 2) Zeiterfassung prüfen + Abrechnungszeitraum wählen → 3) Rechnungsdetails eintragen & anlegen.
- * Reads: projekte, kunden, zeiterfassung, beraterInnen. Writes: rechnungen (createRechnungenEntry).
- * Composes: IntentWizardShell, EntitySelectStep, StatusBadge.
+ * Steps: 1) Projekt wählen → 2) Zeiten prüfen (offene verrechenbare Zeiteinträge, Beträge ableiten) → 3) Rechnung prüfen & anlegen.
+ * Reads: projekte (in_bearbeitung), zeiterfassung (Projekt + verrechenbar), berater/innen + leistungskatalog (Sätze), rechnungen (Nummernvorschlag).
+ * Writes: rechnungen (create) + je Zeiteintrag ein Update auf zeiterfassung (verrechenbar = false → gilt als abgerechnet).
+ * Composes: IntentWizardShell, EntitySelectStep, Bound, StepNav, SummaryStep, SuccessStep.
  */
-import { useState } from 'react';
-import { format, addDays } from 'date-fns';
-import { IconFileInvoice, IconClock, IconUser, IconCalendar, IconCheck } from '@tabler/icons-react';
-import { IntentWizardShell } from '@/components/blocks/IntentWizardShell';
+import { useEffect, useState } from 'react';
+import { addDays, format, parseISO } from 'date-fns';
+import { IconClock } from '@tabler/icons-react';
+import { IntentWizardShell, WizardStep } from '@/components/blocks/IntentWizardShell';
 import { EntitySelectStep } from '@/components/blocks/EntitySelectStep';
-import { StatusBadge } from '@/components/blocks/StatusBadge';
+import { Bound } from '@/components/blocks/Bound';
+import { StepNav } from '@/components/blocks/StepNav';
+import { SummaryStep } from '@/components/blocks/SummaryStep';
+import { SuccessStep } from '@/components/blocks/SuccessStep';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useDashboardData } from '@/hooks/useDashboardData';
-import type { Projekte, Zeiterfassung } from '@/types/app';
-import { APP_IDS, LOOKUP_OPTIONS } from '@/types/app';
-import { LivingAppsService, createRecordUrl, extractRecordId } from '@/services/livingAppsService';
-import { formatDate } from '@/lib/formatters';
+import {
+  useStepForm, useJourneySubmit, useRecordSearch, combineFilters, refFilter, todayIso,
+  fieldText, fieldLookup, fieldNumber, fieldDate, fieldRef, optionsOf, displayNameOf,
+} from '@/lib/journey';
+import type { JourneyRecord } from '@/lib/journey';
+import { servicePort } from '@/services/journeyPort';
 import { tx } from '@/i18n';
 
-const RECHNUNGSSTATUS_OPTIONS = LOOKUP_OPTIONS['rechnungen']?.['rechnungsstatus'] ?? [];
-const ABRECHNUNGSMONAT_OPTIONS = LOOKUP_OPTIONS['rechnungen']?.['abrechnungsmonat'] ?? [];
+const eur = (n: number) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(n);
+const hours = (n: number) => `${(Math.round(n * 100) / 100).toLocaleString('de-DE')}`;
+const round2 = (n: number) => Math.round(n * 100) / 100;
+const dmy = (iso: string | null) => (iso ? format(parseISO(iso), 'dd.MM.yyyy') : '–');
+
+interface Entry {
+  id: string;
+  datum: string | null;
+  stunden: number;
+  beschreibung: string;
+  beraterId: string | null;
+  beraterName: string;
+  rate: number | null;
+}
 
 export default function RechnungErstellenPage() {
-  const { projekte, kunden, zeiterfassung, loading, error, fetchAll } = useDashboardData();
-
   const [step, setStep] = useState(1);
+  const [excluded, setExcluded] = useState<string[]>([]);
+  const [manualRates, setManualRates] = useState<Record<string, string>>({});
+  const [refs, setRefs] = useState<Record<string, JourneyRecord | null>>({});
+  const [projektId, setProjektId] = useState<string | null>(null);
 
-  // Step 1 state
-  const [selectedProjekt, setSelectedProjekt] = useState<Projekte | null>(null);
-  const [selectedKundeId, setSelectedKundeId] = useState<string | null>(null);
+  const projekte = useRecordSearch(servicePort, 'projekte', {
+    filter: "r.v_status == 'in_bearbeitung'",
+    where: p => fieldLookup(p, 'status')?.key === 'in_bearbeitung',
+    searchFields: ['projektkennung'],
+    toItem: (p, ctx) => ({
+      id: p.id,
+      title: fieldText(p, 'projektkennung'),
+      subtitle: ctx.ref('kunde'),
+      status: fieldLookup(p, 'status') ?? undefined,
+    }),
+  });
 
-  // Step 2 state
-  const [abrechnungsmonat, setAbrechnungsmonat] = useState<string>(ABRECHNUNGSMONAT_OPTIONS[0]?.key ?? 'januar');
-  const [abrechnungsjahr, setAbrechnungsjahr] = useState<string>(format(new Date(), 'yyyy'));
+  const zeit = useRecordSearch(servicePort, 'zeiterfassung', {
+    filter: projektId ? combineFilters(refFilter('projekt', projektId), tx('r.v_verrechenbar == True')) : undefined,
+    where: z => Boolean(projektId) && fieldRef(z, 'projekt') === projektId && z.fields.verrechenbar === true,
+    searchFields: [],
+  });
 
-  // Step 3 state
-  const [rechnungsnummer, setRechnungsnummer] = useState('');
-  const [rechnungsdatum, setRechnungsdatum] = useState(format(new Date(), 'yyyy-MM-dd'));
-  const [faelligkeitsdatum, setFaelligkeitsdatum] = useState(format(addDays(new Date(), 30), 'yyyy-MM-dd'));
-  const [rechnungsstatusKey, setRechnungsstatusKey] = useState<string>(RECHNUNGSSTATUS_OPTIONS[0]?.key ?? 'offen');
-  const [nettobetrag, setNettobetrag] = useState('');
-  const [mehrwertsteuer, setMehrwertsteuer] = useState('');
-  const [gesamtbetrag, setGesamtbetrag] = useState('');
-  const [leistungspositionen, setLeistungspositionen] = useState('');
-  const [notizen, setNotizen] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  const [createdRechnungId, setCreatedRechnungId] = useState<string | null>(null);
+  const rechnungen = useRecordSearch(servicePort, 'rechnungen', { searchFields: ['rechnungsnummer'] });
 
-  // Derived: active projects only
-  const aktiveProjekte = projekte.filter(p => p.fields.status?.key === 'in_bearbeitung');
+  const f = useStepForm('rechnungen', {
+    fields: [
+      'projekt', 'kunde', 'berater', 'abrechnungsmonat', 'abrechnungsjahr', 'mehrwertsteuer',
+      'rechnungsnummer', 'rechnungsdatum', 'faelligkeitsdatum', 'rechnungsstatus', 'notizen',
+    ],
+    steps: {
+      projekt: 1, kunde: 1, berater: 2, abrechnungsmonat: 2, abrechnungsjahr: 2, mehrwertsteuer: 2,
+      rechnungsnummer: 3, rechnungsdatum: 3, faelligkeitsdatum: 3, rechnungsstatus: 3, notizen: 3,
+    },
+    initial: {
+      mehrwertsteuer: 19,
+      rechnungsdatum: todayIso(),
+      faelligkeitsdatum: format(addDays(new Date(), 30), 'yyyy-MM-dd'),
+      rechnungsstatus: 'offen',
+    },
+  });
 
-  // Derived: billable time entries for selected project
-  const projektZeiterfassung: Zeiterfassung[] = selectedProjekt
-    ? zeiterfassung.filter(
-        ze => extractRecordId(ze.fields.projekt) === selectedProjekt.record_id && ze.fields.verrechenbar === true
-      )
-    : [];
+  // Referenced berater / leistungen (rates) — fetched once per id.
+  const refKeys: string[] = [];
+  for (const z of zeit.records) {
+    const b = fieldRef(z, 'berater');
+    const l = fieldRef(z, 'leistung');
+    if (b) refKeys.push(`berater/innen:${b}`);
+    if (l) refKeys.push(`leistungskatalog:${l}`);
+  }
+  const refSig = Array.from(new Set(refKeys)).sort().join('|');
+  useEffect(() => {
+    const missing = refSig.split('|').filter(k => k && !(k in refs));
+    if (missing.length === 0) return;
+    let cancelled = false;
+    void Promise.all(missing.map(async k => {
+      const [entity, id] = k.split(':') as ['berater/innen' | 'leistungskatalog', string];
+      const rec = await servicePort.get(entity, id).catch(() => null);
+      return [k, rec] as const;
+    })).then(pairs => {
+      if (cancelled) return;
+      setRefs(prev => ({ ...prev, ...Object.fromEntries(pairs) }));
+    });
+    return () => { cancelled = true; };
+  }, [refSig, refs]);
 
-  const gesamtStunden = projektZeiterfassung.reduce((sum, ze) => sum + (ze.fields.stunden ?? 0), 0);
+  const refsPending = refSig.split('|').some(k => k && !(k in refs));
 
-  // Derive unique berater IDs from filtered time entries
-  const uniqueBeraterIds = Array.from(
-    new Set(
-      projektZeiterfassung
-        .map(ze => extractRecordId(ze.fields.berater))
-        .filter((id): id is string => id !== null)
-    )
-  );
+  const entries: Entry[] = zeit.records.map(z => {
+    const bId = fieldRef(z, 'berater');
+    const lId = fieldRef(z, 'leistung');
+    const bRec = bId ? refs[`berater/innen:${bId}`] : null;
+    const lRec = lId ? refs[`leistungskatalog:${lId}`] : null;
+    const leistungRate = lRec ? fieldNumber(lRec, 'stundensatz_leistung') : null;
+    const beraterRate = bRec ? fieldNumber(bRec, 'stundensatz') : null;
+    const manual = Number(manualRates[z.id]?.replace(',', '.'));
+    const rate = leistungRate ?? beraterRate ?? (manualRates[z.id] && Number.isFinite(manual) ? manual : null);
+    return {
+      id: z.id,
+      datum: fieldDate(z, 'datum'),
+      stunden: fieldNumber(z, 'stunden') ?? 0,
+      beschreibung: fieldText(z, 'taetigkeitsbeschreibung'),
+      beraterId: bId,
+      beraterName: bRec ? displayNameOf('berater/innen', bRec.fields) : '',
+      rate,
+    };
+  }).sort((a, b) => (a.datum ?? '').localeCompare(b.datum ?? ''));
 
-  // Step 1 handlers
-  function handleProjektSelect(id: string) {
-    const projekt = projekte.find(p => p.record_id === id) ?? null;
-    setSelectedProjekt(projekt);
-    if (projekt) {
-      const kundeId = extractRecordId(projekt.fields.kunde);
-      setSelectedKundeId(kundeId);
-    } else {
-      setSelectedKundeId(null);
+  const included = entries.filter(e => !excluded.includes(e.id));
+  const withoutRate = included.filter(e => e.rate === null);
+  const totalHours = included.reduce((s, e) => s + e.stunden, 0);
+  const netto = round2(included.reduce((s, e) => s + e.stunden * (e.rate ?? 0), 0));
+  const mwstRaw = Number(f.get('mehrwertsteuer'));
+  const mwst = Number.isFinite(mwstRaw) ? mwstRaw : 0;
+  const gesamt = round2(netto + netto * mwst / 100);
+  const leistungspositionen = included
+    .map(e => tx`${dmy(e.datum)} · ${e.beschreibung || '–'} · ${hours(e.stunden)} Std. · ${eur(round2(e.stunden * (e.rate ?? 0)))}`)
+    .join('\n');
+  const includedSig = included.map(e => e.id).join(',');
+  const beraterIds = Array.from(new Set(included.map(e => e.beraterId).filter((x): x is string => Boolean(x))));
+
+  // Berater, Monat und Jahr leiten sich aus den gewählten Einträgen ab (danach editierbar).
+  useEffect(() => {
+    if (!includedSig) return;
+    const latest = included.map(e => e.datum).filter((d): d is string => Boolean(d)).sort().pop();
+    if (latest) {
+      const monat = optionsOf('rechnungen', 'abrechnungsmonat')[Number(latest.slice(5, 7)) - 1]?.key;
+      if (monat) f.set('abrechnungsmonat', monat);
+      f.set('abrechnungsjahr', latest.slice(0, 4));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [includedSig]);
+
+  const beraterSig = beraterIds.join(',');
+  useEffect(() => {
+    for (const e of included) if (e.beraterId && e.beraterName) f.remember(e.beraterId, e.beraterName);
+    f.set('berater', beraterIds, included.map(e => e.beraterName).filter(Boolean).join(', ') || undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [beraterSig, refSig, refsPending]);
+
+  // Rechnungsnummer-Vorschlag aus den vorhandenen Rechnungen.
+  const nummer = String(f.get('rechnungsnummer') ?? '');
+  const nummernLoading = rechnungen.select.loading;
+  useEffect(() => {
+    if (nummernLoading || nummer) return;
+    const year = format(new Date(), 'yyyy');
+    const prefix = `RE-${year}-`;
+    let max = 0;
+    let any = false;
+    for (const r of rechnungen.records) {
+      const n = fieldText(r, 'rechnungsnummer');
+      if (!n.startsWith(prefix)) continue;
+      const m = /(\d+)\s*$/.exec(n);
+      if (m) { any = true; max = Math.max(max, Number(m[1])); }
+    }
+    const next = any ? max + 1 : rechnungen.records.length + 1;
+    f.set('rechnungsnummer', `${prefix}${String(next).padStart(3, '0')}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nummernLoading, nummer, rechnungen.records.length]);
+
+  const submit = useJourneySubmit(servicePort, [
+    {
+      key: 'rechnung', entity: 'rechnungen', form: f, primary: true,
+      values: () => ({ nettobetrag: netto, gesamtbetrag: gesamt, leistungspositionen }),
+    },
+    ...included.map(e => ({
+      key: `zeit-${e.id}`, entity: 'zeiterfassung' as const, updates: e.id,
+      values: { verrechenbar: false }, needs: ['rechnung'],
+      label: tx`Zeiteintrag ${dmy(e.datum)} als abgerechnet markieren`,
+    })),
+  ], { draftKey: 'rechnung-erstellen' });
+
+  const pickProjekt = (id: string) => {
+    const rec = projekte.recordOf(id);
+    const kundeId = rec ? fieldRef(rec, 'kunde') : null;
+    f.set('projekt', id, projekte.labelOf(id));
+    if (rec && kundeId) f.set('kunde', kundeId, projekte.refLabel(rec, 'kunde'));
+    setProjektId(id);
+    setExcluded([]);
+    setManualRates({});
     setStep(2);
-  }
+  };
 
-  // Step 3 submit
-  async function handleSubmit() {
-    if (!selectedProjekt || !selectedKundeId) return;
-    if (!rechnungsnummer || !gesamtbetrag) return;
-
-    let rid = createdRechnungId;
-    if (rid) {
-      // already created — navigate to success
-      setStep(4);
-      return;
-    }
-
-    setSubmitting(true);
-    setSubmitError(null);
-    try {
-      const uniqueBeraterUrls = uniqueBeraterIds.map(id =>
-        createRecordUrl(APP_IDS.BERATERINNEN, id)
-      );
-
-      const result = await LivingAppsService.createRechnungenEntry({
-        rechnungsnummer,
-        rechnungsdatum,
-        faelligkeitsdatum: faelligkeitsdatum || undefined,
-        rechnungsstatus: rechnungsstatusKey,
-        abrechnungsmonat,
-        abrechnungsjahr,
-        nettobetrag: nettobetrag ? parseFloat(nettobetrag) : undefined,
-        mehrwertsteuer: mehrwertsteuer ? parseFloat(mehrwertsteuer) : undefined,
-        gesamtbetrag: parseFloat(gesamtbetrag),
-        leistungspositionen: leistungspositionen || undefined,
-        notizen: notizen || undefined,
-        kunde: createRecordUrl(APP_IDS.KUNDEN, selectedKundeId),
-        projekt: createRecordUrl(APP_IDS.PROJEKTE, selectedProjekt.record_id),
-        berater: uniqueBeraterUrls.length > 0 ? uniqueBeraterUrls : undefined,
-      });
-
-      rid = result.record_id;
-      setCreatedRechnungId(rid);
-      await fetchAll();
-      setStep(4);
-    } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : tx('Fehler beim Anlegen der Rechnung'));
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  function handleReset() {
+  const restart = () => {
+    submit.reset();
+    f.reset();
+    setProjektId(null);
+    setExcluded([]);
+    setManualRates({});
     setStep(1);
-    setSelectedProjekt(null);
-    setSelectedKundeId(null);
-    setAbrechnungsmonat(ABRECHNUNGSMONAT_OPTIONS[0]?.key ?? 'januar');
-    setAbrechnungsjahr(format(new Date(), 'yyyy'));
-    setRechnungsnummer('');
-    setRechnungsdatum(format(new Date(), 'yyyy-MM-dd'));
-    setFaelligkeitsdatum(format(addDays(new Date(), 30), 'yyyy-MM-dd'));
-    setRechnungsstatusKey(RECHNUNGSSTATUS_OPTIONS[0]?.key ?? 'offen');
-    setNettobetrag('');
-    setMehrwertsteuer('');
-    setGesamtbetrag('');
-    setLeistungspositionen('');
-    setNotizen('');
-    setCreatedRechnungId(null);
-    setSubmitError(null);
-  }
+  };
 
-  const kunde = selectedKundeId ? kunden.find(k => k.record_id === selectedKundeId) : null;
+  const checkZeiten = () => {
+    if (included.length === 0) return tx('Wähle mindestens einen Zeiteintrag aus.');
+    if (refsPending) return tx('Die Sätze werden noch geladen …');
+    if (withoutRate.length > 0) return tx('Trage für alle Einträge ohne Satz einen Stundensatz ein.');
+    return f.validate(['abrechnungsmonat', 'abrechnungsjahr', 'mehrwertsteuer']);
+  };
 
   return (
     <IntentWizardShell
       title={tx('Rechnung erstellen')}
-      subtitle={tx('Projekt wählen, Zeiterfassung prüfen und Rechnung anlegen')}
-      steps={[
-        { label: tx('Projekt') },
-        { label: tx('Zeiterfassung') },
-        { label: tx('Rechnungsdetails') },
-        { label: tx('Fertig') },
-      ]}
-      currentStep={step}
-      onStepChange={setStep}
-      loading={loading}
-      error={error}
-      onRetry={fetchAll}
+      subtitle={tx('Aus den noch nicht abgerechneten Zeiten eines Projekts eine Rechnung erzeugen')}
+      currentStep={step} onStepChange={setStep}
+      forms={[f]} draftKey="rechnung-erstellen"
+      intro={{ description: tx('Rechnung aus offenen Zeiteinträgen eines Projekts erzeugen.'), needs: [tx('Projekt in Bearbeitung'), tx('Erfasste, verrechenbare Zeiten')] }}
     >
-      {/* Step 1: Projekt wählen */}
-      {step === 1 && (
+      <WizardStep label={tx('Projekt')} description={tx('Für welches Projekt soll abgerechnet werden?')}>
+        <EntitySelectStep {...projekte.select} selectedId={projektId} onSelect={pickProjekt}
+          searchPlaceholder={tx('Projektkennung suchen …')}
+          emptyText={tx('Kein Projekt in Bearbeitung gefunden.')} />
+      </WizardStep>
+
+      <WizardStep label={tx('Zeiten')} description={tx('Offene Zeiteinträge prüfen — nicht passende einfach abwählen.')} needs={['projekt']}>
         <div className="space-y-4">
-          <EntitySelectStep
-            items={aktiveProjekte.map(p => {
-              const kundeRec = (() => {
-                const kid = extractRecordId(p.fields.kunde);
-                return kid ? kunden.find(k => k.record_id === kid) : undefined;
-              })();
-              return {
-                id: p.record_id,
-                title: p.fields.projektkennung ?? p.record_id,
-                subtitle: [
-                  p.fields.projektart?.label,
-                  kundeRec?.fields.kundenname,
-                ].filter(Boolean).join(' · '),
-                status: p.fields.status
-                  ? { key: p.fields.status.key, label: p.fields.status.label }
-                  : undefined,
-                icon: <IconFileInvoice size={20} className="text-primary" />,
-              };
-            })}
-            onSelect={handleProjektSelect}
-            searchPlaceholder={tx('Projekt suchen …')}
-            emptyText={tx('Keine aktiven Projekte gefunden')}
-          />
-        </div>
-      )}
-
-      {/* Step 2: Zeiterfassung prüfen */}
-      {step === 2 && (
-        selectedProjekt ? (
-          <div className="space-y-6">
-            {/* Context */}
-            <div className="rounded-2xl border bg-card p-4 space-y-1">
-              <div className="flex items-center gap-2">
-                <IconFileInvoice size={16} className="shrink-0 text-primary" />
-                <span className="font-semibold text-sm">{selectedProjekt.fields.projektkennung}</span>
-                {selectedProjekt.fields.status && (
-                  <StatusBadge statusKey={selectedProjekt.fields.status.key} label={selectedProjekt.fields.status.label} />
-                )}
-              </div>
-              {kunde && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <IconUser size={14} className="shrink-0" />
-                  <span>{kunde.fields.kundenname}</span>
-                </div>
-              )}
+          {zeit.select.loading || refsPending ? (
+            <p className="text-sm text-muted-foreground">{tx('Zeiten werden geladen …')}</p>
+          ) : entries.length === 0 ? (
+            <div className="rounded-2xl border bg-card p-6 text-center space-y-1">
+              <IconClock size={32} className="mx-auto text-muted-foreground" stroke={1.5} />
+              <p className="text-sm font-medium">{tx('Für dieses Projekt gibt es keine offenen Zeiten.')}</p>
+              <p className="text-sm text-muted-foreground">{tx('Ohne offene Zeiteinträge ist keine Rechnung möglich — wähle ein anderes Projekt.')}</p>
+              <Button variant="outline" onClick={() => setStep(1)}>{tx('Anderes Projekt wählen')}</Button>
             </div>
-
-            {/* Abrechnungszeitraum */}
-            <div className="rounded-2xl border bg-card p-4 space-y-3">
-              <h3 className="font-semibold text-sm">{tx('Abrechnungszeitraum')}</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs text-muted-foreground">{tx('Monat')}</label>
-                  <Select value={abrechnungsmonat} onValueChange={setAbrechnungsmonat}>
-                    <SelectTrigger>
-                      <SelectValue placeholder={tx('Monat wählen')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ABRECHNUNGSMONAT_OPTIONS.map(opt => (
-                        <SelectItem key={opt.key} value={opt.key}>{opt.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs text-muted-foreground">{tx('Jahr')}</label>
-                  <Input
-                    value={abrechnungsjahr}
-                    onChange={e => setAbrechnungsjahr(e.target.value)}
-                    placeholder="2024"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Verrechenbare Zeiteinträge */}
-            <div className="rounded-2xl border bg-card p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-sm">{tx('Verrechenbare Zeiterfassung')}</h3>
-                <span className="text-sm font-semibold text-primary">
-                  {gesamtStunden.toFixed(2)} {tx('Std.')}
-                </span>
-              </div>
-
-              {projektZeiterfassung.length === 0 ? (
-                <div className="text-center py-6 space-y-1">
-                  <IconClock size={32} className="mx-auto text-muted-foreground" stroke={1.5} />
-                  <p className="text-sm text-muted-foreground">{tx('Keine verrechenbaren Zeiteinträge für dieses Projekt')}</p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {projektZeiterfassung.map(ze => (
-                    <div key={ze.record_id} className="flex items-start gap-3 py-2 border-b last:border-0">
-                      <IconClock size={16} className="shrink-0 mt-0.5 text-muted-foreground" />
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-sm font-medium truncate">
-                            {ze.fields.datum ? formatDate(ze.fields.datum) : '–'}
+          ) : (
+            <>
+              <div className="rounded-2xl border bg-card divide-y">
+                {entries.map(e => {
+                  const checked = !excluded.includes(e.id);
+                  return (
+                    <div key={e.id} className="flex items-start gap-3 p-3">
+                      <Checkbox
+                        id={`ze-${e.id}`}
+                        checked={checked}
+                        onCheckedChange={v => setExcluded(prev => v === true ? prev.filter(x => x !== e.id) : [...prev, e.id])}
+                        className="mt-1"
+                      />
+                      <label htmlFor={`ze-${e.id}`} className="min-w-0 flex-1 cursor-pointer space-y-0.5">
+                        <div className="flex items-center justify-between gap-2 text-sm">
+                          <span className="font-medium">{dmy(e.datum)} · {hours(e.stunden)} {tx('Std.')}</span>
+                          <span className="font-semibold shrink-0">
+                            {e.rate !== null ? eur(round2(e.stunden * e.rate)) : tx('ohne Satz')}
                           </span>
-                          <span className="text-sm font-semibold shrink-0">{ze.fields.stunden ?? 0} {tx('Std.')}</span>
                         </div>
-                        {ze.fields.taetigkeitsbeschreibung && (
-                          <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
-                            {ze.fields.taetigkeitsbeschreibung}
-                          </p>
-                        )}
-                      </div>
+                        {e.beschreibung && <p className="text-xs text-muted-foreground">{e.beschreibung}</p>}
+                        <p className="text-xs text-muted-foreground">
+                          {[e.beraterName, e.rate !== null ? `${eur(e.rate)}/${tx('Std.')}` : ''].filter(Boolean).join(' · ')}
+                        </p>
+                      </label>
+                      {checked && e.rate === null && (
+                        <Input
+                          inputMode="decimal"
+                          className="w-28"
+                          aria-label={tx('Stundensatz (€/Std.)')}
+                          placeholder={tx('€/Std.')}
+                          value={manualRates[e.id] ?? ''}
+                          onChange={ev => setManualRates(prev => ({ ...prev, [e.id]: ev.target.value }))}
+                        />
+                      )}
                     </div>
-                  ))}
-                </div>
-              )}
+                  );
+                })}
+              </div>
 
-              {uniqueBeraterIds.length > 0 && (
-                <div className="pt-1 text-xs text-muted-foreground flex items-center gap-1">
-                  <IconUser size={12} className="shrink-0" />
-                  <span>
-                    {uniqueBeraterIds.length} {tx('Berater/in einbezogen')}
-                  </span>
-                </div>
-              )}
-            </div>
+              <div className="rounded-2xl border bg-secondary/40 p-4 space-y-1 text-sm">
+                <div className="flex justify-between"><span>{tx('Stunden gesamt')}</span><span className="font-semibold">{hours(totalHours)}</span></div>
+                <div className="flex justify-between"><span>{tx('Nettobetrag')}</span><span className="font-semibold">{eur(netto)}</span></div>
+                <div className="flex justify-between"><span>{tx`inkl. ${mwst} % MwSt.`}</span><span className="font-semibold">{eur(gesamt)}</span></div>
+              </div>
+            </>
+          )}
 
-            <div className="flex justify-between gap-3">
-              <Button variant="outline" onClick={() => setStep(1)}>
-                {tx('Zurück')}
-              </Button>
-              <Button onClick={() => setStep(3)}>
-                {tx('Weiter zu Rechnungsdetails')}
-              </Button>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Bound form={f} name="mehrwertsteuer" hint={tx('In Prozent, Standard 19')} />
+            <Bound form={f} name="abrechnungsjahr" />
           </div>
-        ) : (
-          <div className="text-center py-12 space-y-3">
-            <p className="text-sm text-muted-foreground">{tx('Dieser Schritt braucht die Auswahl aus Schritt 1.')}</p>
-            <Button variant="outline" onClick={() => setStep(1)}>{tx('Neu starten')}</Button>
-          </div>
-        )
-      )}
-
-      {/* Step 3: Rechnungsdetails */}
-      {step === 3 && (
-        selectedProjekt && selectedKundeId ? (
-          <div className="space-y-6">
-            {/* Context summary */}
-            <div className="rounded-2xl border bg-secondary/40 p-4 space-y-2">
-              <div className="flex items-center gap-2 text-sm">
-                <IconFileInvoice size={16} className="shrink-0 text-primary" />
-                <span className="font-semibold">{selectedProjekt.fields.projektkennung}</span>
-                {kunde && <span className="text-muted-foreground">· {kunde.fields.kundenname}</span>}
-              </div>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <IconCalendar size={14} className="shrink-0" />
-                <span>
-                  {ABRECHNUNGSMONAT_OPTIONS.find(o => o.key === abrechnungsmonat)?.label} {abrechnungsjahr}
-                  {' · '}
-                  {gesamtStunden.toFixed(2)} {tx('verrechenbare Std.')}
-                </span>
-              </div>
-            </div>
-
-            {/* Form */}
-            <div className="rounded-2xl border bg-card p-4 space-y-4">
-              <h3 className="font-semibold text-sm">{tx('Rechnungsinformationen')}</h3>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs text-muted-foreground">{tx('Rechnungsnummer')} *</label>
-                  <Input
-                    value={rechnungsnummer}
-                    onChange={e => setRechnungsnummer(e.target.value)}
-                    placeholder={tx('z. B. RE-2024-001')}
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs text-muted-foreground">{tx('Rechnungsstatus')} *</label>
-                  <Select value={rechnungsstatusKey} onValueChange={setRechnungsstatusKey}>
-                    <SelectTrigger>
-                      <SelectValue placeholder={tx('Status wählen')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {RECHNUNGSSTATUS_OPTIONS.map(opt => (
-                        <SelectItem key={opt.key} value={opt.key}>{opt.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs text-muted-foreground">{tx('Rechnungsdatum')} *</label>
-                  <Input
-                    type="date"
-                    value={rechnungsdatum}
-                    onChange={e => setRechnungsdatum(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs text-muted-foreground">{tx('Fälligkeitsdatum')}</label>
-                  <Input
-                    type="date"
-                    value={faelligkeitsdatum}
-                    onChange={e => setFaelligkeitsdatum(e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-2xl border bg-card p-4 space-y-4">
-              <h3 className="font-semibold text-sm">{tx('Beträge')}</h3>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs text-muted-foreground">{tx('Nettobetrag (€)')}</label>
-                  <Input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={nettobetrag}
-                    onChange={e => setNettobetrag(e.target.value)}
-                    placeholder="0.00"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs text-muted-foreground">{tx('MwSt. (%)')}</label>
-                  <Input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={mehrwertsteuer}
-                    onChange={e => setMehrwertsteuer(e.target.value)}
-                    placeholder="19"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs text-muted-foreground">{tx('Gesamtbetrag (€)')} *</label>
-                  <Input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={gesamtbetrag}
-                    onChange={e => setGesamtbetrag(e.target.value)}
-                    placeholder="0.00"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-2xl border bg-card p-4 space-y-4">
-              <h3 className="font-semibold text-sm">{tx('Details')}</h3>
-
-              <div className="space-y-1">
-                <label className="text-xs text-muted-foreground">{tx('Leistungspositionen')}</label>
-                <Textarea
-                  value={leistungspositionen}
-                  onChange={e => setLeistungspositionen(e.target.value)}
-                  placeholder={tx('Beschreibung der abgerechneten Leistungen …')}
-                  rows={4}
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs text-muted-foreground">{tx('Notizen')}</label>
-                <Textarea
-                  value={notizen}
-                  onChange={e => setNotizen(e.target.value)}
-                  placeholder={tx('Interne Notizen zur Rechnung …')}
-                  rows={2}
-                />
-              </div>
-            </div>
-
-            {submitError && (
-              <div className="rounded-xl bg-destructive/10 border border-destructive/20 p-3 text-sm text-destructive">
-                {submitError}
-              </div>
-            )}
-
-            <div className="flex justify-between gap-3">
-              <Button variant="outline" onClick={() => setStep(2)} disabled={submitting}>
-                {tx('Zurück')}
-              </Button>
-              <Button
-                disabled={!rechnungsnummer || !gesamtbetrag || submitting}
-                onClick={handleSubmit}
-              >
-                {submitting ? tx('Wird angelegt …') : tx('Rechnung anlegen')}
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div className="text-center py-12 space-y-3">
-            <p className="text-sm text-muted-foreground">{tx('Dieser Schritt braucht die Auswahl aus Schritt 1.')}</p>
-            <Button variant="outline" onClick={() => setStep(1)}>{tx('Neu starten')}</Button>
-          </div>
-        )
-      )}
-
-      {/* Step 4: Fertig */}
-      {step === 4 && (
-        <div className="flex flex-col items-center text-center py-12 space-y-6">
-          <div className="rounded-full bg-primary/10 p-5">
-            <IconCheck size={40} className="text-primary" stroke={2} />
-          </div>
-          <div className="space-y-2">
-            <h2 className="text-xl font-bold">{tx('Rechnung wurde angelegt')}</h2>
-            <p className="text-sm text-muted-foreground max-w-sm">
-              {tx('Die Rechnung')} <strong>{rechnungsnummer}</strong> {tx('wurde erfolgreich erstellt.')}
-              {kunde && (
-                <> {tx('Kunde')}: {kunde.fields.kundenname}.</>
-              )}
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Button variant="outline" onClick={handleReset}>
-              {tx('Neue Rechnung anlegen')}
-            </Button>
-            <a href="#/">
-              <Button>{tx('Zurück zum Dashboard')}</Button>
-            </a>
-          </div>
+          <Bound form={f} name="abrechnungsmonat" />
+          <StepNav onBack={() => setStep(1)} onNext={checkZeiten} nextStepLabel={tx('Rechnung prüfen')}
+            nextDisabled={entries.length === 0} />
         </div>
+      </WizardStep>
+
+      <WizardStep label={tx('Rechnung')} description={tx('Nummer, Datum und Status der Rechnung festlegen.')} needs={['projekt']}>
+        <div className="space-y-4">
+          <Bound form={f} name="rechnungsnummer" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Bound form={f} name="rechnungsdatum" />
+            <Bound form={f} name="faelligkeitsdatum" />
+          </div>
+          <Bound form={f} name="rechnungsstatus" />
+          <Bound form={f} name="notizen" rows={3} />
+          <StepNav onBack={() => setStep(2)}
+            onNext={() => f.validate(['rechnungsnummer', 'rechnungsdatum', 'faelligkeitsdatum', 'rechnungsstatus', 'notizen'])}
+            nextStepLabel={tx('Prüfen')} />
+        </div>
+      </WizardStep>
+
+      <WizardStep label={tx('Prüfen')}>
+        {!submit.done && (
+          <SummaryStep forms={[f]} submit={submit}
+            items={[
+              { key: 'zeiten', label: tx('Zeiteinträge'), value: String(included.length) },
+              { key: 'stunden', label: tx('Stunden gesamt'), value: hours(totalHours) },
+              { key: 'netto', label: tx('Nettobetrag'), value: eur(netto) },
+              { key: 'gesamt', label: tx('Gesamtbetrag'), value: eur(gesamt) },
+            ]}
+            whatHappensNext={tx('Die Rechnung wird angelegt und alle enthaltenen Zeiteinträge werden als abgerechnet markiert — sie erscheinen auf keiner weiteren Rechnung.')} />
+        )}
+      </WizardStep>
+
+      {submit.result && (
+        <SuccessStep result={submit.result}
+          facts={[
+            { label: tx('Rechnungsnummer'), value: nummer },
+            { label: tx('Stunden gesamt'), value: hours(totalHours) },
+            { label: tx('Gesamtbetrag'), value: eur(gesamt) },
+          ]}
+          next={[
+            { label: tx('Neue Rechnung'), onClick: restart },
+            { label: tx('Zum Dashboard'), href: '#/' },
+          ]}
+          whatHappensNext={tx('Die abgerechneten Zeiteinträge sind als nicht mehr verrechenbar markiert.')} />
       )}
     </IntentWizardShell>
   );
