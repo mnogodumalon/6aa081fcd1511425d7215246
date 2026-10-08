@@ -20,7 +20,7 @@
  *   - kunden: kundenname (Name / Firmenname), kundentyp (Kundentyp), email (E-Mail)
  *   - leistungskatalog: leistungsbezeichnung (Leistungsbezeichnung), leistungstyp (Leistungstyp)
  *   - projekte: projektkennung (Projektkennung), projektnummer (Projektnummer), projektart (Projektart), projektstart_jahr (Startjahr), status (Projektstatus), kunde (Kunde)
- *   - angebote: angebotsnummer (Angebotsnummer), angebotsjahr (Jahr), angebotstyp (Angebotstyp), angebotsdatum (Angebotsdatum)
+ *   - angebote: angebotsnummer (Angebotsnummer), angebotsjahr (Jahr), angebotstyp (Angebotstyp), angebotsdatum (Angebotsdatum), angebotsstatus (Angebotsstatus)
  *   - zeiterfassung: datum (Datum), stunden (Geleistete Stunden), monat (Abrechnungsmonat), jahr (Abrechnungsjahr), berater (Berater/in), projekt (Projekt)
  *   - rechnungen: rechnungsnummer (Rechnungsnummer), rechnungsdatum (Rechnungsdatum), rechnungsstatus (Rechnungsstatus), gesamtbetrag (Gesamtbetrag (€)), kunde (Kunde), projekt (Projekt)
  */
@@ -33,7 +33,7 @@ export interface MessageFields {
   "kunden": "kundenname" | "kundentyp" | "email" | "telefon" | "strasse" | "hausnummer" | "plz" | "ort" | "re_strasse" | "re_hausnummer" | "re_plz" | "re_ort" | "anlagedatum" | "ap_titel" | "ap_vorname" | "ap_nachname" | "ap_email" | "ap_telefon" | "bevorzugte_kontaktart" | "letzter_kontakt_datum" | "letzter_kontakt_ansprechpartner" | "notizen" | "laufende_projekte";
   "leistungskatalog": "leistungsbezeichnung" | "leistungstyp" | "beschreibung" | "kostenvoranschlag" | "stundensatz_leistung" | "einheit" | "verfuegbarkeit" | "kuerzel";
   "projekte": "projektkennung" | "projektnummer" | "projektart" | "projektstart_jahr" | "projektstart_monat" | "status" | "ansprechpartner_kunde" | "letzter_schritt" | "projektende" | "notizen" | "kunde" | "projektleitung";
-  "angebote": "angebotsnummer" | "angebotsjahr" | "angebotstyp" | "angebotsdatum" | "gueltig_bis" | "zeitrahmen_anfang" | "zeitrahmen_ende" | "dauer" | "kostentyp" | "kostenbetrag" | "kosten_beschreibung" | "angebotsbeschreibung" | "leistungspositionen" | "anmerkungen" | "projekt" | "kunde";
+  "angebote": "angebotsnummer" | "angebotsjahr" | "angebotstyp" | "angebotsdatum" | "gueltig_bis" | "zeitrahmen_anfang" | "zeitrahmen_ende" | "dauer" | "kostentyp" | "kostenbetrag" | "kosten_beschreibung" | "angebotsbeschreibung" | "leistungspositionen" | "anmerkungen" | "angebotsstatus" | "projekt" | "kunde";
   "zeiterfassung": "datum" | "stunden" | "monat" | "jahr" | "taetigkeitsbeschreibung" | "verrechenbar" | "notizen" | "berater" | "projekt" | "leistung";
   "rechnungen": "rechnungsnummer" | "rechnungsdatum" | "faelligkeitsdatum" | "rechnungsstatus" | "abrechnungsmonat" | "abrechnungsjahr" | "nettobetrag" | "mehrwertsteuer" | "gesamtbetrag" | "zahlungseingang" | "leistungspositionen" | "notizen" | "kunde" | "projekt" | "berater";
 }

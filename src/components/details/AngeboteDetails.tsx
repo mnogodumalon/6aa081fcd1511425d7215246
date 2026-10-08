@@ -54,6 +54,7 @@ export function AngeboteDetails({
             <MediaThumbnail src={record.fields.vorlage_datei as string} fit="contain" className="max-h-64 w-full rounded-lg" />
           ) : '—'}
         </RecordField>
+        <RecordField label={fieldLabel('angebote', 'angebotsstatus')} value={record.fields.angebotsstatus} format="pill" />
       </RecordSection>
 
       {/* N:1 — verknüpfte Records: IMMER klickbar, nie eine Text-Sackgasse. */}

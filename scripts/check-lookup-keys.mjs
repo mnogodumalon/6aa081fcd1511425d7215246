@@ -29,6 +29,13 @@ const VALID_KEYS = {
     "oktober",
     "september"
   ],
+  "angebotsstatus": [
+    "abgelehnt",
+    "angenommen",
+    "entwurf",
+    "freigegeben",
+    "versendet"
+  ],
   "angebotstyp": [
     "dienstleistung",
     "projekt",

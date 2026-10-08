@@ -15,9 +15,6 @@
 export const SYSTEM_ASSIGNED: Record<string, string[]> = {};
 
 export const PLAN_SENTENCES: Record<string, string[]> = {
-  "stunden-erfassen": [],
-  "angebot-erstellen": [],
-  "rechnung-erstellen": [],
   "kunde-bearbeiten": [
     "Ändert: kunden"
   ]

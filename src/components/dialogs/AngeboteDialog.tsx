@@ -46,9 +46,10 @@ import { fileToDataUri, extractFromInput, extractPhotoMeta, reverseGeocode, data
 import { lookupKey } from '@/lib/formatters';
 
 /** Widened prefill type for AngeboteDialog.defaultValues — see file header. */
-export type AngeboteDialogDefaults = Omit<Angebote['fields'], 'angebotstyp' | 'kostentyp'> & {
+export type AngeboteDialogDefaults = Omit<Angebote['fields'], 'angebotstyp' | 'kostentyp' | 'angebotsstatus'> & {
     angebotstyp?: LookupValue | string;
     kostentyp?: LookupValue | string;
+    angebotsstatus?: LookupValue | string;
   };
 
 interface AngeboteDialogProps {
@@ -73,6 +74,7 @@ interface AngeboteDialogProps {
 const NORMALIZE_LOOKUPS: Record<string, readonly { key: string; label: string }[]> = {
   angebotstyp: LOOKUP_OPTIONS['angebote']?.['angebotstyp'] ?? [],
   kostentyp: LOOKUP_OPTIONS['angebote']?.['kostentyp'] ?? [],
+  angebotsstatus: LOOKUP_OPTIONS['angebote']?.['angebotsstatus'] ?? [],
 };
 const NORMALIZE_APPLOOKUPS: Record<string, string> = {
   projekt: APP_IDS.PROJEKTE,
@@ -148,7 +150,7 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
   // Fields the plan assigns to a tool (empty without a plan).
   const SYSTEM_ASSIGNED: string[] = [];
   const [showErrors, setShowErrors] = useState(false);
-  const REQUIRED_FIELDS = ['angebotsnummer', 'angebotsjahr', 'angebotstyp', 'angebotsdatum'] as const;
+  const REQUIRED_FIELDS = ['angebotsnummer', 'angebotsjahr', 'angebotstyp', 'angebotsdatum', 'angebotsstatus'] as const;
   const missingRequired = REQUIRED_FIELDS.filter(k => {
     const v = (fields as Record<string, unknown>)[k];
     return v == null || v === '' || (Array.isArray(v) && v.length === 0);
@@ -305,7 +307,7 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
         }
       }
       const photoContext = contextParts.length ? contextParts.join('\n') : undefined;
-      const schema = `{\n  "angebotsnummer": string | null, // Angebotsnummer\n  "angebotsjahr": string | null, // Jahr\n  "angebotstyp": LookupValue | null, // Angebotstyp (select one key: "dienstleistung" | "projekt" | "wartung" | "schulung" | "sonstiges") mapping: dienstleistung=Dienstleistungsangebot, projekt=Projektangebot, wartung=Wartungsangebot, schulung=Schulungsangebot, sonstiges=Sonstiges\n  "angebotsdatum": string | null, // YYYY-MM-DD\n  "gueltig_bis": string | null, // YYYY-MM-DD\n  "zeitrahmen_anfang": string | null, // YYYY-MM-DD\n  "zeitrahmen_ende": string | null, // YYYY-MM-DD\n  "dauer": string | null, // Dauer\n  "kostentyp": LookupValue | null, // Kostentyp (select one key: "einmalig" | "monatlich" | "jaehrlich" | "nach_aufwand" | "pauschal" | "sonstiges") mapping: einmalig=Einmalig, monatlich=Monatlich, jaehrlich=Jährlich, nach_aufwand=Nach Aufwand, pauschal=Pauschal, sonstiges=Sonstiges\n  "kostenbetrag": number | null, // Betrag (€)\n  "kosten_beschreibung": string | null, // Kostenbeschreibung\n  "angebotsbeschreibung": string | null, // Angebotsbeschreibung\n  "leistungspositionen": string | null, // Leistungspositionen\n  "anmerkungen": string | null, // Anmerkungen / Sonstiges\n  "projekt": string | null, // Display name from Projekte (see <available-records>)\n  "kunde": string | null, // Display name from Kunden (see <available-records>)\n}`;
+      const schema = `{\n  "angebotsnummer": string | null, // Angebotsnummer\n  "angebotsjahr": string | null, // Jahr\n  "angebotstyp": LookupValue | null, // Angebotstyp (select one key: "dienstleistung" | "projekt" | "wartung" | "schulung" | "sonstiges") mapping: dienstleistung=Dienstleistungsangebot, projekt=Projektangebot, wartung=Wartungsangebot, schulung=Schulungsangebot, sonstiges=Sonstiges\n  "angebotsdatum": string | null, // YYYY-MM-DD\n  "gueltig_bis": string | null, // YYYY-MM-DD\n  "zeitrahmen_anfang": string | null, // YYYY-MM-DD\n  "zeitrahmen_ende": string | null, // YYYY-MM-DD\n  "dauer": string | null, // Dauer\n  "kostentyp": LookupValue | null, // Kostentyp (select one key: "einmalig" | "monatlich" | "jaehrlich" | "nach_aufwand" | "pauschal" | "sonstiges") mapping: einmalig=Einmalig, monatlich=Monatlich, jaehrlich=Jährlich, nach_aufwand=Nach Aufwand, pauschal=Pauschal, sonstiges=Sonstiges\n  "kostenbetrag": number | null, // Betrag (€)\n  "kosten_beschreibung": string | null, // Kostenbeschreibung\n  "angebotsbeschreibung": string | null, // Angebotsbeschreibung\n  "leistungspositionen": string | null, // Leistungspositionen\n  "anmerkungen": string | null, // Anmerkungen / Sonstiges\n  "angebotsstatus": LookupValue | null, // Angebotsstatus (select one key: "entwurf" | "freigegeben" | "versendet" | "angenommen" | "abgelehnt") mapping: entwurf=Entwurf, freigegeben=Freigegeben, versendet=Versendet, angenommen=Angenommen, abgelehnt=Abgelehnt\n  "projekt": string | null, // Display name from Projekte (see <available-records>)\n  "kunde": string | null, // Display name from Kunden (see <available-records>)\n}`;
       const raw = await extractFromInput<Record<string, unknown>>(schema, {
         dataUri: uri,
         userText: aiText.trim() || undefined,
@@ -710,6 +712,81 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
         )}
       </div>
     ),
+    'angebotsstatus': (
+      <div key="angebotsstatus" className="space-y-1.5">
+        <Label htmlFor="angebotsstatus">{fieldLabel('angebote', 'angebotsstatus')} <span className="text-destructive" aria-hidden="true">*</span></Label>
+        <div role="radiogroup" className="flex flex-wrap gap-1.5">
+          <button
+            type="button"
+            role="radio"
+            aria-checked={lookupKey(fields.angebotsstatus) === 'entwurf'}
+            onClick={() => setFields(f => ({ ...f, angebotsstatus: (lookupKey(f.angebotsstatus) === 'entwurf' ? undefined : 'entwurf') as any }))}
+            className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+              lookupKey(fields.angebotsstatus) === 'entwurf'
+                ? 'bg-foreground text-background border-foreground'
+                : 'bg-background text-foreground border-input hover:bg-accent'
+            }`}
+          >
+            {lookupLabel('angebote', 'angebotsstatus', 'entwurf') ?? 'Entwurf'}
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={lookupKey(fields.angebotsstatus) === 'freigegeben'}
+            onClick={() => setFields(f => ({ ...f, angebotsstatus: (lookupKey(f.angebotsstatus) === 'freigegeben' ? undefined : 'freigegeben') as any }))}
+            className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+              lookupKey(fields.angebotsstatus) === 'freigegeben'
+                ? 'bg-foreground text-background border-foreground'
+                : 'bg-background text-foreground border-input hover:bg-accent'
+            }`}
+          >
+            {lookupLabel('angebote', 'angebotsstatus', 'freigegeben') ?? 'Freigegeben'}
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={lookupKey(fields.angebotsstatus) === 'versendet'}
+            onClick={() => setFields(f => ({ ...f, angebotsstatus: (lookupKey(f.angebotsstatus) === 'versendet' ? undefined : 'versendet') as any }))}
+            className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+              lookupKey(fields.angebotsstatus) === 'versendet'
+                ? 'bg-foreground text-background border-foreground'
+                : 'bg-background text-foreground border-input hover:bg-accent'
+            }`}
+          >
+            {lookupLabel('angebote', 'angebotsstatus', 'versendet') ?? 'Versendet'}
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={lookupKey(fields.angebotsstatus) === 'angenommen'}
+            onClick={() => setFields(f => ({ ...f, angebotsstatus: (lookupKey(f.angebotsstatus) === 'angenommen' ? undefined : 'angenommen') as any }))}
+            className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+              lookupKey(fields.angebotsstatus) === 'angenommen'
+                ? 'bg-foreground text-background border-foreground'
+                : 'bg-background text-foreground border-input hover:bg-accent'
+            }`}
+          >
+            {lookupLabel('angebote', 'angebotsstatus', 'angenommen') ?? 'Angenommen'}
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={lookupKey(fields.angebotsstatus) === 'abgelehnt'}
+            onClick={() => setFields(f => ({ ...f, angebotsstatus: (lookupKey(f.angebotsstatus) === 'abgelehnt' ? undefined : 'abgelehnt') as any }))}
+            className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+              lookupKey(fields.angebotsstatus) === 'abgelehnt'
+                ? 'bg-foreground text-background border-foreground'
+                : 'bg-background text-foreground border-input hover:bg-accent'
+            }`}
+          >
+            {lookupLabel('angebote', 'angebotsstatus', 'abgelehnt') ?? 'Abgelehnt'}
+          </button>
+        </div>
+        {showErrors && !fields.angebotsstatus && (
+          <p className="text-xs text-destructive mt-1" role="alert">{requiredMessage('angebote', 'angebotsstatus')}</p>
+        )}
+      </div>
+    ),
     'projekt': (
       <div key="projekt" className="space-y-1.5">
         <Label htmlFor="projekt">{fieldLabel('angebote', 'projekt')}</Label>
@@ -758,7 +835,7 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
   //     kein passendes Backend-Feld in orderedFields) erscheinen NICHT als
   //     Input, sondern unten als kompakte 'Berechnungen'-Übersicht oder als
   //     Inline-Hint unter dem letzten beitragenden Input.
-  const FIELD_LABELS: Record<string, string> = {"angebotsnummer": "Angebotsnummer", "angebotsjahr": "Jahr", "angebotstyp": "Angebotstyp", "angebotsdatum": "Angebotsdatum", "gueltig_bis": "Gültig bis", "zeitrahmen_anfang": "Beginn", "zeitrahmen_ende": "Ende (falls vorhanden)", "dauer": "Dauer", "kostentyp": "Kostentyp", "kostenbetrag": "Betrag (€)", "kosten_beschreibung": "Kostenbeschreibung", "angebotsbeschreibung": "Angebotsbeschreibung", "leistungspositionen": "Leistungspositionen", "anmerkungen": "Anmerkungen / Sonstiges", "vorlage_datei": "Angebotsvorlage (PDF/Dokument)", "projekt": "Zugewiesenes Projekt", "kunde": "Kunde"};
+  const FIELD_LABELS: Record<string, string> = {"angebotsnummer": "Angebotsnummer", "angebotsjahr": "Jahr", "angebotstyp": "Angebotstyp", "angebotsdatum": "Angebotsdatum", "gueltig_bis": "Gültig bis", "zeitrahmen_anfang": "Beginn", "zeitrahmen_ende": "Ende (falls vorhanden)", "dauer": "Dauer", "kostentyp": "Kostentyp", "kostenbetrag": "Betrag (€)", "kosten_beschreibung": "Kostenbeschreibung", "angebotsbeschreibung": "Angebotsbeschreibung", "leistungspositionen": "Leistungspositionen", "anmerkungen": "Anmerkungen / Sonstiges", "vorlage_datei": "Angebotsvorlage (PDF/Dokument)", "angebotsstatus": "Angebotsstatus", "projekt": "Zugewiesenes Projekt", "kunde": "Kunde"};
   const CURRENCY_KEYS = new Set<string>(["kostenbetrag"]);
   // Applookup-Referenz-Labels: pro applookup-Feld in dieser Form (ownKey)
   // eine Map { lookupKey: label } für ALLE Felder des Target-Schemas. Wird

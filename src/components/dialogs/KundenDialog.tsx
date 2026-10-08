@@ -278,7 +278,7 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
         }
       }
       const photoContext = contextParts.length ? contextParts.join('\n') : undefined;
-      const schema = `{\n  "kundenname": string | null, // Name / Firmenname\n  "kundentyp": LookupValue | null, // Kundentyp (select one key: "firma" | "behoerde" | "sonstiges" | "einzelperson") mapping: firma=Firma, behoerde=Behörde, sonstiges=Sonstiges, einzelperson=Einzelperson\n  "email": string | null, // E-Mail\n  "telefon": string | null, // Telefon\n  "strasse": string | null, // Straße\n  "hausnummer": string | null, // Hausnummer\n  "plz": string | null, // Postleitzahl\n  "ort": string | null, // Ort\n  "re_strasse": string | null, // Rechnungsstraße\n  "re_hausnummer": string | null, // Rechnungs-Hausnummer\n  "re_plz": string | null, // Rechnungs-Postleitzahl\n  "re_ort": string | null, // Rechnungs-Ort\n  "anlagedatum": string | null, // YYYY-MM-DD\n  "ap_titel": string | null, // Titel Ansprechpartner\n  "ap_vorname": string | null, // Vorname Ansprechpartner\n  "ap_nachname": string | null, // Nachname Ansprechpartner\n  "ap_email": string | null, // E-Mail Ansprechpartner\n  "ap_telefon": string | null, // Telefon Ansprechpartner\n  "bevorzugte_kontaktart": LookupValue | null, // Bevorzugte Kontaktart (select one key: "email" | "telefon" | "post" | "persoenlich") mapping: email=E-Mail, telefon=Telefon, post=Post, persoenlich=Persönlich\n  "letzter_kontakt_datum": string | null, // YYYY-MM-DD\n  "letzter_kontakt_ansprechpartner": string | null, // Ansprechpartner beim letzten Kontakt\n  "notizen": string | null, // Notizen\n  "laufende_projekte": string[] | null, // Display names from Projekte, one per referenced record (see <available-records>)\n}`;
+      const schema = `{\n  "kundenname": string | null, // Name / Firmenname\n  "kundentyp": LookupValue | null, // Kundentyp (select one key: "einzelperson" | "firma" | "behoerde" | "sonstiges") mapping: einzelperson=Einzelperson, firma=Firma, behoerde=Behörde, sonstiges=Sonstiges\n  "email": string | null, // E-Mail\n  "telefon": string | null, // Telefon\n  "strasse": string | null, // Straße\n  "hausnummer": string | null, // Hausnummer\n  "plz": string | null, // Postleitzahl\n  "ort": string | null, // Ort\n  "re_strasse": string | null, // Rechnungsstraße\n  "re_hausnummer": string | null, // Rechnungs-Hausnummer\n  "re_plz": string | null, // Rechnungs-Postleitzahl\n  "re_ort": string | null, // Rechnungs-Ort\n  "anlagedatum": string | null, // YYYY-MM-DD\n  "ap_titel": string | null, // Titel Ansprechpartner\n  "ap_vorname": string | null, // Vorname Ansprechpartner\n  "ap_nachname": string | null, // Nachname Ansprechpartner\n  "ap_email": string | null, // E-Mail Ansprechpartner\n  "ap_telefon": string | null, // Telefon Ansprechpartner\n  "bevorzugte_kontaktart": LookupValue | null, // Bevorzugte Kontaktart (select one key: "email" | "telefon" | "post" | "persoenlich") mapping: email=E-Mail, telefon=Telefon, post=Post, persoenlich=Persönlich\n  "letzter_kontakt_datum": string | null, // YYYY-MM-DD\n  "letzter_kontakt_ansprechpartner": string | null, // Ansprechpartner beim letzten Kontakt\n  "notizen": string | null, // Notizen\n  "laufende_projekte": string[] | null, // Display names from Projekte, one per referenced record (see <available-records>)\n}`;
       const raw = await extractFromInput<Record<string, unknown>>(schema, {
         dataUri: uri,
         userText: aiText.trim() || undefined,
@@ -372,6 +372,19 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
           <button
             type="button"
             role="radio"
+            aria-checked={lookupKey(fields.kundentyp) === 'einzelperson'}
+            onClick={() => setFields(f => ({ ...f, kundentyp: (lookupKey(f.kundentyp) === 'einzelperson' ? undefined : 'einzelperson') as any }))}
+            className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+              lookupKey(fields.kundentyp) === 'einzelperson'
+                ? 'bg-foreground text-background border-foreground'
+                : 'bg-background text-foreground border-input hover:bg-accent'
+            }`}
+          >
+            {lookupLabel('kunden', 'kundentyp', 'einzelperson') ?? 'Einzelperson'}
+          </button>
+          <button
+            type="button"
+            role="radio"
             aria-checked={lookupKey(fields.kundentyp) === 'firma'}
             onClick={() => setFields(f => ({ ...f, kundentyp: (lookupKey(f.kundentyp) === 'firma' ? undefined : 'firma') as any }))}
             className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
@@ -407,19 +420,6 @@ export function KundenDialog({ open, onClose, onSubmit, defaultValues, recordId,
             }`}
           >
             {lookupLabel('kunden', 'kundentyp', 'sonstiges') ?? 'Sonstiges'}
-          </button>
-          <button
-            type="button"
-            role="radio"
-            aria-checked={lookupKey(fields.kundentyp) === 'einzelperson'}
-            onClick={() => setFields(f => ({ ...f, kundentyp: (lookupKey(f.kundentyp) === 'einzelperson' ? undefined : 'einzelperson') as any }))}
-            className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
-              lookupKey(fields.kundentyp) === 'einzelperson'
-                ? 'bg-foreground text-background border-foreground'
-                : 'bg-background text-foreground border-input hover:bg-accent'
-            }`}
-          >
-            {lookupLabel('kunden', 'kundentyp', 'einzelperson') ?? 'Einzelperson'}
           </button>
         </div>
         {showErrors && !fields.kundentyp && (

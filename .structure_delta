@@ -3,116 +3,14 @@
   "changes": [
     {
       "kind": "field_added",
-      "entity": "berater/innen",
-      "field": "hausnummer_geschaeftlich",
-      "fulltype": "string/text",
-      "label": "Hausnummer (geschäftlich)"
-    },
-    {
-      "kind": "field_added",
-      "entity": "berater/innen",
-      "field": "ort_geschaeftlich",
-      "fulltype": "string/text",
-      "label": "Ort (geschäftlich)"
-    },
-    {
-      "kind": "field_added",
-      "entity": "berater/innen",
-      "field": "plz_geschaeftlich",
-      "fulltype": "string/text",
-      "label": "Postleitzahl (geschäftlich)"
-    },
-    {
-      "kind": "field_added",
-      "entity": "berater/innen",
-      "field": "strasse_geschaeftlich",
-      "fulltype": "string/text",
-      "label": "Straße (geschäftlich)"
-    },
-    {
-      "kind": "field_added",
-      "entity": "berater/innen",
-      "field": "telefon_geschaeftlich",
-      "fulltype": "string/tel",
-      "label": "Telefon (geschäftlich)"
-    },
-    {
-      "kind": "label_changed",
-      "scope": "field",
-      "entity": "berater/innen",
-      "field": "hausnummer",
-      "old_label": "Hausnummer",
-      "new_label": "Hausnummer (privat)"
-    },
-    {
-      "kind": "label_changed",
-      "scope": "field",
-      "entity": "berater/innen",
-      "field": "leistungen",
-      "old_label": "Erbringbare Leistungen",
-      "new_label": "Durchführbare Leistungen"
-    },
-    {
-      "kind": "label_changed",
-      "scope": "field",
-      "entity": "berater/innen",
-      "field": "ort",
-      "old_label": "Ort",
-      "new_label": "Ort (privat)"
-    },
-    {
-      "kind": "label_changed",
-      "scope": "field",
-      "entity": "berater/innen",
-      "field": "plz",
-      "old_label": "Postleitzahl",
-      "new_label": "Postleitzahl (privat)"
-    },
-    {
-      "kind": "options_changed",
-      "entity": "berater/innen",
-      "field": "status",
-      "added": [
-        "unternehmen_verlassen"
-      ],
-      "removed": []
-    },
-    {
-      "kind": "label_changed",
-      "scope": "field",
-      "entity": "berater/innen",
-      "field": "strasse",
-      "old_label": "Straße",
-      "new_label": "Straße (privat)"
-    },
-    {
-      "kind": "label_changed",
-      "scope": "field",
-      "entity": "berater/innen",
-      "field": "telefon",
-      "old_label": "Telefon",
-      "new_label": "Telefon (privat)"
-    },
-    {
-      "kind": "field_added",
-      "entity": "leistungskatalog",
-      "field": "kuerzel",
-      "fulltype": "string/text",
-      "label": "Kürzel"
-    },
-    {
-      "kind": "field_removed",
-      "entity": "leistungskatalog",
-      "field": "berater",
-      "fulltype": "multipleapplookup/select",
-      "label": "Ausführende Berater/innen"
+      "entity": "angebote",
+      "field": "angebotsstatus",
+      "fulltype": "lookup/radio",
+      "label": "Angebotsstatus"
     }
   ],
   "counts": {
-    "field_added": 6,
-    "field_removed": 1,
-    "label_changed": 6,
-    "options_changed": 1
+    "field_added": 1
   },
   "harmless_only": false
 }

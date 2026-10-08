@@ -384,10 +384,10 @@
           "in_fulltext_search": true,
           "in_expert_search": true,
           "lookup_data": {
+            "einzelperson": "Einzelperson",
             "firma": "Firma",
             "behoerde": "Behörde",
-            "sonstiges": "Sonstiges",
-            "einzelperson": "Einzelperson"
+            "sonstiges": "Sonstiges"
           }
         },
         "email": {
@@ -908,7 +908,6 @@
           "in_fulltext_search": true,
           "in_expert_search": true,
           "lookup_data": {
-            "it_beratung": "IT-Beratung",
             "entwicklung": "Entwicklung",
             "schulung": "Schulung",
             "konzeption": "Konzeption",
@@ -923,7 +922,8 @@
             "sonstige_projekte": "Sonstiges / Andere Projekte",
             "workshops_seminare": "Workshops / Seminare",
             "immobilienprojekte": "Immobilienprojekte",
-            "it_projekte": "IT-Projekte"
+            "it_projekte": "IT-Projekte",
+            "it_beratung": "IT-Beratung"
           }
         },
         "projektstart_jahr": {
@@ -957,7 +957,6 @@
           "in_expert_search": true,
           "lookup_data": {
             "januar": "Januar",
-            "februar": "Februar",
             "maerz": "März",
             "april": "April",
             "mai": "Mai",
@@ -967,7 +966,8 @@
             "september": "September",
             "oktober": "Oktober",
             "november": "November",
-            "dezember": "Dezember"
+            "dezember": "Dezember",
+            "februar": "Februar"
           }
         },
         "status": {
@@ -1329,6 +1329,28 @@
           "in_structured_search": null,
           "in_fulltext_search": null,
           "in_expert_search": true
+        },
+        "angebotsstatus": {
+          "identifier": "angebotsstatus",
+          "label": "Angebotsstatus",
+          "type": "lookup",
+          "subtype": "radio",
+          "fulltype": "lookup/radio",
+          "description": "One selected option of multiple available options (or `null`/`None`).\n\nThe available options are defined in the `lookup_data` attribute of this control.\n\nThe field value will be the key in this `lookup_data` attribute (or `null`/`None`).\n\nDisplayed as radio button fields in HTML pages.",
+          "required": true,
+          "in_list": false,
+          "in_mobile_list": false,
+          "in_text": false,
+          "in_structured_search": null,
+          "in_fulltext_search": null,
+          "in_expert_search": true,
+          "lookup_data": {
+            "entwurf": "Entwurf",
+            "freigegeben": "Freigegeben",
+            "versendet": "Versendet",
+            "angenommen": "Angenommen",
+            "abgelehnt": "Abgelehnt"
+          }
         },
         "projekt": {
           "identifier": "projekt",

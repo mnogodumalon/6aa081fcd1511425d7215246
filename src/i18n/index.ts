@@ -1665,10 +1665,10 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         },
         "lookups": {
           "kundentyp": {
+            "einzelperson": "Einzelperson",
             "firma": "Firma",
             "behoerde": "Behörde",
-            "sonstiges": "Sonstiges",
-            "einzelperson": "Einzelperson"
+            "sonstiges": "Sonstiges"
           },
           "bevorzugte_kontaktart": {
             "email": "E-Mail",
@@ -1727,7 +1727,6 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         },
         "lookups": {
           "projektart": {
-            "it_beratung": "IT-Beratung",
             "entwicklung": "Entwicklung",
             "schulung": "Schulung",
             "konzeption": "Konzeption",
@@ -1742,11 +1741,11 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "sonstige_projekte": "Sonstiges / Andere Projekte",
             "workshops_seminare": "Workshops / Seminare",
             "immobilienprojekte": "Immobilienprojekte",
-            "it_projekte": "IT-Projekte"
+            "it_projekte": "IT-Projekte",
+            "it_beratung": "IT-Beratung"
           },
           "projektstart_monat": {
             "januar": "Januar",
-            "februar": "Februar",
             "maerz": "März",
             "april": "April",
             "mai": "Mai",
@@ -1756,7 +1755,8 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "september": "September",
             "oktober": "Oktober",
             "november": "November",
-            "dezember": "Dezember"
+            "dezember": "Dezember",
+            "februar": "Februar"
           },
           "status": {
             "in_bearbeitung": "In Bearbeitung",
@@ -1784,6 +1784,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "leistungspositionen": "Leistungspositionen",
           "anmerkungen": "Anmerkungen / Sonstiges",
           "vorlage_datei": "Angebotsvorlage (PDF/Dokument)",
+          "angebotsstatus": "Angebotsstatus",
           "projekt": "Zugewiesenes Projekt",
           "kunde": "Kunde"
         },
@@ -1802,6 +1803,13 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "nach_aufwand": "Nach Aufwand",
             "pauschal": "Pauschal",
             "sonstiges": "Sonstiges"
+          },
+          "angebotsstatus": {
+            "entwurf": "Entwurf",
+            "freigegeben": "Freigegeben",
+            "versendet": "Versendet",
+            "angenommen": "Angenommen",
+            "abgelehnt": "Abgelehnt"
           }
         }
       },
@@ -1890,35 +1898,35 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         "name": "Consultants",
         "app_id": "6aa081c0c506683d75c76a89",
         "fields": {
-          "nachname": "Last name",
-          "vorname": "First name",
+          "nachname": "Last Name",
+          "vorname": "First Name",
           "titel": "Title (optional)",
           "strasse": "Street (private)",
-          "hausnummer": "House number (private)",
-          "plz": "Postal code (private)",
+          "hausnummer": "House Number (private)",
+          "plz": "Postal Code (private)",
           "ort": "City (private)",
           "email_beruflich": "Email (business)",
           "email_privat": "Email (private)",
           "telefon": "Phone (private)",
-          "einstiegsdatum": "Start date",
+          "einstiegsdatum": "Start Date",
           "status": "Status",
-          "stundensatz": "Hourly rate (€/h)",
-          "sonstiges_1": "Other notes (1)",
-          "sonstiges_2": "Other notes (2)",
+          "stundensatz": "Hourly Rate (€/h)",
+          "sonstiges_1": "Other Notes (1)",
+          "sonstiges_2": "Other Notes (2)",
           "strasse_geschaeftlich": "Street (business)",
-          "hausnummer_geschaeftlich": "House number (business)",
-          "plz_geschaeftlich": "Postal code (business)",
+          "hausnummer_geschaeftlich": "House Number (business)",
+          "plz_geschaeftlich": "Postal Code (business)",
           "ort_geschaeftlich": "City (business)",
           "telefon_geschaeftlich": "Phone (business)",
-          "leistungen": "Services offered",
-          "projekte": "Currently assigned projects"
+          "leistungen": "Services Offered",
+          "projekte": "Currently Assigned Projects"
         },
         "lookups": {
           "status": {
             "aktiv": "Active",
             "urlaub": "Vacation",
-            "elternzeit": "Parental leave",
-            "unternehmen_verlassen": "Left company",
+            "elternzeit": "Parental Leave",
+            "unternehmen_verlassen": "Left Company",
             "sonstiges": "Other"
           }
         }
@@ -1927,55 +1935,55 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         "name": "Customers",
         "app_id": "6aa081c7132fedb98dca2728",
         "fields": {
-          "kundenname": "Name / Company name",
-          "kundentyp": "Customer type",
+          "kundenname": "Name / Company Name",
+          "kundentyp": "Customer Type",
           "email": "Email",
           "telefon": "Phone",
           "strasse": "Street",
-          "hausnummer": "House number",
-          "plz": "Postal code",
+          "hausnummer": "House Number",
+          "plz": "Postal Code",
           "ort": "City",
-          "re_strasse": "Billing street",
-          "re_hausnummer": "Billing house number",
-          "re_plz": "Billing postal code",
-          "re_ort": "Billing city",
-          "anlagedatum": "Creation date",
-          "ap_titel": "Contact person title",
-          "ap_vorname": "Contact person first name",
-          "ap_nachname": "Contact person last name",
-          "ap_email": "Contact person email",
-          "ap_telefon": "Contact person phone",
-          "bevorzugte_kontaktart": "Preferred contact method",
-          "letzter_kontakt_datum": "Last contact date",
-          "letzter_kontakt_ansprechpartner": "Contact person at last contact",
+          "re_strasse": "Billing Street",
+          "re_hausnummer": "Billing House Number",
+          "re_plz": "Billing Postal Code",
+          "re_ort": "Billing City",
+          "anlagedatum": "Creation Date",
+          "ap_titel": "Contact Person Title",
+          "ap_vorname": "Contact Person First Name",
+          "ap_nachname": "Contact Person Last Name",
+          "ap_email": "Contact Person Email",
+          "ap_telefon": "Contact Person Phone",
+          "bevorzugte_kontaktart": "Preferred Contact Method",
+          "letzter_kontakt_datum": "Last Contact Date",
+          "letzter_kontakt_ansprechpartner": "Contact Person at Last Contact",
           "notizen": "Notes",
-          "laufende_projekte": "Currently running projects"
+          "laufende_projekte": "Currently Running Projects"
         },
         "lookups": {
           "kundentyp": {
+            "einzelperson": "Individual",
             "firma": "Company",
-            "behoerde": "Public authority",
-            "sonstiges": "Other",
-            "einzelperson": "Individual"
+            "behoerde": "Authority",
+            "sonstiges": "Other"
           },
           "bevorzugte_kontaktart": {
             "email": "Email",
             "telefon": "Phone",
             "post": "Mail",
-            "persoenlich": "In person"
+            "persoenlich": "In Person"
           }
         }
       },
       "leistungskatalog": {
-        "name": "Service catalog",
+        "name": "Service Catalog",
         "app_id": "6aa081c82238262fa0d4700e",
         "fields": {
-          "leistungsbezeichnung": "Service name",
-          "leistungstyp": "Service type",
+          "leistungsbezeichnung": "Service Name",
+          "leistungstyp": "Service Type",
           "beschreibung": "Description",
-          "kostenvoranschlag": "Standard cost estimate (€)",
-          "stundensatz_leistung": "Hourly rate for this service (€/h)",
-          "einheit": "Billing unit",
+          "kostenvoranschlag": "Standard Cost Estimate (€)",
+          "stundensatz_leistung": "Hourly Rate for This Service (€/h)",
+          "einheit": "Billing Unit",
           "verfuegbarkeit": "Availability / Notes",
           "kuerzel": "Abbreviation"
         },
@@ -1985,13 +1993,13 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "entwicklung": "Development",
             "schulung": "Training",
             "support": "Support",
-            "konzeption": "Concept design",
+            "konzeption": "Conceptual Design",
             "sonstiges": "Other"
           },
           "einheit": {
             "stunde": "Hour",
             "tag": "Day",
-            "pauschal": "Flat rate",
+            "pauschal": "Flat Rate",
             "monat": "Month"
           }
         }
@@ -2000,41 +2008,40 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         "name": "Projects",
         "app_id": "6aa081c907043fa96898c8ca",
         "fields": {
-          "projektkennung": "Project identifier",
-          "projektnummer": "Project number",
-          "projektart": "Project type",
-          "projektstart_jahr": "Start year",
-          "projektstart_monat": "Start month",
-          "status": "Project status",
-          "ansprechpartner_kunde": "Contact person at customer",
-          "letzter_schritt": "Last step / current status",
-          "projektende": "Planned project end",
+          "projektkennung": "Project ID",
+          "projektnummer": "Project Number",
+          "projektart": "Project Type",
+          "projektstart_jahr": "Start Year",
+          "projektstart_monat": "Start Month",
+          "status": "Project Status",
+          "ansprechpartner_kunde": "Customer Contact Person",
+          "letzter_schritt": "Last Step / Current Status",
+          "projektende": "Planned Project End",
           "notizen": "Notes",
           "kunde": "Customer",
-          "projektleitung": "Project management"
+          "projektleitung": "Project Management"
         },
         "lookups": {
           "projektart": {
-            "it_beratung": "IT consulting",
             "entwicklung": "Development",
             "schulung": "Training",
-            "konzeption": "Concept design",
+            "konzeption": "Conceptual Design",
             "support": "Support",
             "sonstiges": "Other",
-            "inklusionsbetriebe": "Inclusion enterprises",
-            "interimsgeschaeftsfuehrung": "Interim management",
-            "projekte_inklusion": "Inclusion projects",
-            "strategieberatung": "Strategy consulting",
+            "inklusionsbetriebe": "Inclusion Businesses",
+            "interimsgeschaeftsfuehrung": "Interim Management",
+            "projekte_inklusion": "Inclusion Projects",
+            "strategieberatung": "Strategy Consulting",
             "coaching": "Coaching",
-            "personalprojekte": "HR projects",
-            "sonstige_projekte": "Other / Miscellaneous projects",
+            "personalprojekte": "HR Projects",
+            "sonstige_projekte": "Other Projects",
             "workshops_seminare": "Workshops / Seminars",
-            "immobilienprojekte": "Real estate projects",
-            "it_projekte": "IT projects"
+            "immobilienprojekte": "Real Estate Projects",
+            "it_projekte": "IT Projects",
+            "it_beratung": "IT Consulting"
           },
           "projektstart_monat": {
             "januar": "January",
-            "februar": "February",
             "maerz": "March",
             "april": "April",
             "mai": "May",
@@ -2044,10 +2051,11 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "september": "September",
             "oktober": "October",
             "november": "November",
-            "dezember": "December"
+            "dezember": "December",
+            "februar": "February"
           },
           "status": {
-            "in_bearbeitung": "In progress",
+            "in_bearbeitung": "In Progress",
             "akquise": "Acquisition",
             "abgeschlossen": "Completed"
           }
@@ -2057,56 +2065,64 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         "name": "Quotes",
         "app_id": "6aa081cb38637bacef45337c",
         "fields": {
-          "angebotsnummer": "Quote number",
+          "angebotsnummer": "Quote Number",
           "angebotsjahr": "Year",
-          "angebotstyp": "Quote type",
-          "angebotsdatum": "Quote date",
-          "gueltig_bis": "Valid until",
+          "angebotstyp": "Quote Type",
+          "angebotsdatum": "Quote Date",
+          "gueltig_bis": "Valid Until",
           "zeitrahmen_anfang": "Start",
           "zeitrahmen_ende": "End (if applicable)",
           "dauer": "Duration",
-          "kostentyp": "Cost type",
+          "kostentyp": "Cost Type",
           "kostenbetrag": "Amount (€)",
-          "kosten_beschreibung": "Cost description",
-          "angebotsbeschreibung": "Quote description",
-          "leistungspositionen": "Service items",
-          "anmerkungen": "Notes / Miscellaneous",
-          "vorlage_datei": "Quote template (PDF/document)",
-          "projekt": "Assigned project",
+          "kosten_beschreibung": "Cost Description",
+          "angebotsbeschreibung": "Quote Description",
+          "leistungspositionen": "Service Items",
+          "anmerkungen": "Notes / Other",
+          "vorlage_datei": "Quote Template (PDF/Document)",
+          "angebotsstatus": "Quote Status",
+          "projekt": "Assigned Project",
           "kunde": "Customer"
         },
         "lookups": {
           "angebotstyp": {
-            "dienstleistung": "Service quote",
-            "projekt": "Project quote",
-            "wartung": "Maintenance quote",
-            "schulung": "Training quote",
+            "dienstleistung": "Service Quote",
+            "projekt": "Project Quote",
+            "wartung": "Maintenance Quote",
+            "schulung": "Training Quote",
             "sonstiges": "Other"
           },
           "kostentyp": {
             "einmalig": "One-time",
             "monatlich": "Monthly",
-            "jaehrlich": "Annual",
-            "nach_aufwand": "Time and materials",
-            "pauschal": "Flat rate",
+            "jaehrlich": "Yearly",
+            "nach_aufwand": "Time and Materials",
+            "pauschal": "Flat Rate",
             "sonstiges": "Other"
+          },
+          "angebotsstatus": {
+            "entwurf": "Draft",
+            "freigegeben": "Approved",
+            "versendet": "Sent",
+            "angenommen": "Accepted",
+            "abgelehnt": "Rejected"
           }
         }
       },
       "zeiterfassung": {
-        "name": "Time tracking",
+        "name": "Time Tracking",
         "app_id": "6aa081cc39a7f94cf37ce8a6",
         "fields": {
           "datum": "Date",
-          "stunden": "Hours worked",
-          "monat": "Billing month",
-          "jahr": "Billing year",
-          "taetigkeitsbeschreibung": "Activity description",
+          "stunden": "Hours Worked",
+          "monat": "Billing Month",
+          "jahr": "Billing Year",
+          "taetigkeitsbeschreibung": "Activity Description",
           "verrechenbar": "Billable",
           "notizen": "Notes",
           "berater": "Consultant",
           "projekt": "Project",
-          "leistung": "Service provided"
+          "leistung": "Service Provided"
         },
         "lookups": {
           "monat": {
@@ -2129,22 +2145,22 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         "name": "Invoices",
         "app_id": "6aa081ce66928f7ec2cf38c4",
         "fields": {
-          "rechnungsnummer": "Invoice number",
-          "rechnungsdatum": "Invoice date",
-          "faelligkeitsdatum": "Due date",
-          "rechnungsstatus": "Invoice status",
-          "abrechnungsmonat": "Billing month",
-          "abrechnungsjahr": "Billing year",
-          "nettobetrag": "Net amount (€)",
+          "rechnungsnummer": "Invoice Number",
+          "rechnungsdatum": "Invoice Date",
+          "faelligkeitsdatum": "Due Date",
+          "rechnungsstatus": "Invoice Status",
+          "abrechnungsmonat": "Billing Month",
+          "abrechnungsjahr": "Billing Year",
+          "nettobetrag": "Net Amount (€)",
           "mehrwertsteuer": "VAT (%)",
-          "gesamtbetrag": "Total amount (€)",
-          "zahlungseingang": "Payment received",
-          "leistungspositionen": "Service items",
+          "gesamtbetrag": "Total Amount (€)",
+          "zahlungseingang": "Payment Received",
+          "leistungspositionen": "Service Items",
           "notizen": "Notes",
-          "rechnungsdatei": "Invoice document (PDF)",
+          "rechnungsdatei": "Invoice Document (PDF)",
           "kunde": "Customer",
           "projekt": "Project",
-          "berater": "Consultants involved"
+          "berater": "Consultants Involved"
         },
         "lookups": {
           "rechnungsstatus": {

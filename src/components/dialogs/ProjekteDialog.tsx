@@ -307,7 +307,7 @@ export function ProjekteDialog({ open, onClose, onSubmit, defaultValues, recordI
         }
       }
       const photoContext = contextParts.length ? contextParts.join('\n') : undefined;
-      const schema = `{\n  "projektkennung": string | null, // Projektkennung\n  "projektnummer": number | null, // Projektnummer\n  "projektart": LookupValue | null, // Projektart (select one key: "it_beratung" | "entwicklung" | "schulung" | "konzeption" | "support" | "sonstiges" | "inklusionsbetriebe" | "interimsgeschaeftsfuehrung" | "projekte_inklusion" | "strategieberatung" | "coaching" | "personalprojekte" | "sonstige_projekte" | "workshops_seminare" | "immobilienprojekte" | "it_projekte") mapping: it_beratung=IT-Beratung, entwicklung=Entwicklung, schulung=Schulung, konzeption=Konzeption, support=Support, sonstiges=Sonstiges, inklusionsbetriebe=Inklusionsbetriebe, interimsgeschaeftsfuehrung=Interimsgeschäftsführung, projekte_inklusion=Projekte Inklusion, strategieberatung=Strategieberatung, coaching=Coaching, personalprojekte=Personalprojekte, sonstige_projekte=Sonstiges / Andere Projekte, workshops_seminare=Workshops / Seminare, immobilienprojekte=Immobilienprojekte, it_projekte=IT-Projekte\n  "projektstart_jahr": string | null, // Startjahr\n  "projektstart_monat": LookupValue | null, // Startmonat (select one key: "januar" | "februar" | "maerz" | "april" | "mai" | "juni" | "juli" | "august" | "september" | "oktober" | "november" | "dezember") mapping: januar=Januar, februar=Februar, maerz=März, april=April, mai=Mai, juni=Juni, juli=Juli, august=August, september=September, oktober=Oktober, november=November, dezember=Dezember\n  "status": LookupValue | null, // Projektstatus (select one key: "in_bearbeitung" | "akquise" | "abgeschlossen") mapping: in_bearbeitung=In Bearbeitung, akquise=Akquise, abgeschlossen=Abgeschlossen\n  "ansprechpartner_kunde": string | null, // Ansprechpartner beim Kunden\n  "letzter_schritt": string | null, // Letzter Schritt / aktueller Stand\n  "projektende": string | null, // YYYY-MM-DD\n  "notizen": string | null, // Notizen\n  "kunde": string | null, // Display name from Kunden (see <available-records>)\n  "projektleitung": string | null, // Display name from Berater/innen (see <available-records>)\n}`;
+      const schema = `{\n  "projektkennung": string | null, // Projektkennung\n  "projektnummer": number | null, // Projektnummer\n  "projektart": LookupValue | null, // Projektart (select one key: "entwicklung" | "schulung" | "konzeption" | "support" | "sonstiges" | "inklusionsbetriebe" | "interimsgeschaeftsfuehrung" | "projekte_inklusion" | "strategieberatung" | "coaching" | "personalprojekte" | "sonstige_projekte" | "workshops_seminare" | "immobilienprojekte" | "it_projekte" | "it_beratung") mapping: entwicklung=Entwicklung, schulung=Schulung, konzeption=Konzeption, support=Support, sonstiges=Sonstiges, inklusionsbetriebe=Inklusionsbetriebe, interimsgeschaeftsfuehrung=Interimsgeschäftsführung, projekte_inklusion=Projekte Inklusion, strategieberatung=Strategieberatung, coaching=Coaching, personalprojekte=Personalprojekte, sonstige_projekte=Sonstiges / Andere Projekte, workshops_seminare=Workshops / Seminare, immobilienprojekte=Immobilienprojekte, it_projekte=IT-Projekte, it_beratung=IT-Beratung\n  "projektstart_jahr": string | null, // Startjahr\n  "projektstart_monat": LookupValue | null, // Startmonat (select one key: "januar" | "maerz" | "april" | "mai" | "juni" | "juli" | "august" | "september" | "oktober" | "november" | "dezember" | "februar") mapping: januar=Januar, maerz=März, april=April, mai=Mai, juni=Juni, juli=Juli, august=August, september=September, oktober=Oktober, november=November, dezember=Dezember, februar=Februar\n  "status": LookupValue | null, // Projektstatus (select one key: "in_bearbeitung" | "akquise" | "abgeschlossen") mapping: in_bearbeitung=In Bearbeitung, akquise=Akquise, abgeschlossen=Abgeschlossen\n  "ansprechpartner_kunde": string | null, // Ansprechpartner beim Kunden\n  "letzter_schritt": string | null, // Letzter Schritt / aktueller Stand\n  "projektende": string | null, // YYYY-MM-DD\n  "notizen": string | null, // Notizen\n  "kunde": string | null, // Display name from Kunden (see <available-records>)\n  "projektleitung": string | null, // Display name from Berater/innen (see <available-records>)\n}`;
       const raw = await extractFromInput<Record<string, unknown>>(schema, {
         dataUri: uri,
         userText: aiText.trim() || undefined,
@@ -424,7 +424,6 @@ export function ProjekteDialog({ open, onClose, onSubmit, defaultValues, recordI
           <SelectTrigger id="projektart" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
-            <SelectItem value="it_beratung">{lookupLabel('projekte', 'projektart', 'it_beratung') ?? 'IT-Beratung'}</SelectItem>
             <SelectItem value="entwicklung">{lookupLabel('projekte', 'projektart', 'entwicklung') ?? 'Entwicklung'}</SelectItem>
             <SelectItem value="schulung">{lookupLabel('projekte', 'projektart', 'schulung') ?? 'Schulung'}</SelectItem>
             <SelectItem value="konzeption">{lookupLabel('projekte', 'projektart', 'konzeption') ?? 'Konzeption'}</SelectItem>
@@ -440,6 +439,7 @@ export function ProjekteDialog({ open, onClose, onSubmit, defaultValues, recordI
             <SelectItem value="workshops_seminare">{lookupLabel('projekte', 'projektart', 'workshops_seminare') ?? 'Workshops / Seminare'}</SelectItem>
             <SelectItem value="immobilienprojekte">{lookupLabel('projekte', 'projektart', 'immobilienprojekte') ?? 'Immobilienprojekte'}</SelectItem>
             <SelectItem value="it_projekte">{lookupLabel('projekte', 'projektart', 'it_projekte') ?? 'IT-Projekte'}</SelectItem>
+            <SelectItem value="it_beratung">{lookupLabel('projekte', 'projektart', 'it_beratung') ?? 'IT-Beratung'}</SelectItem>
           </SelectContent>
         </Select>
         {showErrors && !fields.projektart && (
@@ -473,7 +473,6 @@ export function ProjekteDialog({ open, onClose, onSubmit, defaultValues, recordI
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="januar">{lookupLabel('projekte', 'projektstart_monat', 'januar') ?? 'Januar'}</SelectItem>
-            <SelectItem value="februar">{lookupLabel('projekte', 'projektstart_monat', 'februar') ?? 'Februar'}</SelectItem>
             <SelectItem value="maerz">{lookupLabel('projekte', 'projektstart_monat', 'maerz') ?? 'März'}</SelectItem>
             <SelectItem value="april">{lookupLabel('projekte', 'projektstart_monat', 'april') ?? 'April'}</SelectItem>
             <SelectItem value="mai">{lookupLabel('projekte', 'projektstart_monat', 'mai') ?? 'Mai'}</SelectItem>
@@ -484,6 +483,7 @@ export function ProjekteDialog({ open, onClose, onSubmit, defaultValues, recordI
             <SelectItem value="oktober">{lookupLabel('projekte', 'projektstart_monat', 'oktober') ?? 'Oktober'}</SelectItem>
             <SelectItem value="november">{lookupLabel('projekte', 'projektstart_monat', 'november') ?? 'November'}</SelectItem>
             <SelectItem value="dezember">{lookupLabel('projekte', 'projektstart_monat', 'dezember') ?? 'Dezember'}</SelectItem>
+            <SelectItem value="februar">{lookupLabel('projekte', 'projektstart_monat', 'februar') ?? 'Februar'}</SelectItem>
           </SelectContent>
         </Select>
       </div>

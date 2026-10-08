@@ -403,6 +403,10 @@
             "required": true,
             "options": [
               {
+                "key": "einzelperson",
+                "label": "Einzelperson"
+              },
+              {
                 "key": "firma",
                 "label": "Firma"
               },
@@ -413,10 +417,6 @@
               {
                 "key": "sonstiges",
                 "label": "Sonstiges"
-              },
-              {
-                "key": "einzelperson",
-                "label": "Einzelperson"
               }
             ]
           },
@@ -741,14 +741,14 @@
           "label": "Projektart",
           "type": "lookup/select",
           "options": [
-            "IT-Beratung",
             "Entwicklung",
             "Schulung",
             "Konzeption",
             "Support",
             "Sonstiges",
             "Inklusionsbetriebe",
-            "Interimsgeschäftsführung"
+            "Interimsgeschäftsführung",
+            "Projekte Inklusion"
           ]
         },
         {
@@ -762,13 +762,13 @@
           "type": "lookup/select",
           "options": [
             "Januar",
-            "Februar",
             "März",
             "April",
             "Mai",
             "Juni",
             "Juli",
-            "August"
+            "August",
+            "September"
           ]
         },
         {
@@ -826,10 +826,6 @@
             "required": true,
             "options": [
               {
-                "key": "it_beratung",
-                "label": "IT-Beratung"
-              },
-              {
                 "key": "entwicklung",
                 "label": "Entwicklung"
               },
@@ -856,6 +852,10 @@
               {
                 "key": "interimsgeschaeftsfuehrung",
                 "label": "Interimsgeschäftsführung"
+              },
+              {
+                "key": "projekte_inklusion",
+                "label": "Projekte Inklusion"
               }
             ]
           },
@@ -874,10 +874,6 @@
               {
                 "key": "januar",
                 "label": "Januar"
-              },
-              {
-                "key": "februar",
-                "label": "Februar"
               },
               {
                 "key": "maerz",
@@ -902,6 +898,10 @@
               {
                 "key": "august",
                 "label": "August"
+              },
+              {
+                "key": "september",
+                "label": "September"
               }
             ]
           },
@@ -1197,6 +1197,34 @@
             "label": "Anmerkungen / Sonstiges",
             "type": "string/textarea",
             "required": false
+          },
+          {
+            "key": "angebotsstatus",
+            "label": "Angebotsstatus",
+            "type": "lookup/radio",
+            "required": true,
+            "options": [
+              {
+                "key": "entwurf",
+                "label": "Entwurf"
+              },
+              {
+                "key": "freigegeben",
+                "label": "Freigegeben"
+              },
+              {
+                "key": "versendet",
+                "label": "Versendet"
+              },
+              {
+                "key": "angenommen",
+                "label": "Angenommen"
+              },
+              {
+                "key": "abgelehnt",
+                "label": "Abgelehnt"
+              }
+            ]
           },
           {
             "key": "projekt",

@@ -382,10 +382,10 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "label": "Kundentyp",
       "writable": true,
       "options": [
+        "einzelperson",
         "firma",
         "behoerde",
-        "sonstiges",
-        "einzelperson"
+        "sonstiges"
       ]
     },
     "email": {
@@ -699,7 +699,6 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "label": "Projektart",
       "writable": true,
       "options": [
-        "it_beratung",
         "entwicklung",
         "schulung",
         "konzeption",
@@ -714,7 +713,8 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
         "sonstige_projekte",
         "workshops_seminare",
         "immobilienprojekte",
-        "it_projekte"
+        "it_projekte",
+        "it_beratung"
       ]
     },
     "projektstart_jahr": {
@@ -735,7 +735,6 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "writable": true,
       "options": [
         "januar",
-        "februar",
         "maerz",
         "april",
         "mai",
@@ -745,7 +744,8 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
         "september",
         "oktober",
         "november",
-        "dezember"
+        "dezember",
+        "februar"
       ]
     },
     "status": {
@@ -954,6 +954,21 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "required": false,
       "label": "Angebotsvorlage (PDF/Dokument)",
       "writable": false
+    },
+    "angebotsstatus": {
+      "key": "angebotsstatus",
+      "fulltype": "lookup/radio",
+      "kind": "lookup",
+      "required": true,
+      "label": "Angebotsstatus",
+      "writable": true,
+      "options": [
+        "entwurf",
+        "freigegeben",
+        "versendet",
+        "angenommen",
+        "abgelehnt"
+      ]
     },
     "projekt": {
       "key": "projekt",
@@ -1315,6 +1330,11 @@ export const SHAPES: Record<EntityKey, Shape[]> = {
       "kind": "choice",
       "field": "kostentyp",
       "count": 6
+    },
+    {
+      "kind": "choice",
+      "field": "angebotsstatus",
+      "count": 5
     },
     {
       "kind": "record",

@@ -13,10 +13,10 @@
  *
  * Facts from the metadata — candidates, NOT decisions:
  *   - berater/innen: applookups leistungen→leistungskatalog, projekte→projekte · lookups status[aktiv|urlaub|elternzeit|unternehmen_verlassen|sonstiges]
- *   - kunden: applookups laufende_projekte→projekte · lookups kundentyp[firma|behoerde|sonstiges|einzelperson], bevorzugte_kontaktart[email|telefon|post|persoenlich]
+ *   - kunden: applookups laufende_projekte→projekte · lookups kundentyp[einzelperson|firma|behoerde|sonstiges], bevorzugte_kontaktart[email|telefon|post|persoenlich]
  *   - leistungskatalog: lookups leistungstyp[beratung|entwicklung|schulung|support|konzeption|sonstiges], einheit[stunde|tag|pauschal|monat]
- *   - projekte: applookups kunde→kunden, projektleitung→berater/innen · lookups projektart[it_beratung|entwicklung|schulung|konzeption|support|sonstiges|inklusionsbetriebe|interimsgeschaeftsfuehrung|projekte_inklusion|strategieberatung|coaching|personalprojekte|sonstige_projekte|workshops_seminare|immobilienprojekte|it_projekte], projektstart_monat[januar|februar|maerz|april|mai|juni|juli|august|september|oktober|november|dezember], status[in_bearbeitung|akquise|abgeschlossen]
- *   - angebote: applookups projekt→projekte, kunde→kunden · lookups angebotstyp[dienstleistung|projekt|wartung|schulung|sonstiges], kostentyp[einmalig|monatlich|jaehrlich|nach_aufwand|pauschal|sonstiges]
+ *   - projekte: applookups kunde→kunden, projektleitung→berater/innen · lookups projektart[entwicklung|schulung|konzeption|support|sonstiges|inklusionsbetriebe|interimsgeschaeftsfuehrung|projekte_inklusion|strategieberatung|coaching|personalprojekte|sonstige_projekte|workshops_seminare|immobilienprojekte|it_projekte|it_beratung], projektstart_monat[januar|maerz|april|mai|juni|juli|august|september|oktober|november|dezember|februar], status[in_bearbeitung|akquise|abgeschlossen]
+ *   - angebote: applookups projekt→projekte, kunde→kunden · lookups angebotstyp[dienstleistung|projekt|wartung|schulung|sonstiges], kostentyp[einmalig|monatlich|jaehrlich|nach_aufwand|pauschal|sonstiges], angebotsstatus[entwurf|freigegeben|versendet|angenommen|abgelehnt]
  *   - zeiterfassung: applookups berater→berater/innen, projekt→projekte, leistung→leistungskatalog · lookups monat[januar|februar|maerz|april|mai|juni|juli|august|september|oktober|november|dezember]
  *   - rechnungen: applookups kunde→kunden, projekt→projekte, berater→berater/innen · lookups rechnungsstatus[offen|bezahlt|storniert|ueberfaellig], abrechnungsmonat[januar|februar|maerz|april|mai|juni|juli|august|september|oktober|november|dezember]
  */
