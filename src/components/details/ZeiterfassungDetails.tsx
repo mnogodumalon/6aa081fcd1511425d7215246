@@ -67,7 +67,7 @@ export function ZeiterfassungDetails({
         <RecordRelation
           label={fieldLabel('zeiterfassung', 'leistung')}
           name={leistungTarget?.fields.leistungsbezeichnung ?? '—'}
-          meta={undefined}
+          meta={[leistungTarget?.fields.kuerzel].filter(Boolean).join(' · ') || undefined}
           onClick={leistungTarget && onOpenLeistungskatalog ? () => onOpenLeistungskatalog!(leistungTarget!) : undefined}
         />
       </RecordSection>

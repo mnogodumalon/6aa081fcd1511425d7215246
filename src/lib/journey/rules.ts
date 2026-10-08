@@ -18,9 +18,9 @@ export type EntityKey = 'berater/innen' | 'kunden' | 'leistungskatalog' | 'proje
 /** The text fields of each entity — what a search may run over (generated;
  *  `never` for an entity without text of its own, e.g. a link table). */
 export interface StringFields {
-  "berater/innen": "nachname" | "vorname" | "titel" | "strasse" | "hausnummer" | "plz" | "ort" | "email_beruflich" | "email_privat" | "telefon" | "sonstiges_1" | "sonstiges_2";
+  "berater/innen": "nachname" | "vorname" | "titel" | "strasse" | "hausnummer" | "plz" | "ort" | "email_beruflich" | "email_privat" | "telefon" | "sonstiges_1" | "sonstiges_2" | "strasse_geschaeftlich" | "hausnummer_geschaeftlich" | "plz_geschaeftlich" | "ort_geschaeftlich" | "telefon_geschaeftlich";
   "kunden": "kundenname" | "email" | "telefon" | "strasse" | "hausnummer" | "plz" | "ort" | "re_strasse" | "re_hausnummer" | "re_plz" | "re_ort" | "ap_titel" | "ap_vorname" | "ap_nachname" | "ap_email" | "ap_telefon" | "letzter_kontakt_ansprechpartner" | "notizen";
-  "leistungskatalog": "leistungsbezeichnung" | "beschreibung" | "verfuegbarkeit";
+  "leistungskatalog": "leistungsbezeichnung" | "beschreibung" | "verfuegbarkeit" | "kuerzel";
   "projekte": "projektkennung" | "projektstart_jahr" | "ansprechpartner_kunde" | "letzter_schritt" | "notizen";
   "angebote": "angebotsnummer" | "angebotsjahr" | "dauer" | "kosten_beschreibung" | "angebotsbeschreibung" | "leistungspositionen" | "anmerkungen";
   "zeiterfassung": "jahr" | "taetigkeitsbeschreibung" | "notizen";
@@ -34,7 +34,7 @@ export type StringFieldKey<E extends EntityKey> = E extends keyof StringFields ?
 export interface RecordFields {
   "berater/innen": "leistungen" | "projekte";
   "kunden": "laufende_projekte";
-  "leistungskatalog": "berater";
+  "leistungskatalog": never;
   "projekte": "kunde" | "projektleitung";
   "angebote": "projekt" | "kunde";
   "zeiterfassung": "berater" | "projekt" | "leistung";
@@ -189,7 +189,7 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "fulltype": "string/text",
       "kind": "text",
       "required": false,
-      "label": "Straße",
+      "label": "Straße (privat)",
       "writable": true,
       "maxLength": 4000,
       "autoComplete": "address-line1"
@@ -199,7 +199,7 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "fulltype": "string/text",
       "kind": "text",
       "required": false,
-      "label": "Hausnummer",
+      "label": "Hausnummer (privat)",
       "writable": true,
       "maxLength": 4000
     },
@@ -208,7 +208,7 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "fulltype": "string/text",
       "kind": "text",
       "required": false,
-      "label": "Postleitzahl",
+      "label": "Postleitzahl (privat)",
       "writable": true,
       "maxLength": 4000,
       "autoComplete": "postal-code"
@@ -218,7 +218,7 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "fulltype": "string/text",
       "kind": "text",
       "required": false,
-      "label": "Ort",
+      "label": "Ort (privat)",
       "writable": true,
       "maxLength": 4000,
       "autoComplete": "address-level2"
@@ -246,7 +246,7 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "fulltype": "string/tel",
       "kind": "tel",
       "required": false,
-      "label": "Telefon",
+      "label": "Telefon (privat)",
       "writable": true,
       "autoComplete": "tel"
     },
@@ -269,6 +269,7 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
         "aktiv",
         "urlaub",
         "elternzeit",
+        "unternehmen_verlassen",
         "sonstiges"
       ]
     },
@@ -297,12 +298,57 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "label": "Sonstige Anmerkungen (2)",
       "writable": true
     },
+    "strasse_geschaeftlich": {
+      "key": "strasse_geschaeftlich",
+      "fulltype": "string/text",
+      "kind": "text",
+      "required": false,
+      "label": "Straße (geschäftlich)",
+      "writable": true,
+      "maxLength": 4000
+    },
+    "hausnummer_geschaeftlich": {
+      "key": "hausnummer_geschaeftlich",
+      "fulltype": "string/text",
+      "kind": "text",
+      "required": false,
+      "label": "Hausnummer (geschäftlich)",
+      "writable": true,
+      "maxLength": 4000
+    },
+    "plz_geschaeftlich": {
+      "key": "plz_geschaeftlich",
+      "fulltype": "string/text",
+      "kind": "text",
+      "required": false,
+      "label": "Postleitzahl (geschäftlich)",
+      "writable": true,
+      "maxLength": 4000
+    },
+    "ort_geschaeftlich": {
+      "key": "ort_geschaeftlich",
+      "fulltype": "string/text",
+      "kind": "text",
+      "required": false,
+      "label": "Ort (geschäftlich)",
+      "writable": true,
+      "maxLength": 4000
+    },
+    "telefon_geschaeftlich": {
+      "key": "telefon_geschaeftlich",
+      "fulltype": "string/tel",
+      "kind": "tel",
+      "required": false,
+      "label": "Telefon (geschäftlich)",
+      "writable": true,
+      "autoComplete": "tel"
+    },
     "leistungen": {
       "key": "leistungen",
       "fulltype": "multipleapplookup/select",
       "kind": "multirecord",
       "required": false,
-      "label": "Erbringbare Leistungen",
+      "label": "Durchführbare Leistungen",
       "writable": true,
       "targetAppId": "6aa081c82238262fa0d4700e",
       "targetEntity": "leistungskatalog"
@@ -336,10 +382,10 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "label": "Kundentyp",
       "writable": true,
       "options": [
-        "einzelperson",
         "firma",
         "behoerde",
-        "sonstiges"
+        "sonstiges",
+        "einzelperson"
       ]
     },
     "email": {
@@ -544,16 +590,6 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
     }
   },
   "leistungskatalog": {
-    "berater": {
-      "key": "berater",
-      "fulltype": "multipleapplookup/select",
-      "kind": "multirecord",
-      "required": false,
-      "label": "Ausführende Berater/innen",
-      "writable": true,
-      "targetAppId": "6aa081c0c506683d75c76a89",
-      "targetEntity": "berater/innen"
-    },
     "leistungsbezeichnung": {
       "key": "leistungsbezeichnung",
       "fulltype": "string/text",
@@ -626,6 +662,15 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "required": false,
       "label": "Verfügbarkeit / Hinweise",
       "writable": true
+    },
+    "kuerzel": {
+      "key": "kuerzel",
+      "fulltype": "string/text",
+      "kind": "text",
+      "required": false,
+      "label": "Kürzel",
+      "writable": true,
+      "maxLength": 4000
     }
   },
   "projekte": {
@@ -654,12 +699,13 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "label": "Projektart",
       "writable": true,
       "options": [
+        "it_beratung",
         "entwicklung",
         "schulung",
         "konzeption",
         "support",
-        "it_beratung",
         "sonstiges",
+        "inklusionsbetriebe",
         "interimsgeschaeftsfuehrung",
         "projekte_inklusion",
         "strategieberatung",
@@ -667,7 +713,6 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
         "personalprojekte",
         "sonstige_projekte",
         "workshops_seminare",
-        "inklusionsbetriebe",
         "immobilienprojekte",
         "it_projekte"
       ]
@@ -1201,7 +1246,7 @@ export const SHAPES: Record<EntityKey, Shape[]> = {
     {
       "kind": "choice",
       "field": "status",
-      "count": 4
+      "count": 5
     },
     {
       "kind": "record",
@@ -1241,11 +1286,6 @@ export const SHAPES: Record<EntityKey, Shape[]> = {
       "kind": "choice",
       "field": "einheit",
       "count": 4
-    },
-    {
-      "kind": "record",
-      "field": "berater",
-      "targetEntity": "berater/innen"
     }
   ],
   "projekte": [

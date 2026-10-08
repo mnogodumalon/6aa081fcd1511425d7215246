@@ -55,6 +55,11 @@ export interface BeraterInnen {
     stundensatz?: number;
     sonstiges_1?: string;
     sonstiges_2?: string;
+    strasse_geschaeftlich?: string;
+    hausnummer_geschaeftlich?: string;
+    plz_geschaeftlich?: string;
+    ort_geschaeftlich?: string;
+    telefon_geschaeftlich?: string;
     leistungen?: RecordUrl[];
     projekte?: RecordUrl[];
   };
@@ -108,7 +113,6 @@ export interface Leistungskatalog {
   createdat: string;
   updatedat: string | null;
   fields: {
-    berater?: RecordUrl[];
     leistungsbezeichnung?: string;
     leistungstyp?: LookupValue;
     beschreibung?: string;
@@ -116,6 +120,7 @@ export interface Leistungskatalog {
     stundensatz_leistung?: number;
     einheit?: LookupValue;
     verfuegbarkeit?: string;
+    kuerzel?: string;
   };
 }
 
@@ -243,10 +248,10 @@ export const APP_IDS = {
 
 export const LOOKUP_OPTIONS: Record<string, Record<string, {key: string, label: string}[]>> = {
   'berater/innen': {
-    status: [{ key: "aktiv", get label() { return lookupLabel('berater/innen', 'status', "aktiv") ?? "Aktiv"; } }, { key: "urlaub", get label() { return lookupLabel('berater/innen', 'status', "urlaub") ?? "Urlaub"; } }, { key: "elternzeit", get label() { return lookupLabel('berater/innen', 'status', "elternzeit") ?? "Elternzeit"; } }, { key: "sonstiges", get label() { return lookupLabel('berater/innen', 'status', "sonstiges") ?? "Sonstiges"; } }],
+    status: [{ key: "aktiv", get label() { return lookupLabel('berater/innen', 'status', "aktiv") ?? "Aktiv"; } }, { key: "urlaub", get label() { return lookupLabel('berater/innen', 'status', "urlaub") ?? "Urlaub"; } }, { key: "elternzeit", get label() { return lookupLabel('berater/innen', 'status', "elternzeit") ?? "Elternzeit"; } }, { key: "unternehmen_verlassen", get label() { return lookupLabel('berater/innen', 'status', "unternehmen_verlassen") ?? "Unternehmen verlassen"; } }, { key: "sonstiges", get label() { return lookupLabel('berater/innen', 'status', "sonstiges") ?? "Sonstiges"; } }],
   },
   'kunden': {
-    kundentyp: [{ key: "einzelperson", get label() { return lookupLabel('kunden', 'kundentyp', "einzelperson") ?? "Einzelperson"; } }, { key: "firma", get label() { return lookupLabel('kunden', 'kundentyp', "firma") ?? "Firma"; } }, { key: "behoerde", get label() { return lookupLabel('kunden', 'kundentyp', "behoerde") ?? "Behörde"; } }, { key: "sonstiges", get label() { return lookupLabel('kunden', 'kundentyp', "sonstiges") ?? "Sonstiges"; } }],
+    kundentyp: [{ key: "firma", get label() { return lookupLabel('kunden', 'kundentyp', "firma") ?? "Firma"; } }, { key: "behoerde", get label() { return lookupLabel('kunden', 'kundentyp', "behoerde") ?? "Behörde"; } }, { key: "sonstiges", get label() { return lookupLabel('kunden', 'kundentyp', "sonstiges") ?? "Sonstiges"; } }, { key: "einzelperson", get label() { return lookupLabel('kunden', 'kundentyp', "einzelperson") ?? "Einzelperson"; } }],
     bevorzugte_kontaktart: [{ key: "email", get label() { return lookupLabel('kunden', 'bevorzugte_kontaktart', "email") ?? "E-Mail"; } }, { key: "telefon", get label() { return lookupLabel('kunden', 'bevorzugte_kontaktart', "telefon") ?? "Telefon"; } }, { key: "post", get label() { return lookupLabel('kunden', 'bevorzugte_kontaktart', "post") ?? "Post"; } }, { key: "persoenlich", get label() { return lookupLabel('kunden', 'bevorzugte_kontaktart', "persoenlich") ?? "Persönlich"; } }],
   },
   'leistungskatalog': {
@@ -254,7 +259,7 @@ export const LOOKUP_OPTIONS: Record<string, Record<string, {key: string, label: 
     einheit: [{ key: "stunde", get label() { return lookupLabel('leistungskatalog', 'einheit', "stunde") ?? "Stunde"; } }, { key: "tag", get label() { return lookupLabel('leistungskatalog', 'einheit', "tag") ?? "Tag"; } }, { key: "pauschal", get label() { return lookupLabel('leistungskatalog', 'einheit', "pauschal") ?? "Pauschal"; } }, { key: "monat", get label() { return lookupLabel('leistungskatalog', 'einheit', "monat") ?? "Monat"; } }],
   },
   'projekte': {
-    projektart: [{ key: "entwicklung", get label() { return lookupLabel('projekte', 'projektart', "entwicklung") ?? "Entwicklung"; } }, { key: "schulung", get label() { return lookupLabel('projekte', 'projektart', "schulung") ?? "Schulung"; } }, { key: "konzeption", get label() { return lookupLabel('projekte', 'projektart', "konzeption") ?? "Konzeption"; } }, { key: "support", get label() { return lookupLabel('projekte', 'projektart', "support") ?? "Support"; } }, { key: "it_beratung", get label() { return lookupLabel('projekte', 'projektart', "it_beratung") ?? "IT-Beratung"; } }, { key: "sonstiges", get label() { return lookupLabel('projekte', 'projektart', "sonstiges") ?? "Sonstiges"; } }, { key: "interimsgeschaeftsfuehrung", get label() { return lookupLabel('projekte', 'projektart', "interimsgeschaeftsfuehrung") ?? "Interimsgeschäftsführung"; } }, { key: "projekte_inklusion", get label() { return lookupLabel('projekte', 'projektart', "projekte_inklusion") ?? "Projekte Inklusion"; } }, { key: "strategieberatung", get label() { return lookupLabel('projekte', 'projektart', "strategieberatung") ?? "Strategieberatung"; } }, { key: "coaching", get label() { return lookupLabel('projekte', 'projektart', "coaching") ?? "Coaching"; } }, { key: "personalprojekte", get label() { return lookupLabel('projekte', 'projektart', "personalprojekte") ?? "Personalprojekte"; } }, { key: "sonstige_projekte", get label() { return lookupLabel('projekte', 'projektart', "sonstige_projekte") ?? "Sonstiges / Andere Projekte"; } }, { key: "workshops_seminare", get label() { return lookupLabel('projekte', 'projektart', "workshops_seminare") ?? "Workshops / Seminare"; } }, { key: "inklusionsbetriebe", get label() { return lookupLabel('projekte', 'projektart', "inklusionsbetriebe") ?? "Inklusionsbetriebe"; } }, { key: "immobilienprojekte", get label() { return lookupLabel('projekte', 'projektart', "immobilienprojekte") ?? "Immobilienprojekte"; } }, { key: "it_projekte", get label() { return lookupLabel('projekte', 'projektart', "it_projekte") ?? "IT-Projekte"; } }],
+    projektart: [{ key: "it_beratung", get label() { return lookupLabel('projekte', 'projektart', "it_beratung") ?? "IT-Beratung"; } }, { key: "entwicklung", get label() { return lookupLabel('projekte', 'projektart', "entwicklung") ?? "Entwicklung"; } }, { key: "schulung", get label() { return lookupLabel('projekte', 'projektart', "schulung") ?? "Schulung"; } }, { key: "konzeption", get label() { return lookupLabel('projekte', 'projektart', "konzeption") ?? "Konzeption"; } }, { key: "support", get label() { return lookupLabel('projekte', 'projektart', "support") ?? "Support"; } }, { key: "sonstiges", get label() { return lookupLabel('projekte', 'projektart', "sonstiges") ?? "Sonstiges"; } }, { key: "inklusionsbetriebe", get label() { return lookupLabel('projekte', 'projektart', "inklusionsbetriebe") ?? "Inklusionsbetriebe"; } }, { key: "interimsgeschaeftsfuehrung", get label() { return lookupLabel('projekte', 'projektart', "interimsgeschaeftsfuehrung") ?? "Interimsgeschäftsführung"; } }, { key: "projekte_inklusion", get label() { return lookupLabel('projekte', 'projektart', "projekte_inklusion") ?? "Projekte Inklusion"; } }, { key: "strategieberatung", get label() { return lookupLabel('projekte', 'projektart', "strategieberatung") ?? "Strategieberatung"; } }, { key: "coaching", get label() { return lookupLabel('projekte', 'projektart', "coaching") ?? "Coaching"; } }, { key: "personalprojekte", get label() { return lookupLabel('projekte', 'projektart', "personalprojekte") ?? "Personalprojekte"; } }, { key: "sonstige_projekte", get label() { return lookupLabel('projekte', 'projektart', "sonstige_projekte") ?? "Sonstiges / Andere Projekte"; } }, { key: "workshops_seminare", get label() { return lookupLabel('projekte', 'projektart', "workshops_seminare") ?? "Workshops / Seminare"; } }, { key: "immobilienprojekte", get label() { return lookupLabel('projekte', 'projektart', "immobilienprojekte") ?? "Immobilienprojekte"; } }, { key: "it_projekte", get label() { return lookupLabel('projekte', 'projektart', "it_projekte") ?? "IT-Projekte"; } }],
     projektstart_monat: [{ key: "januar", get label() { return lookupLabel('projekte', 'projektstart_monat', "januar") ?? "Januar"; } }, { key: "februar", get label() { return lookupLabel('projekte', 'projektstart_monat', "februar") ?? "Februar"; } }, { key: "maerz", get label() { return lookupLabel('projekte', 'projektstart_monat', "maerz") ?? "März"; } }, { key: "april", get label() { return lookupLabel('projekte', 'projektstart_monat', "april") ?? "April"; } }, { key: "mai", get label() { return lookupLabel('projekte', 'projektstart_monat', "mai") ?? "Mai"; } }, { key: "juni", get label() { return lookupLabel('projekte', 'projektstart_monat', "juni") ?? "Juni"; } }, { key: "juli", get label() { return lookupLabel('projekte', 'projektstart_monat', "juli") ?? "Juli"; } }, { key: "august", get label() { return lookupLabel('projekte', 'projektstart_monat', "august") ?? "August"; } }, { key: "september", get label() { return lookupLabel('projekte', 'projektstart_monat', "september") ?? "September"; } }, { key: "oktober", get label() { return lookupLabel('projekte', 'projektstart_monat', "oktober") ?? "Oktober"; } }, { key: "november", get label() { return lookupLabel('projekte', 'projektstart_monat', "november") ?? "November"; } }, { key: "dezember", get label() { return lookupLabel('projekte', 'projektstart_monat', "dezember") ?? "Dezember"; } }],
     status: [{ key: "in_bearbeitung", get label() { return lookupLabel('projekte', 'status', "in_bearbeitung") ?? "In Bearbeitung"; } }, { key: "akquise", get label() { return lookupLabel('projekte', 'status', "akquise") ?? "Akquise"; } }, { key: "abgeschlossen", get label() { return lookupLabel('projekte', 'status', "abgeschlossen") ?? "Abgeschlossen"; } }],
   },
@@ -296,6 +301,11 @@ export const FIELD_TYPES: Record<string, Record<string, string>> = {
     'stundensatz': 'number',
     'sonstiges_1': 'string/textarea',
     'sonstiges_2': 'string/textarea',
+    'strasse_geschaeftlich': 'string/text',
+    'hausnummer_geschaeftlich': 'string/text',
+    'plz_geschaeftlich': 'string/text',
+    'ort_geschaeftlich': 'string/text',
+    'telefon_geschaeftlich': 'string/tel',
     'leistungen': 'multipleapplookup/select',
     'projekte': 'multipleapplookup/select',
   },
@@ -325,7 +335,6 @@ export const FIELD_TYPES: Record<string, Record<string, string>> = {
     'laufende_projekte': 'multipleapplookup/select',
   },
   'leistungskatalog': {
-    'berater': 'multipleapplookup/select',
     'leistungsbezeichnung': 'string/text',
     'leistungstyp': 'lookup/select',
     'beschreibung': 'string/textarea',
@@ -333,6 +342,7 @@ export const FIELD_TYPES: Record<string, Record<string, string>> = {
     'stundensatz_leistung': 'number',
     'einheit': 'lookup/select',
     'verfuegbarkeit': 'string/textarea',
+    'kuerzel': 'string/text',
   },
   'projekte': {
     'projektkennung': 'string/text',
@@ -401,7 +411,6 @@ export const FIELD_TYPES: Record<string, Record<string, string>> = {
 
 export const HUB_TOPOLOGY: Record<string, { field: string; entity: string }[]> = {
   'berater/innen': [
-    { field: 'berater', entity: 'leistungskatalog' },
     { field: 'projektleitung', entity: 'projekte' },
     { field: 'berater', entity: 'zeiterfassung' },
     { field: 'berater', entity: 'rechnungen' },

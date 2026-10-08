@@ -31,7 +31,6 @@ const HUBS = {
     "component": "BeraterInnenDetails",
     "file": "src/components/details/BeraterInnenDetails.tsx",
     "satellites": [
-      "leistungskatalog",
       "projekte",
       "zeiterfassung",
       "rechnungen"

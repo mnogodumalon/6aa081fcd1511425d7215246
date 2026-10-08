@@ -3,7 +3,6 @@
  *
  * Props: open, onClose, onSubmit(fields) => Promise<void>, defaultValues?,
  * recordId? (pass when EDITING — enables the attachments section),
- * beraterInnenList (full hook array — resolves the BeraterInnen applookup),
  * enablePhotoScan?, enablePhotoLocation?.
  *
  * defaultValues is SHAPE-TOLERANT and its prop type is the EXPORTED
@@ -14,9 +13,9 @@
  *  ✓ useState<LeistungskatalogDialogDefaults | undefined>(undefined)
  */
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import type { Leistungskatalog, BeraterInnen, LookupValue } from '@/types/app';
+import type { Leistungskatalog, LookupValue } from '@/types/app';
 import { APP_IDS, LOOKUP_OPTIONS } from '@/types/app';
-import { extractRecordId, createRecordUrl, cleanFieldsForApi, extractRecordIds, getUserProfile, LivingAppsService } from '@/services/livingAppsService';
+import { extractRecordId, createRecordUrl, cleanFieldsForApi, getUserProfile } from '@/services/livingAppsService';
 import {
   Dialog, DialogContent, DialogHeader,
   DialogTitle, DialogFooter,
@@ -35,8 +34,6 @@ import {
   Select, SelectContent, SelectItem,
   SelectTrigger, SelectValue,
 } from '@/components/ui/select';
-import { Combobox, MultiCombobox } from '@/components/Combobox';
-import { BeraterInnenDialog } from '@/components/dialogs/BeraterInnenDialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { IconAlertCircle, IconCamera, IconChevronDown, IconCircleCheck, IconClipboard, IconFileText, IconLoader2, IconPhotoPlus, IconSparkles, IconUpload, IconX } from '@tabler/icons-react';
 import { fileToDataUri, extractFromInput, extractPhotoMeta, reverseGeocode } from '@/lib/ai';
@@ -58,7 +55,6 @@ interface LeistungskatalogDialogProps {
   defaultValues?: LeistungskatalogDialogDefaults;
   /** Record id when editing — enables the attachments section. Omit on create. */
   recordId?: string;
-  beraterInnenList: BeraterInnen[];
   enablePhotoScan?: boolean;
   enablePhotoLocation?: boolean;
 }
@@ -70,9 +66,6 @@ const NORMALIZE_LOOKUPS: Record<string, readonly { key: string; label: string }[
   leistungstyp: LOOKUP_OPTIONS['leistungskatalog']?.['leistungstyp'] ?? [],
   einheit: LOOKUP_OPTIONS['leistungskatalog']?.['einheit'] ?? [],
 };
-const NORMALIZE_APPLOOKUPS: Record<string, string> = {
-  berater: APP_IDS.BERATERINNEN,
-};
 function normalizeDefaults(values: Record<string, unknown>): Record<string, unknown> {
   const out: Record<string, unknown> = { ...values };
   for (const [k, opts] of Object.entries(NORMALIZE_LOOKUPS)) {
@@ -80,15 +73,10 @@ function normalizeDefaults(values: Record<string, unknown>): Record<string, unkn
     if (typeof v === 'string') out[k] = opts.find(o => o.key === v) ?? { key: v, label: v };
     else if (Array.isArray(v)) out[k] = v.map(x => (typeof x === 'string' ? opts.find(o => o.key === x) ?? { key: x, label: x } : x));
   }
-  for (const [k, appId] of Object.entries(NORMALIZE_APPLOOKUPS)) {
-    const v = out[k];
-    if (typeof v === 'string' && v !== '' && !v.startsWith('http')) out[k] = createRecordUrl(appId, v);
-    else if (Array.isArray(v)) out[k] = v.map(x => (typeof x === 'string' && x !== '' && !x.startsWith('http') ? createRecordUrl(appId, x) : x));
-  }
   return out;
 }
 
-export function LeistungskatalogDialog({ open, onClose, onSubmit, defaultValues, recordId, beraterInnenList, enablePhotoScan = true, enablePhotoLocation = true }: LeistungskatalogDialogProps) {
+export function LeistungskatalogDialog({ open, onClose, onSubmit, defaultValues, recordId, enablePhotoScan = true, enablePhotoLocation = true }: LeistungskatalogDialogProps) {
   const [fields, setFields] = useState<Partial<Leistungskatalog['fields']>>({});
   const [saving, setSaving] = useState(false);
   const normalizedDefaults = useMemo<Record<string, unknown> | undefined>(
@@ -106,23 +94,6 @@ export function LeistungskatalogDialog({ open, onClose, onSubmit, defaultValues,
       return true;
     }
   }, [fields, normalizedDefaults]);
-  // Inline-Create state for "BeraterInnen" target. The dropdown's
-  // "+ Neuer …" option opens a sub-dialog; on submit we POST, add the new
-  // record to the local `extraBeraterInnen` list, and select it in
-  // the originating Combobox via the captured `createBeraterInnenField`.
-  const [createBeraterInnenOpen, setCreateBeraterInnenOpen] = useState(false);
-  const [createBeraterInnenInitial, setCreateBeraterInnenInitial] = useState('');
-  const [createBeraterInnenField, setCreateBeraterInnenField] = useState<string>('');
-  const [extraBeraterInnen, setExtraBeraterInnen] = useState< BeraterInnen[]>([]);
-  const beraterInnenListAll = useMemo(
-    () => [...beraterInnenList, ...extraBeraterInnen],
-    [beraterInnenList, extraBeraterInnen],
-  );
-  function openCreateBeraterInnen(fieldKey: string, q: string) {
-    setCreateBeraterInnenField(fieldKey);
-    setCreateBeraterInnenInitial(q);
-    setCreateBeraterInnenOpen(true);
-  }
   // Fields the plan assigns to a tool (empty without a plan).
   const SYSTEM_ASSIGNED: string[] = [];
   const [showErrors, setShowErrors] = useState(false);
@@ -153,9 +124,8 @@ export function LeistungskatalogDialog({ open, onClose, onSubmit, defaultValues,
   // operands can resolve to numeric fields on the target record.
   const computedContext = useMemo<ComputedContext>(() => ({
     lookupLists: {
-      'berater': beraterInnenList,
     },
-  }), [beraterInnenList, ]);
+  }), []);
   const computedValues = useMemo<Record<string, number | null>>(() => {
     let out: Record<string, number | null> = {};
     const entries = Object.entries(formEnhancements.computed);
@@ -271,7 +241,6 @@ export function LeistungskatalogDialog({ open, onClose, onSubmit, defaultValues,
       if (parts.length) {
         contextParts.push(`<photo-metadata>\nThe following metadata was extracted from the photo\'s EXIF data:\n${parts.join('\n')}\n</photo-metadata>`);
       }
-      contextParts.push(`<available-records field="berater" entity="Berater/innen">\n${JSON.stringify(beraterInnenList.map(r => ({ record_id: r.record_id, ...r.fields })), null, 2)}\n</available-records>`);
       if (usePersonalInfo) {
         try {
           const profile = await getUserProfile();
@@ -281,7 +250,7 @@ export function LeistungskatalogDialog({ open, onClose, onSubmit, defaultValues,
         }
       }
       const photoContext = contextParts.length ? contextParts.join('\n') : undefined;
-      const schema = `{\n  "berater": string[] | null, // Display names from Berater/innen, one per referenced record (see <available-records>)\n  "leistungsbezeichnung": string | null, // Leistungsbezeichnung\n  "leistungstyp": LookupValue | null, // Leistungstyp (select one key: "beratung" | "entwicklung" | "schulung" | "support" | "konzeption" | "sonstiges") mapping: beratung=Beratung, entwicklung=Entwicklung, schulung=Schulung, support=Support, konzeption=Konzeption, sonstiges=Sonstiges\n  "beschreibung": string | null, // Beschreibung\n  "kostenvoranschlag": number | null, // Normaler Kostenvoranschlag (€)\n  "stundensatz_leistung": number | null, // Stundensatz für diese Leistung (€/h)\n  "einheit": LookupValue | null, // Abrechnungseinheit (select one key: "stunde" | "tag" | "pauschal" | "monat") mapping: stunde=Stunde, tag=Tag, pauschal=Pauschal, monat=Monat\n  "verfuegbarkeit": string | null, // Verfügbarkeit / Hinweise\n}`;
+      const schema = `{\n  "leistungsbezeichnung": string | null, // Leistungsbezeichnung\n  "leistungstyp": LookupValue | null, // Leistungstyp (select one key: "beratung" | "entwicklung" | "schulung" | "support" | "konzeption" | "sonstiges") mapping: beratung=Beratung, entwicklung=Entwicklung, schulung=Schulung, support=Support, konzeption=Konzeption, sonstiges=Sonstiges\n  "beschreibung": string | null, // Beschreibung\n  "kostenvoranschlag": number | null, // Normaler Kostenvoranschlag (€)\n  "stundensatz_leistung": number | null, // Stundensatz für diese Leistung (€/h)\n  "einheit": LookupValue | null, // Abrechnungseinheit (select one key: "stunde" | "tag" | "pauschal" | "monat") mapping: stunde=Stunde, tag=Tag, pauschal=Pauschal, monat=Monat\n  "verfuegbarkeit": string | null, // Verfügbarkeit / Hinweise\n  "kuerzel": string | null, // Kürzel\n}`;
       const raw = await extractFromInput<Record<string, unknown>>(schema, {
         dataUri: uri,
         userText: aiText.trim() || undefined,
@@ -294,18 +263,8 @@ export function LeistungskatalogDialog({ open, onClose, onSubmit, defaultValues,
           const n = name.toLowerCase().trim();
           return candidates.some(c => c.toLowerCase().includes(n) || n.includes(c.toLowerCase()));
         }
-        const applookupKeys = new Set<string>(["berater"]);
         for (const [k, v] of Object.entries(raw)) {
-          if (applookupKeys.has(k)) continue;
           if (v != null) merged[k] = v;
-        }
-        const beraterNames = raw['berater'];
-        if (Array.isArray(beraterNames) && beraterNames.length > 0) {
-          const beraterUrls = (beraterNames as unknown[])
-            .map(n => beraterInnenList.find(r => matchName(String(n), [[r.fields.vorname ?? '', r.fields.nachname ?? ''].filter(Boolean).join(' ')])))
-            .filter((r): r is NonNullable<typeof r> => Boolean(r))
-            .map(r => createRecordUrl(APP_IDS.BERATERINNEN, r.record_id));
-          if (beraterUrls.length > 0) merged['berater'] = beraterUrls;
         }
         return merged as Partial<Leistungskatalog['fields']>;
       });
@@ -353,23 +312,6 @@ export function LeistungskatalogDialog({ open, onClose, onSubmit, defaultValues,
     : t('new_entity', { entity: appLabel('leistungskatalog') });
 
   const fieldBlocks: Record<string, React.ReactNode> = {
-    'berater': (
-      <div key="berater" className="space-y-1.5">
-        <Label htmlFor="berater">{fieldLabel('leistungskatalog', 'berater')}</Label>
-        <MultiCombobox
-          id="berater"
-          placeholder=""
-          items={beraterInnenListAll.map(r => ({
-            id: r.record_id,
-            label: String(r.fields.nachname ?? r.record_id),
-          }))}
-          values={extractRecordIds(fields.berater)}
-          onChange={ids => setFields(f => ({ ...f, berater: ids.length ? ids.map(id => createRecordUrl(APP_IDS.BERATERINNEN, id)) as any : undefined }))}
-          onCreateNew={(q) => openCreateBeraterInnen("berater", q)}
-          createLabel={t('create_in', { entity: appLabel('berater/innen') })}
-        />
-      </div>
-    ),
     'leistungsbezeichnung': (
       <div key="leistungsbezeichnung" className="space-y-1.5">
         <Label htmlFor="leistungsbezeichnung">{fieldLabel('leistungskatalog', 'leistungsbezeichnung')} <span className="text-destructive" aria-hidden="true">*</span></Label>
@@ -521,6 +463,17 @@ export function LeistungskatalogDialog({ open, onClose, onSubmit, defaultValues,
         />
       </div>
     ),
+    'kuerzel': (
+      <div key="kuerzel" className="space-y-1.5">
+        <Label htmlFor="kuerzel">{fieldLabel('leistungskatalog', 'kuerzel')}</Label>
+        <Input
+          id="kuerzel"
+          placeholder=""
+          value={fields.kuerzel ?? ''}
+          onChange={e => setFields(f => ({ ...f, kuerzel: e.target.value }))}
+        />
+      </div>
+    ),
   };
   const orderedFields = applyFieldOrder(Object.keys(fieldBlocks), formEnhancements.fieldOrder);
   const orderedFieldsKey = orderedFields.map((it) => typeof it === 'string' ? it : it.row.join('+')).join(',');
@@ -535,13 +488,13 @@ export function LeistungskatalogDialog({ open, onClose, onSubmit, defaultValues,
   //     kein passendes Backend-Feld in orderedFields) erscheinen NICHT als
   //     Input, sondern unten als kompakte 'Berechnungen'-Übersicht oder als
   //     Inline-Hint unter dem letzten beitragenden Input.
-  const FIELD_LABELS: Record<string, string> = {"berater": "Ausführende Berater/innen", "leistungsbezeichnung": "Leistungsbezeichnung", "leistungstyp": "Leistungstyp", "beschreibung": "Beschreibung", "kostenvoranschlag": "Normaler Kostenvoranschlag (€)", "stundensatz_leistung": "Stundensatz für diese Leistung (€/h)", "einheit": "Abrechnungseinheit", "verfuegbarkeit": "Verfügbarkeit / Hinweise"};
+  const FIELD_LABELS: Record<string, string> = {"leistungsbezeichnung": "Leistungsbezeichnung", "leistungstyp": "Leistungstyp", "beschreibung": "Beschreibung", "kostenvoranschlag": "Normaler Kostenvoranschlag (€)", "stundensatz_leistung": "Stundensatz für diese Leistung (€/h)", "einheit": "Abrechnungseinheit", "verfuegbarkeit": "Verfügbarkeit / Hinweise", "kuerzel": "Kürzel"};
   const CURRENCY_KEYS = new Set<string>(["kostenvoranschlag", "stundensatz_leistung"]);
   // Applookup-Referenz-Labels: pro applookup-Feld in dieser Form (ownKey)
   // eine Map { lookupKey: label } für ALLE Felder des Target-Schemas. Wird
   // beim Render-Walk gefiltert auf die in der computed-Formel tatsächlich
   // referenzierten lookupKeys (siehe applookupRefs unten).
-  const APPLOOKUP_LABELS: Record<string, Record<string, string>> = {"berater": {"nachname": "Nachname", "vorname": "Vorname", "titel": "Titel (optional)", "strasse": "Straße", "hausnummer": "Hausnummer", "plz": "Postleitzahl", "ort": "Ort", "email_beruflich": "E-Mail (beruflich)", "email_privat": "E-Mail (privat)", "telefon": "Telefon", "einstiegsdatum": "Einstiegsdatum", "status": "Status", "stundensatz": "Stundensatz (€/h)", "sonstiges_1": "Sonstige Anmerkungen (1)", "sonstiges_2": "Sonstige Anmerkungen (2)", "leistungen": "Erbringbare Leistungen", "projekte": "Aktuell zugewiesene Projekte"}};
+  const APPLOOKUP_LABELS: Record<string, Record<string, string>> = {};
   const inputFields = useMemo(() => flattenFieldOrder(orderedFields), [orderedFieldsKey]);
   const backendFieldSet = useMemo(() => new Set(inputFields), [inputFields.join(',')]);
   const virtualComputed = useMemo(
@@ -922,27 +875,6 @@ export function LeistungskatalogDialog({ open, onClose, onSubmit, defaultValues,
         </form>
       </DialogContent>
     </Dialog>
-    {createBeraterInnenOpen && (
-      <BeraterInnenDialog
-        open={createBeraterInnenOpen}
-        onClose={() => setCreateBeraterInnenOpen(false)}
-        onSubmit={async (newFields) => {
-          const result = await LivingAppsService.createBeraterInnenEntry(newFields as any) as { id?: string };
-          if (result?.id) {
-            const newRec = { record_id: result.id, fields: newFields } as unknown as BeraterInnen;
-            setExtraBeraterInnen(prev => [...prev, newRec]);
-            const url = createRecordUrl(APP_IDS.BERATERINNEN, result.id);
-            setFields(prev => ({ ...prev, [createBeraterInnenField]: url } as any));
-          }
-          setCreateBeraterInnenOpen(false);
-        }}
-        defaultValues={createBeraterInnenInitial
-          ? ({ nachname: createBeraterInnenInitial } as any)
-          : undefined}
-        leistungskatalogList={[]}
-        projekteList={[]}
-      />
-    )}
     </>
   );
 }

@@ -1,4 +1,4 @@
-import type { Angebote, BeraterInnen, Kunden, Leistungskatalog, Projekte, Rechnungen, Zeiterfassung } from './app';
+import type { Angebote, BeraterInnen, Kunden, Projekte, Rechnungen, Zeiterfassung } from './app';
 
 export type EnrichedBeraterInnen = BeraterInnen & {
   leistungenName: string;
@@ -7,10 +7,6 @@ export type EnrichedBeraterInnen = BeraterInnen & {
 
 export type EnrichedKunden = Kunden & {
   laufende_projekteName: string;
-};
-
-export type EnrichedLeistungskatalog = Leistungskatalog & {
-  beraterName: string;
 };
 
 export type EnrichedProjekte = Projekte & {

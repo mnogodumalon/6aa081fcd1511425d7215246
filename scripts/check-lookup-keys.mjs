@@ -129,6 +129,7 @@ const VALID_KEYS = {
     "elternzeit",
     "in_bearbeitung",
     "sonstiges",
+    "unternehmen_verlassen",
     "urlaub"
   ]
 };

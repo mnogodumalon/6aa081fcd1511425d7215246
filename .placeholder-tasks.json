@@ -26,22 +26,22 @@
         },
         {
           "key": "strasse",
-          "label": "Straße",
+          "label": "Straße (privat)",
           "type": "string/text"
         },
         {
           "key": "hausnummer",
-          "label": "Hausnummer",
+          "label": "Hausnummer (privat)",
           "type": "string/text"
         },
         {
           "key": "plz",
-          "label": "Postleitzahl",
+          "label": "Postleitzahl (privat)",
           "type": "string/text"
         },
         {
           "key": "ort",
-          "label": "Ort",
+          "label": "Ort (privat)",
           "type": "string/text"
         },
         {
@@ -75,8 +75,28 @@
           "type": "string/textarea"
         },
         {
+          "key": "strasse_geschaeftlich",
+          "label": "Straße (geschäftlich)",
+          "type": "string/text"
+        },
+        {
+          "key": "hausnummer_geschaeftlich",
+          "label": "Hausnummer (geschäftlich)",
+          "type": "string/text"
+        },
+        {
+          "key": "plz_geschaeftlich",
+          "label": "Postleitzahl (geschäftlich)",
+          "type": "string/text"
+        },
+        {
+          "key": "ort_geschaeftlich",
+          "label": "Ort (geschäftlich)",
+          "type": "string/text"
+        },
+        {
           "key": "leistungen",
-          "label": "Erbringbare Leistungen",
+          "label": "Durchführbare Leistungen",
           "type": "multipleapplookup/select",
           "target_entity": "Leistungskatalog"
         },
@@ -110,25 +130,25 @@
           },
           {
             "key": "strasse",
-            "label": "Straße",
+            "label": "Straße (privat)",
             "type": "string/text",
             "required": false
           },
           {
             "key": "hausnummer",
-            "label": "Hausnummer",
+            "label": "Hausnummer (privat)",
             "type": "string/text",
             "required": false
           },
           {
             "key": "plz",
-            "label": "Postleitzahl",
+            "label": "Postleitzahl (privat)",
             "type": "string/text",
             "required": false
           },
           {
             "key": "ort",
-            "label": "Ort",
+            "label": "Ort (privat)",
             "type": "string/text",
             "required": false
           },
@@ -146,7 +166,7 @@
           },
           {
             "key": "telefon",
-            "label": "Telefon",
+            "label": "Telefon (privat)",
             "type": "string/tel",
             "required": false
           },
@@ -175,6 +195,10 @@
                 "label": "Elternzeit"
               },
               {
+                "key": "unternehmen_verlassen",
+                "label": "Unternehmen verlassen"
+              },
+              {
                 "key": "sonstiges",
                 "label": "Sonstiges"
               }
@@ -199,8 +223,38 @@
             "required": false
           },
           {
+            "key": "strasse_geschaeftlich",
+            "label": "Straße (geschäftlich)",
+            "type": "string/text",
+            "required": false
+          },
+          {
+            "key": "hausnummer_geschaeftlich",
+            "label": "Hausnummer (geschäftlich)",
+            "type": "string/text",
+            "required": false
+          },
+          {
+            "key": "plz_geschaeftlich",
+            "label": "Postleitzahl (geschäftlich)",
+            "type": "string/text",
+            "required": false
+          },
+          {
+            "key": "ort_geschaeftlich",
+            "label": "Ort (geschäftlich)",
+            "type": "string/text",
+            "required": false
+          },
+          {
+            "key": "telefon_geschaeftlich",
+            "label": "Telefon (geschäftlich)",
+            "type": "string/tel",
+            "required": false
+          },
+          {
             "key": "leistungen",
-            "label": "Erbringbare Leistungen",
+            "label": "Durchführbare Leistungen",
             "type": "multipleapplookup/select",
             "required": false,
             "target_entity": "Leistungskatalog",
@@ -349,10 +403,6 @@
             "required": true,
             "options": [
               {
-                "key": "einzelperson",
-                "label": "Einzelperson"
-              },
-              {
                 "key": "firma",
                 "label": "Firma"
               },
@@ -363,6 +413,10 @@
               {
                 "key": "sonstiges",
                 "label": "Sonstiges"
+              },
+              {
+                "key": "einzelperson",
+                "label": "Einzelperson"
               }
             ]
           },
@@ -526,12 +580,6 @@
       "entity_context": "inclou. ERP",
       "fields": [
         {
-          "key": "berater",
-          "label": "Ausführende Berater/innen",
-          "type": "multipleapplookup/select",
-          "target_entity": "Berater/innen"
-        },
-        {
           "key": "leistungsbezeichnung",
           "label": "Leistungsbezeichnung",
           "type": "string/text"
@@ -568,24 +616,16 @@
           "key": "verfuegbarkeit",
           "label": "Verfügbarkeit / Hinweise",
           "type": "string/textarea"
+        },
+        {
+          "key": "kuerzel",
+          "label": "Kürzel",
+          "type": "string/text"
         }
       ],
       "formEnhancements": {
         "configPath": "src/config/form-enhancements/Leistungskatalog.ts",
         "fields": [
-          {
-            "key": "berater",
-            "label": "Ausführende Berater/innen",
-            "type": "multipleapplookup/select",
-            "required": false,
-            "target_entity": "Berater/innen",
-            "target_numeric_fields": [
-              {
-                "key": "stundensatz",
-                "label": "Stundensatz (€/h)"
-              }
-            ]
-          },
           {
             "key": "leistungsbezeichnung",
             "label": "Leistungsbezeichnung",
@@ -671,6 +711,12 @@
             "label": "Verfügbarkeit / Hinweise",
             "type": "string/textarea",
             "required": false
+          },
+          {
+            "key": "kuerzel",
+            "label": "Kürzel",
+            "type": "string/text",
+            "required": false
           }
         ]
       }
@@ -695,14 +741,14 @@
           "label": "Projektart",
           "type": "lookup/select",
           "options": [
+            "IT-Beratung",
             "Entwicklung",
             "Schulung",
             "Konzeption",
             "Support",
-            "IT-Beratung",
             "Sonstiges",
-            "Interimsgeschäftsführung",
-            "Projekte Inklusion"
+            "Inklusionsbetriebe",
+            "Interimsgeschäftsführung"
           ]
         },
         {
@@ -780,6 +826,10 @@
             "required": true,
             "options": [
               {
+                "key": "it_beratung",
+                "label": "IT-Beratung"
+              },
+              {
                 "key": "entwicklung",
                 "label": "Entwicklung"
               },
@@ -796,20 +846,16 @@
                 "label": "Support"
               },
               {
-                "key": "it_beratung",
-                "label": "IT-Beratung"
-              },
-              {
                 "key": "sonstiges",
                 "label": "Sonstiges"
               },
               {
-                "key": "interimsgeschaeftsfuehrung",
-                "label": "Interimsgeschäftsführung"
+                "key": "inklusionsbetriebe",
+                "label": "Inklusionsbetriebe"
               },
               {
-                "key": "projekte_inklusion",
-                "label": "Projekte Inklusion"
+                "key": "interimsgeschaeftsfuehrung",
+                "label": "Interimsgeschäftsführung"
               }
             ]
           },

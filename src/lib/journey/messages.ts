@@ -29,9 +29,9 @@ import { labelOf, type EntityKey } from './rules';
 
 /** The writable fields of each entity — the keys a message may address (generated). */
 export interface MessageFields {
-  "berater/innen": "nachname" | "vorname" | "titel" | "strasse" | "hausnummer" | "plz" | "ort" | "email_beruflich" | "email_privat" | "telefon" | "einstiegsdatum" | "status" | "stundensatz" | "sonstiges_1" | "sonstiges_2" | "leistungen" | "projekte";
+  "berater/innen": "nachname" | "vorname" | "titel" | "strasse" | "hausnummer" | "plz" | "ort" | "email_beruflich" | "email_privat" | "telefon" | "einstiegsdatum" | "status" | "stundensatz" | "sonstiges_1" | "sonstiges_2" | "strasse_geschaeftlich" | "hausnummer_geschaeftlich" | "plz_geschaeftlich" | "ort_geschaeftlich" | "telefon_geschaeftlich" | "leistungen" | "projekte";
   "kunden": "kundenname" | "kundentyp" | "email" | "telefon" | "strasse" | "hausnummer" | "plz" | "ort" | "re_strasse" | "re_hausnummer" | "re_plz" | "re_ort" | "anlagedatum" | "ap_titel" | "ap_vorname" | "ap_nachname" | "ap_email" | "ap_telefon" | "bevorzugte_kontaktart" | "letzter_kontakt_datum" | "letzter_kontakt_ansprechpartner" | "notizen" | "laufende_projekte";
-  "leistungskatalog": "berater" | "leistungsbezeichnung" | "leistungstyp" | "beschreibung" | "kostenvoranschlag" | "stundensatz_leistung" | "einheit" | "verfuegbarkeit";
+  "leistungskatalog": "leistungsbezeichnung" | "leistungstyp" | "beschreibung" | "kostenvoranschlag" | "stundensatz_leistung" | "einheit" | "verfuegbarkeit" | "kuerzel";
   "projekte": "projektkennung" | "projektnummer" | "projektart" | "projektstart_jahr" | "projektstart_monat" | "status" | "ansprechpartner_kunde" | "letzter_schritt" | "projektende" | "notizen" | "kunde" | "projektleitung";
   "angebote": "angebotsnummer" | "angebotsjahr" | "angebotstyp" | "angebotsdatum" | "gueltig_bis" | "zeitrahmen_anfang" | "zeitrahmen_ende" | "dauer" | "kostentyp" | "kostenbetrag" | "kosten_beschreibung" | "angebotsbeschreibung" | "leistungspositionen" | "anmerkungen" | "projekt" | "kunde";
   "zeiterfassung": "datum" | "stunden" | "monat" | "jahr" | "taetigkeitsbeschreibung" | "verrechenbar" | "notizen" | "berater" | "projekt" | "leistung";

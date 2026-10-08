@@ -19,14 +19,6 @@ export interface BeraterInnenDetailsProps {
   projekteList: Projekte[];
   /** Reserviert — Projekte ist hier nur über ein Mehrfach-Feld verknüpft (Text-Join, keine Einzel-Relation); Übergabe erlaubt, aber ohne Wirkung. */
   onOpenProjekte?: (record: Projekte) => void;
-  /** 1:N „Leistungskatalog" (berater): VOLLE Liste — der Block filtert auf diesen Record. */
-  leistungskatalogBeraterList: Leistungskatalog[];
-  /** Zeilen-Klick → overlay.push auf das Leistungskatalog-Detail (nie der Edit-Dialog). */
-  onOpenLeistungskatalogBerater: (record: Leistungskatalog) => void;
-  /** Kontextuelles „+": öffnet den Leistungskatalog-Dialog mit diesem Record vorgesetzt. */
-  onAddLeistungskatalogBerater?: () => void;
-  /** „Vorhandene wählen": Listenfeld-Rückbezug — hängt diesen Record an einen bestehenden Leistungskatalog-Datensatz. */
-  onPickLeistungskatalogBerater?: () => void;
   /** 1:N „Projekte" (projektleitung): VOLLE Liste — der Block filtert auf diesen Record. */
   projekteProjektleitungList: Projekte[];
   /** Zeilen-Klick → overlay.push auf das Projekte-Detail (nie der Edit-Dialog). */
@@ -53,10 +45,6 @@ export function BeraterInnenDetails({
   record,
   leistungskatalogList,
   projekteList,
-  leistungskatalogBeraterList,
-  onOpenLeistungskatalogBerater,
-  onAddLeistungskatalogBerater,
-  onPickLeistungskatalogBerater,
   projekteProjektleitungList,
   onOpenProjekteProjektleitung,
   onAddProjekteProjektleitung,
@@ -88,19 +76,14 @@ export function BeraterInnenDetails({
         <RecordField label={fieldLabel('berater/innen', 'stundensatz')} value={record.fields.stundensatz} format="text" />
         <RecordField label={fieldLabel('berater/innen', 'sonstiges_1')} value={record.fields.sonstiges_1} format="longtext" className="md:col-span-2" />
         <RecordField label={fieldLabel('berater/innen', 'sonstiges_2')} value={record.fields.sonstiges_2} format="longtext" className="md:col-span-2" />
+        <RecordField label={fieldLabel('berater/innen', 'strasse_geschaeftlich')} value={record.fields.strasse_geschaeftlich} format="text" />
+        <RecordField label={fieldLabel('berater/innen', 'hausnummer_geschaeftlich')} value={record.fields.hausnummer_geschaeftlich} format="text" />
+        <RecordField label={fieldLabel('berater/innen', 'plz_geschaeftlich')} value={record.fields.plz_geschaeftlich} format="text" />
+        <RecordField label={fieldLabel('berater/innen', 'ort_geschaeftlich')} value={record.fields.ort_geschaeftlich} format="text" />
+        <RecordField label={fieldLabel('berater/innen', 'telefon_geschaeftlich')} value={record.fields.telefon_geschaeftlich} format="text" />
         <RecordField label={fieldLabel('berater/innen', 'leistungen')} value={Array.isArray(record.fields.leistungen) ? record.fields.leistungen.map((u: unknown) => leistungskatalogList.find(t => t.record_id === extractRecordId(u))?.fields.leistungsbezeichnung ?? '—').join(', ') : null} format="text" />
         <RecordField label={fieldLabel('berater/innen', 'projekte')} value={Array.isArray(record.fields.projekte) ? record.fields.projekte.map((u: unknown) => projekteList.find(t => t.record_id === extractRecordId(u))?.fields.projektkennung ?? '—').join(', ') : null} format="text" />
       </RecordSection>
-
-      <SatelliteSection
-        title={`${appLabel('leistungskatalog')} · ${fieldLabel('leistungskatalog', 'berater')}`}
-        items={leistungskatalogBeraterList.filter(r => Array.isArray(r.fields.berater) && r.fields.berater.some((u: unknown) => extractRecordId(u) === record.record_id))}
-        map={r => ({ name: r.fields.leistungsbezeichnung ?? appLabel('leistungskatalog'), meta: undefined })}
-        onOpen={onOpenLeistungskatalogBerater}
-        onAdd={onAddLeistungskatalogBerater}
-        onPick={onPickLeistungskatalogBerater}
-        getKey={r => r.record_id}
-      />
 
       <SatelliteSection
         title={`${appLabel('projekte')} · ${fieldLabel('projekte', 'projektleitung')}`}

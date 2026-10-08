@@ -54,7 +54,7 @@
         },
         "strasse": {
           "identifier": "strasse",
-          "label": "Straße",
+          "label": "Straße (privat)",
           "type": "string",
           "subtype": "text",
           "fulltype": "string/text",
@@ -69,7 +69,7 @@
         },
         "hausnummer": {
           "identifier": "hausnummer",
-          "label": "Hausnummer",
+          "label": "Hausnummer (privat)",
           "type": "string",
           "subtype": "text",
           "fulltype": "string/text",
@@ -84,7 +84,7 @@
         },
         "plz": {
           "identifier": "plz",
-          "label": "Postleitzahl",
+          "label": "Postleitzahl (privat)",
           "type": "string",
           "subtype": "text",
           "fulltype": "string/text",
@@ -99,7 +99,7 @@
         },
         "ort": {
           "identifier": "ort",
-          "label": "Ort",
+          "label": "Ort (privat)",
           "type": "string",
           "subtype": "text",
           "fulltype": "string/text",
@@ -144,7 +144,7 @@
         },
         "telefon": {
           "identifier": "telefon",
-          "label": "Telefon",
+          "label": "Telefon (privat)",
           "type": "string",
           "subtype": "tel",
           "fulltype": "string/tel",
@@ -190,6 +190,7 @@
             "aktiv": "Aktiv",
             "urlaub": "Urlaub",
             "elternzeit": "Elternzeit",
+            "unternehmen_verlassen": "Unternehmen verlassen",
             "sonstiges": "Sonstiges"
           }
         },
@@ -239,9 +240,84 @@
           "in_fulltext_search": null,
           "in_expert_search": true
         },
+        "strasse_geschaeftlich": {
+          "identifier": "strasse_geschaeftlich",
+          "label": "Straße (geschäftlich)",
+          "type": "string",
+          "subtype": "text",
+          "fulltype": "string/text",
+          "description": "A string value not longer than 4000 characters (or `null`/`None`).",
+          "required": false,
+          "in_list": false,
+          "in_mobile_list": false,
+          "in_text": false,
+          "in_structured_search": null,
+          "in_fulltext_search": null,
+          "in_expert_search": true
+        },
+        "hausnummer_geschaeftlich": {
+          "identifier": "hausnummer_geschaeftlich",
+          "label": "Hausnummer (geschäftlich)",
+          "type": "string",
+          "subtype": "text",
+          "fulltype": "string/text",
+          "description": "A string value not longer than 4000 characters (or `null`/`None`).",
+          "required": false,
+          "in_list": false,
+          "in_mobile_list": false,
+          "in_text": false,
+          "in_structured_search": null,
+          "in_fulltext_search": null,
+          "in_expert_search": true
+        },
+        "plz_geschaeftlich": {
+          "identifier": "plz_geschaeftlich",
+          "label": "Postleitzahl (geschäftlich)",
+          "type": "string",
+          "subtype": "text",
+          "fulltype": "string/text",
+          "description": "A string value not longer than 4000 characters (or `null`/`None`).",
+          "required": false,
+          "in_list": false,
+          "in_mobile_list": false,
+          "in_text": false,
+          "in_structured_search": null,
+          "in_fulltext_search": null,
+          "in_expert_search": true
+        },
+        "ort_geschaeftlich": {
+          "identifier": "ort_geschaeftlich",
+          "label": "Ort (geschäftlich)",
+          "type": "string",
+          "subtype": "text",
+          "fulltype": "string/text",
+          "description": "A string value not longer than 4000 characters (or `null`/`None`).",
+          "required": false,
+          "in_list": false,
+          "in_mobile_list": false,
+          "in_text": false,
+          "in_structured_search": null,
+          "in_fulltext_search": null,
+          "in_expert_search": true
+        },
+        "telefon_geschaeftlich": {
+          "identifier": "telefon_geschaeftlich",
+          "label": "Telefon (geschäftlich)",
+          "type": "string",
+          "subtype": "tel",
+          "fulltype": "string/tel",
+          "description": "A valid telephone number (or `null`/`None`). Might include country prefix and should include area code.",
+          "required": false,
+          "in_list": false,
+          "in_mobile_list": false,
+          "in_text": false,
+          "in_structured_search": null,
+          "in_fulltext_search": null,
+          "in_expert_search": true
+        },
         "leistungen": {
           "identifier": "leistungen",
-          "label": "Erbringbare Leistungen",
+          "label": "Durchführbare Leistungen",
           "type": "multipleapplookup",
           "subtype": "select",
           "fulltype": "multipleapplookup/select",
@@ -308,10 +384,10 @@
           "in_fulltext_search": true,
           "in_expert_search": true,
           "lookup_data": {
-            "einzelperson": "Einzelperson",
             "firma": "Firma",
             "behoerde": "Behörde",
-            "sonstiges": "Sonstiges"
+            "sonstiges": "Sonstiges",
+            "einzelperson": "Einzelperson"
           }
         },
         "email": {
@@ -643,22 +719,6 @@
       "name": "Leistungskatalog",
       "main": false,
       "controls": {
-        "berater": {
-          "identifier": "berater",
-          "label": "Ausführende Berater/innen",
-          "type": "multipleapplookup",
-          "subtype": "select",
-          "fulltype": "multipleapplookup/select",
-          "description": "Arbitrary number of referenced LivingApp records from the target lookup app 'Berater/innen' with the id `6aa081c0c506683d75c76a89`.\n\nThe field value will be a list of valid record URLs in the form `https://my.living-apps.de/rest/apps/6aa081c0c506683d75c76a89/records/<record-id>`.\n\nWhen writing, either pass record URLs through exactly as this API returned them, or send the portable relative form `/apps/6aa081c0c506683d75c76a89/records/<record-id>`. Other equivalent record-URL forms are accepted as well.\n\nDisplayed as a multi-select field in HTML pages.",
-          "required": false,
-          "in_list": false,
-          "in_mobile_list": false,
-          "in_text": false,
-          "in_structured_search": null,
-          "in_fulltext_search": false,
-          "in_expert_search": true,
-          "lookup_app": "https://my.living-apps.de/rest/apps/6aa081c0c506683d75c76a89"
-        },
         "leistungsbezeichnung": {
           "identifier": "leistungsbezeichnung",
           "label": "Leistungsbezeichnung",
@@ -779,6 +839,21 @@
           "in_structured_search": null,
           "in_fulltext_search": null,
           "in_expert_search": true
+        },
+        "kuerzel": {
+          "identifier": "kuerzel",
+          "label": "Kürzel",
+          "type": "string",
+          "subtype": "text",
+          "fulltype": "string/text",
+          "description": "A string value not longer than 4000 characters (or `null`/`None`).",
+          "required": false,
+          "in_list": false,
+          "in_mobile_list": false,
+          "in_text": false,
+          "in_structured_search": null,
+          "in_fulltext_search": null,
+          "in_expert_search": true
         }
       }
     },
@@ -833,12 +908,13 @@
           "in_fulltext_search": true,
           "in_expert_search": true,
           "lookup_data": {
+            "it_beratung": "IT-Beratung",
             "entwicklung": "Entwicklung",
             "schulung": "Schulung",
             "konzeption": "Konzeption",
             "support": "Support",
-            "it_beratung": "IT-Beratung",
             "sonstiges": "Sonstiges",
+            "inklusionsbetriebe": "Inklusionsbetriebe",
             "interimsgeschaeftsfuehrung": "Interimsgeschäftsführung",
             "projekte_inklusion": "Projekte Inklusion",
             "strategieberatung": "Strategieberatung",
@@ -846,7 +922,6 @@
             "personalprojekte": "Personalprojekte",
             "sonstige_projekte": "Sonstiges / Andere Projekte",
             "workshops_seminare": "Workshops / Seminare",
-            "inklusionsbetriebe": "Inklusionsbetriebe",
             "immobilienprojekte": "Immobilienprojekte",
             "it_projekte": "IT-Projekte"
           }

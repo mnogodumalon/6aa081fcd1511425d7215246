@@ -299,7 +299,7 @@ export function BeraterInnenDialog({ open, onClose, onSubmit, defaultValues, rec
         }
       }
       const photoContext = contextParts.length ? contextParts.join('\n') : undefined;
-      const schema = `{\n  "nachname": string | null, // Nachname\n  "vorname": string | null, // Vorname\n  "titel": string | null, // Titel (optional)\n  "strasse": string | null, // Straße\n  "hausnummer": string | null, // Hausnummer\n  "plz": string | null, // Postleitzahl\n  "ort": string | null, // Ort\n  "email_beruflich": string | null, // E-Mail (beruflich)\n  "email_privat": string | null, // E-Mail (privat)\n  "telefon": string | null, // Telefon\n  "einstiegsdatum": string | null, // YYYY-MM-DD\n  "status": LookupValue | null, // Status (select one key: "aktiv" | "urlaub" | "elternzeit" | "sonstiges") mapping: aktiv=Aktiv, urlaub=Urlaub, elternzeit=Elternzeit, sonstiges=Sonstiges\n  "stundensatz": number | null, // Stundensatz (€/h)\n  "sonstiges_1": string | null, // Sonstige Anmerkungen (1)\n  "sonstiges_2": string | null, // Sonstige Anmerkungen (2)\n  "leistungen": string[] | null, // Display names from Leistungskatalog, one per referenced record (see <available-records>)\n  "projekte": string[] | null, // Display names from Projekte, one per referenced record (see <available-records>)\n}`;
+      const schema = `{\n  "nachname": string | null, // Nachname\n  "vorname": string | null, // Vorname\n  "titel": string | null, // Titel (optional)\n  "strasse": string | null, // Straße (privat)\n  "hausnummer": string | null, // Hausnummer (privat)\n  "plz": string | null, // Postleitzahl (privat)\n  "ort": string | null, // Ort (privat)\n  "email_beruflich": string | null, // E-Mail (beruflich)\n  "email_privat": string | null, // E-Mail (privat)\n  "telefon": string | null, // Telefon (privat)\n  "einstiegsdatum": string | null, // YYYY-MM-DD\n  "status": LookupValue | null, // Status (select one key: "aktiv" | "urlaub" | "elternzeit" | "unternehmen_verlassen" | "sonstiges") mapping: aktiv=Aktiv, urlaub=Urlaub, elternzeit=Elternzeit, unternehmen_verlassen=Unternehmen verlassen, sonstiges=Sonstiges\n  "stundensatz": number | null, // Stundensatz (€/h)\n  "sonstiges_1": string | null, // Sonstige Anmerkungen (1)\n  "sonstiges_2": string | null, // Sonstige Anmerkungen (2)\n  "strasse_geschaeftlich": string | null, // Straße (geschäftlich)\n  "hausnummer_geschaeftlich": string | null, // Hausnummer (geschäftlich)\n  "plz_geschaeftlich": string | null, // Postleitzahl (geschäftlich)\n  "ort_geschaeftlich": string | null, // Ort (geschäftlich)\n  "telefon_geschaeftlich": string | null, // Telefon (geschäftlich)\n  "leistungen": string[] | null, // Display names from Leistungskatalog, one per referenced record (see <available-records>)\n  "projekte": string[] | null, // Display names from Projekte, one per referenced record (see <available-records>)\n}`;
       const raw = await extractFromInput<Record<string, unknown>>(schema, {
         dataUri: uri,
         userText: aiText.trim() || undefined,
@@ -565,6 +565,19 @@ export function BeraterInnenDialog({ open, onClose, onSubmit, defaultValues, rec
           <button
             type="button"
             role="radio"
+            aria-checked={lookupKey(fields.status) === 'unternehmen_verlassen'}
+            onClick={() => setFields(f => ({ ...f, status: (lookupKey(f.status) === 'unternehmen_verlassen' ? undefined : 'unternehmen_verlassen') as any }))}
+            className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+              lookupKey(fields.status) === 'unternehmen_verlassen'
+                ? 'bg-foreground text-background border-foreground'
+                : 'bg-background text-foreground border-input hover:bg-accent'
+            }`}
+          >
+            {lookupLabel('berater/innen', 'status', 'unternehmen_verlassen') ?? 'Unternehmen verlassen'}
+          </button>
+          <button
+            type="button"
+            role="radio"
             aria-checked={lookupKey(fields.status) === 'sonstiges'}
             onClick={() => setFields(f => ({ ...f, status: (lookupKey(f.status) === 'sonstiges' ? undefined : 'sonstiges') as any }))}
             className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
@@ -620,6 +633,63 @@ export function BeraterInnenDialog({ open, onClose, onSubmit, defaultValues, rec
         />
       </div>
     ),
+    'strasse_geschaeftlich': (
+      <div key="strasse_geschaeftlich" className="space-y-1.5">
+        <Label htmlFor="strasse_geschaeftlich">{fieldLabel('berater/innen', 'strasse_geschaeftlich')}</Label>
+        <Input
+          id="strasse_geschaeftlich"
+          placeholder=""
+          value={fields.strasse_geschaeftlich ?? ''}
+          onChange={e => setFields(f => ({ ...f, strasse_geschaeftlich: e.target.value }))}
+        />
+      </div>
+    ),
+    'hausnummer_geschaeftlich': (
+      <div key="hausnummer_geschaeftlich" className="space-y-1.5">
+        <Label htmlFor="hausnummer_geschaeftlich">{fieldLabel('berater/innen', 'hausnummer_geschaeftlich')}</Label>
+        <Input
+          id="hausnummer_geschaeftlich"
+          placeholder=""
+          value={fields.hausnummer_geschaeftlich ?? ''}
+          onChange={e => setFields(f => ({ ...f, hausnummer_geschaeftlich: e.target.value }))}
+        />
+      </div>
+    ),
+    'plz_geschaeftlich': (
+      <div key="plz_geschaeftlich" className="space-y-1.5">
+        <Label htmlFor="plz_geschaeftlich">{fieldLabel('berater/innen', 'plz_geschaeftlich')}</Label>
+        <Input
+          id="plz_geschaeftlich"
+          placeholder=""
+          value={fields.plz_geschaeftlich ?? ''}
+          onChange={e => setFields(f => ({ ...f, plz_geschaeftlich: e.target.value }))}
+        />
+      </div>
+    ),
+    'ort_geschaeftlich': (
+      <div key="ort_geschaeftlich" className="space-y-1.5">
+        <Label htmlFor="ort_geschaeftlich">{fieldLabel('berater/innen', 'ort_geschaeftlich')}</Label>
+        <Input
+          id="ort_geschaeftlich"
+          placeholder=""
+          value={fields.ort_geschaeftlich ?? ''}
+          onChange={e => setFields(f => ({ ...f, ort_geschaeftlich: e.target.value }))}
+        />
+      </div>
+    ),
+    'telefon_geschaeftlich': (
+      <div key="telefon_geschaeftlich" className="space-y-1.5">
+        <Label htmlFor="telefon_geschaeftlich">{fieldLabel('berater/innen', 'telefon_geschaeftlich')}</Label>
+        <Input
+          id="telefon_geschaeftlich"
+          type="tel"
+          inputMode="tel"
+          placeholder=""
+          value={fields.telefon_geschaeftlich ?? ''}
+          onChange={e => setFields(f => ({ ...f, telefon_geschaeftlich: e.target.value }))}
+        />
+      </div>
+    ),
     'leistungen': (
       <div key="leistungen" className="space-y-1.5">
         <Label htmlFor="leistungen">{fieldLabel('berater/innen', 'leistungen')}</Label>
@@ -668,13 +738,13 @@ export function BeraterInnenDialog({ open, onClose, onSubmit, defaultValues, rec
   //     kein passendes Backend-Feld in orderedFields) erscheinen NICHT als
   //     Input, sondern unten als kompakte 'Berechnungen'-Übersicht oder als
   //     Inline-Hint unter dem letzten beitragenden Input.
-  const FIELD_LABELS: Record<string, string> = {"nachname": "Nachname", "vorname": "Vorname", "titel": "Titel (optional)", "strasse": "Straße", "hausnummer": "Hausnummer", "plz": "Postleitzahl", "ort": "Ort", "email_beruflich": "E-Mail (beruflich)", "email_privat": "E-Mail (privat)", "telefon": "Telefon", "einstiegsdatum": "Einstiegsdatum", "status": "Status", "stundensatz": "Stundensatz (€/h)", "sonstiges_1": "Sonstige Anmerkungen (1)", "sonstiges_2": "Sonstige Anmerkungen (2)", "leistungen": "Erbringbare Leistungen", "projekte": "Aktuell zugewiesene Projekte"};
+  const FIELD_LABELS: Record<string, string> = {"nachname": "Nachname", "vorname": "Vorname", "titel": "Titel (optional)", "strasse": "Straße (privat)", "hausnummer": "Hausnummer (privat)", "plz": "Postleitzahl (privat)", "ort": "Ort (privat)", "email_beruflich": "E-Mail (beruflich)", "email_privat": "E-Mail (privat)", "telefon": "Telefon (privat)", "einstiegsdatum": "Einstiegsdatum", "status": "Status", "stundensatz": "Stundensatz (€/h)", "sonstiges_1": "Sonstige Anmerkungen (1)", "sonstiges_2": "Sonstige Anmerkungen (2)", "strasse_geschaeftlich": "Straße (geschäftlich)", "hausnummer_geschaeftlich": "Hausnummer (geschäftlich)", "plz_geschaeftlich": "Postleitzahl (geschäftlich)", "ort_geschaeftlich": "Ort (geschäftlich)", "telefon_geschaeftlich": "Telefon (geschäftlich)", "leistungen": "Durchführbare Leistungen", "projekte": "Aktuell zugewiesene Projekte"};
   const CURRENCY_KEYS = new Set<string>(["stundensatz"]);
   // Applookup-Referenz-Labels: pro applookup-Feld in dieser Form (ownKey)
   // eine Map { lookupKey: label } für ALLE Felder des Target-Schemas. Wird
   // beim Render-Walk gefiltert auf die in der computed-Formel tatsächlich
   // referenzierten lookupKeys (siehe applookupRefs unten).
-  const APPLOOKUP_LABELS: Record<string, Record<string, string>> = {"leistungen": {"berater": "Ausführende Berater/innen", "leistungsbezeichnung": "Leistungsbezeichnung", "leistungstyp": "Leistungstyp", "beschreibung": "Beschreibung", "kostenvoranschlag": "Normaler Kostenvoranschlag (€)", "stundensatz_leistung": "Stundensatz für diese Leistung (€/h)", "einheit": "Abrechnungseinheit", "verfuegbarkeit": "Verfügbarkeit / Hinweise"}, "projekte": {"projektkennung": "Projektkennung", "projektnummer": "Projektnummer", "projektart": "Projektart", "projektstart_jahr": "Startjahr", "projektstart_monat": "Startmonat", "status": "Projektstatus", "ansprechpartner_kunde": "Ansprechpartner beim Kunden", "letzter_schritt": "Letzter Schritt / aktueller Stand", "projektende": "Geplantes Projektende", "notizen": "Notizen", "kunde": "Kunde", "projektleitung": "Projektleitung"}};
+  const APPLOOKUP_LABELS: Record<string, Record<string, string>> = {"leistungen": {"leistungsbezeichnung": "Leistungsbezeichnung", "leistungstyp": "Leistungstyp", "beschreibung": "Beschreibung", "kostenvoranschlag": "Normaler Kostenvoranschlag (€)", "stundensatz_leistung": "Stundensatz für diese Leistung (€/h)", "einheit": "Abrechnungseinheit", "verfuegbarkeit": "Verfügbarkeit / Hinweise", "kuerzel": "Kürzel"}, "projekte": {"projektkennung": "Projektkennung", "projektnummer": "Projektnummer", "projektart": "Projektart", "projektstart_jahr": "Startjahr", "projektstart_monat": "Startmonat", "status": "Projektstatus", "ansprechpartner_kunde": "Ansprechpartner beim Kunden", "letzter_schritt": "Letzter Schritt / aktueller Stand", "projektende": "Geplantes Projektende", "notizen": "Notizen", "kunde": "Kunde", "projektleitung": "Projektleitung"}};
   const inputFields = useMemo(() => flattenFieldOrder(orderedFields), [orderedFieldsKey]);
   const backendFieldSet = useMemo(() => new Set(inputFields), [inputFields.join(',')]);
   const virtualComputed = useMemo(
@@ -1072,7 +1142,6 @@ export function BeraterInnenDialog({ open, onClose, onSubmit, defaultValues, rec
         defaultValues={createLeistungskatalogInitial
           ? ({ leistungsbezeichnung: createLeistungskatalogInitial } as any)
           : undefined}
-        beraterInnenList={[]}
       />
     )}
     {createProjekteOpen && (
