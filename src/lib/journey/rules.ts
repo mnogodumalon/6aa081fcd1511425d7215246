@@ -34,7 +34,7 @@ export type StringFieldKey<E extends EntityKey> = E extends keyof StringFields ?
 export interface RecordFields {
   "berater/innen": "leistungen" | "projekte";
   "kunden": "laufende_projekte";
-  "leistungskatalog": never;
+  "leistungskatalog": "berater_innen";
   "projekte": "kunde" | "projektleitung";
   "angebote": "projekt" | "kunde";
   "zeiterfassung": "berater" | "projekt" | "leistung";
@@ -671,6 +671,16 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "label": "Kürzel",
       "writable": true,
       "maxLength": 4000
+    },
+    "berater_innen": {
+      "key": "berater_innen",
+      "fulltype": "multipleapplookup/select",
+      "kind": "multirecord",
+      "required": false,
+      "label": "Zuständige Berater/innen",
+      "writable": true,
+      "targetAppId": "6aa081c0c506683d75c76a89",
+      "targetEntity": "berater/innen"
     }
   },
   "projekte": {
@@ -699,6 +709,7 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "label": "Projektart",
       "writable": true,
       "options": [
+        "it_beratung",
         "entwicklung",
         "schulung",
         "konzeption",
@@ -708,7 +719,6 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
         "interimsgeschaeftsfuehrung",
         "projekte_inklusion",
         "strategieberatung",
-        "it_beratung",
         "coaching",
         "personalprojekte",
         "sonstige_projekte",
@@ -1016,6 +1026,9 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "label": "Abrechnungsmonat",
       "writable": true,
       "options": [
+        "februar",
+        "maerz",
+        "april",
         "mai",
         "juni",
         "juli",
@@ -1023,11 +1036,8 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
         "september",
         "oktober",
         "november",
-        "dezember",
         "januar",
-        "februar",
-        "maerz",
-        "april"
+        "dezember"
       ]
     },
     "jahr": {
@@ -1301,6 +1311,11 @@ export const SHAPES: Record<EntityKey, Shape[]> = {
       "kind": "choice",
       "field": "einheit",
       "count": 4
+    },
+    {
+      "kind": "record",
+      "field": "berater_innen",
+      "targetEntity": "berater/innen"
     }
   ],
   "projekte": [

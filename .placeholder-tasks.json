@@ -621,6 +621,12 @@
           "key": "kuerzel",
           "label": "Kürzel",
           "type": "string/text"
+        },
+        {
+          "key": "berater_innen",
+          "label": "Zuständige Berater/innen",
+          "type": "multipleapplookup/select",
+          "target_entity": "Berater/innen"
         }
       ],
       "formEnhancements": {
@@ -717,6 +723,19 @@
             "label": "Kürzel",
             "type": "string/text",
             "required": false
+          },
+          {
+            "key": "berater_innen",
+            "label": "Zuständige Berater/innen",
+            "type": "multipleapplookup/select",
+            "required": false,
+            "target_entity": "Berater/innen",
+            "target_numeric_fields": [
+              {
+                "key": "stundensatz",
+                "label": "Stundensatz (€/h)"
+              }
+            ]
           }
         ]
       }
@@ -741,14 +760,14 @@
           "label": "Projektart",
           "type": "lookup/select",
           "options": [
+            "IT-Beratung",
             "Entwicklung",
             "Schulung",
             "Konzeption",
             "Support",
             "Sonstiges",
             "Inklusionsbetriebe",
-            "Interimsgeschäftsführung",
-            "Projekte Inklusion"
+            "Interimsgeschäftsführung"
           ]
         },
         {
@@ -826,6 +845,10 @@
             "required": true,
             "options": [
               {
+                "key": "it_beratung",
+                "label": "IT-Beratung"
+              },
+              {
                 "key": "entwicklung",
                 "label": "Entwicklung"
               },
@@ -852,10 +875,6 @@
               {
                 "key": "interimsgeschaeftsfuehrung",
                 "label": "Interimsgeschäftsführung"
-              },
-              {
-                "key": "projekte_inklusion",
-                "label": "Projekte Inklusion"
               }
             ]
           },
@@ -1269,14 +1288,14 @@
           "label": "Abrechnungsmonat",
           "type": "lookup/select",
           "options": [
+            "Februar",
+            "März",
+            "April",
             "Mai",
             "Juni",
             "Juli",
             "August",
-            "September",
-            "Oktober",
-            "November",
-            "Dezember"
+            "September"
           ]
         },
         {
@@ -1335,6 +1354,18 @@
             "required": true,
             "options": [
               {
+                "key": "februar",
+                "label": "Februar"
+              },
+              {
+                "key": "maerz",
+                "label": "März"
+              },
+              {
+                "key": "april",
+                "label": "April"
+              },
+              {
                 "key": "mai",
                 "label": "Mai"
               },
@@ -1353,18 +1384,6 @@
               {
                 "key": "september",
                 "label": "September"
-              },
-              {
-                "key": "oktober",
-                "label": "Oktober"
-              },
-              {
-                "key": "november",
-                "label": "November"
-              },
-              {
-                "key": "dezember",
-                "label": "Dezember"
               }
             ]
           },

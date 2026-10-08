@@ -110,3 +110,9 @@ Bei Angeboten brauch es ein Pflichtfeld, bei denen der Status gepflegt wird: Ent
 Bitte sorge dafür das alle Tabelle sortierbar sind, bspw. aufsteigend/absteigend A bis Z
 
 Aktuell funktioniert das nicht für die Tabellen. Bitte überprüfe das nochmal
+
+Bitte passe den Leistungskatalog so an, das ich unten die Berater abhaken kann, der diese Leistung durchführen kann. Mehrere Berater können pro Leistung zugewiesen werden.
+
+Bitte mach das so das es kein Auswahlfeld ist, sondern zum Abhaken
+
+Die Auswahl erlaubt dann aber keine mehrfachauswahl. Wie mache ich diese Möglich?

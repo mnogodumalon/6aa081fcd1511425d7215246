@@ -1689,7 +1689,8 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "stundensatz_leistung": "Stundensatz für diese Leistung (€/h)",
           "einheit": "Abrechnungseinheit",
           "verfuegbarkeit": "Verfügbarkeit / Hinweise",
-          "kuerzel": "Kürzel"
+          "kuerzel": "Kürzel",
+          "berater_innen": "Zuständige Berater/innen"
         },
         "lookups": {
           "leistungstyp": {
@@ -1727,6 +1728,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         },
         "lookups": {
           "projektart": {
+            "it_beratung": "IT-Beratung",
             "entwicklung": "Entwicklung",
             "schulung": "Schulung",
             "konzeption": "Konzeption",
@@ -1736,7 +1738,6 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "interimsgeschaeftsfuehrung": "Interimsgeschäftsführung",
             "projekte_inklusion": "Projekte Inklusion",
             "strategieberatung": "Strategieberatung",
-            "it_beratung": "IT-Beratung",
             "coaching": "Coaching",
             "personalprojekte": "Personalprojekte",
             "sonstige_projekte": "Sonstiges / Andere Projekte",
@@ -1830,6 +1831,9 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         },
         "lookups": {
           "monat": {
+            "februar": "Februar",
+            "maerz": "März",
+            "april": "April",
             "mai": "Mai",
             "juni": "Juni",
             "juli": "Juli",
@@ -1837,11 +1841,8 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "september": "September",
             "oktober": "Oktober",
             "november": "November",
-            "dezember": "Dezember",
             "januar": "Januar",
-            "februar": "Februar",
-            "maerz": "März",
-            "april": "April"
+            "dezember": "Dezember"
           }
         }
       },
@@ -1985,7 +1986,8 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "stundensatz_leistung": "Hourly Rate for this Service (€/h)",
           "einheit": "Billing Unit",
           "verfuegbarkeit": "Availability / Notes",
-          "kuerzel": "Abbreviation"
+          "kuerzel": "Abbreviation",
+          "berater_innen": "Responsible Consultants"
         },
         "lookups": {
           "leistungstyp": {
@@ -2014,7 +2016,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "projektstart_jahr": "Start Year",
           "projektstart_monat": "Start Month",
           "status": "Project Status",
-          "ansprechpartner_kunde": "Customer Contact Person",
+          "ansprechpartner_kunde": "Contact Person at Customer",
           "letzter_schritt": "Last Step / Current Status",
           "projektende": "Planned Project End",
           "notizen": "Notes",
@@ -2023,6 +2025,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         },
         "lookups": {
           "projektart": {
+            "it_beratung": "IT Consulting",
             "entwicklung": "Development",
             "schulung": "Training",
             "konzeption": "Conceptual Design",
@@ -2032,7 +2035,6 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "interimsgeschaeftsfuehrung": "Interim Management",
             "projekte_inklusion": "Inclusion Projects",
             "strategieberatung": "Strategy Consulting",
-            "it_beratung": "IT Consulting",
             "coaching": "Coaching",
             "personalprojekte": "HR Projects",
             "sonstige_projekte": "Other / Miscellaneous Projects",
@@ -2078,7 +2080,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "kosten_beschreibung": "Cost Description",
           "angebotsbeschreibung": "Quote Description",
           "leistungspositionen": "Service Items",
-          "anmerkungen": "Notes / Miscellaneous",
+          "anmerkungen": "Notes / Other",
           "vorlage_datei": "Quote Template (PDF/Document)",
           "angebotsstatus": "Quote Status",
           "projekt": "Assigned Project",
@@ -2095,7 +2097,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "kostentyp": {
             "einmalig": "One-time",
             "monatlich": "Monthly",
-            "jaehrlich": "Annual",
+            "jaehrlich": "Yearly",
             "nach_aufwand": "Time and Materials",
             "pauschal": "Flat Rate",
             "sonstiges": "Other"
@@ -2126,6 +2128,9 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         },
         "lookups": {
           "monat": {
+            "februar": "February",
+            "maerz": "March",
+            "april": "April",
             "mai": "May",
             "juni": "June",
             "juli": "July",
@@ -2133,11 +2138,8 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "september": "September",
             "oktober": "October",
             "november": "November",
-            "dezember": "December",
             "januar": "January",
-            "februar": "February",
-            "maerz": "March",
-            "april": "April"
+            "dezember": "December"
           }
         }
       },

@@ -744,7 +744,7 @@ export function BeraterInnenDialog({ open, onClose, onSubmit, defaultValues, rec
   // eine Map { lookupKey: label } für ALLE Felder des Target-Schemas. Wird
   // beim Render-Walk gefiltert auf die in der computed-Formel tatsächlich
   // referenzierten lookupKeys (siehe applookupRefs unten).
-  const APPLOOKUP_LABELS: Record<string, Record<string, string>> = {"leistungen": {"leistungsbezeichnung": "Leistungsbezeichnung", "leistungstyp": "Leistungstyp", "beschreibung": "Beschreibung", "kostenvoranschlag": "Normaler Kostenvoranschlag (€)", "stundensatz_leistung": "Stundensatz für diese Leistung (€/h)", "einheit": "Abrechnungseinheit", "verfuegbarkeit": "Verfügbarkeit / Hinweise", "kuerzel": "Kürzel"}, "projekte": {"projektkennung": "Projektkennung", "projektnummer": "Projektnummer", "projektart": "Projektart", "projektstart_jahr": "Startjahr", "projektstart_monat": "Startmonat", "status": "Projektstatus", "ansprechpartner_kunde": "Ansprechpartner beim Kunden", "letzter_schritt": "Letzter Schritt / aktueller Stand", "projektende": "Geplantes Projektende", "notizen": "Notizen", "kunde": "Kunde", "projektleitung": "Projektleitung"}};
+  const APPLOOKUP_LABELS: Record<string, Record<string, string>> = {"leistungen": {"leistungsbezeichnung": "Leistungsbezeichnung", "leistungstyp": "Leistungstyp", "beschreibung": "Beschreibung", "kostenvoranschlag": "Normaler Kostenvoranschlag (€)", "stundensatz_leistung": "Stundensatz für diese Leistung (€/h)", "einheit": "Abrechnungseinheit", "verfuegbarkeit": "Verfügbarkeit / Hinweise", "kuerzel": "Kürzel", "berater_innen": "Zuständige Berater/innen"}, "projekte": {"projektkennung": "Projektkennung", "projektnummer": "Projektnummer", "projektart": "Projektart", "projektstart_jahr": "Startjahr", "projektstart_monat": "Startmonat", "status": "Projektstatus", "ansprechpartner_kunde": "Ansprechpartner beim Kunden", "letzter_schritt": "Letzter Schritt / aktueller Stand", "projektende": "Geplantes Projektende", "notizen": "Notizen", "kunde": "Kunde", "projektleitung": "Projektleitung"}};
   const inputFields = useMemo(() => flattenFieldOrder(orderedFields), [orderedFieldsKey]);
   const backendFieldSet = useMemo(() => new Set(inputFields), [inputFields.join(',')]);
   const virtualComputed = useMemo(
@@ -1142,6 +1142,7 @@ export function BeraterInnenDialog({ open, onClose, onSubmit, defaultValues, rec
         defaultValues={createLeistungskatalogInitial
           ? ({ leistungsbezeichnung: createLeistungskatalogInitial } as any)
           : undefined}
+        beraterInnenList={[]}
       />
     )}
     {createProjekteOpen && (

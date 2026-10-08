@@ -155,7 +155,7 @@ export type DashboardData = ReturnType<typeof useDashboardData>;
 
 ## src/lib/enrich.ts
 ```
-import type { EnrichedAngebote, EnrichedBeraterInnen, EnrichedKunden, EnrichedProjekte, EnrichedRechnungen, EnrichedZeiterfassung } from '@/types/enriched';
+import type { EnrichedAngebote, EnrichedBeraterInnen, EnrichedKunden, EnrichedLeistungskatalog, EnrichedProjekte, EnrichedRechnungen, EnrichedZeiterfassung } from '@/types/enriched';
 import type { Angebote, BeraterInnen, Kunden, Leistungskatalog, Projekte, Rechnungen, Zeiterfassung } from '@/types/app';
 import { extractRecordId } from '@/services/livingAppsService';
 
@@ -196,6 +196,20 @@ export function enrichKunden(
   return kunden.map(r => ({
     ...r,
     laufende_projekteName: resolveDisplay(r.fields.laufende_projekte, maps.projekteMap, 'projektkennung'),
+  }));
+}
+
+interface LeistungskatalogMaps {
+  beraterInnenMap: Map<string, BeraterInnen>;
+}
+
+export function enrichLeistungskatalog(
+  leistungskatalog: Leistungskatalog[],
+  maps: LeistungskatalogMaps
+): EnrichedLeistungskatalog[] {
+  return leistungskatalog.map(r => ({
+    ...r,
+    berater_innenName: resolveDisplay(r.fields.berater_innen, maps.beraterInnenMap, 'vorname', 'nachname'),
   }));
 }
 

@@ -11,14 +11,18 @@ import { usePermissions } from '@/lib/permissions';
 export interface LeistungskatalogDetailsProps {
   /** Der Record — enriched oder roh; alle Felder werden hier gerendert. */
   record: Leistungskatalog;
-  /** 1:N „Berater/innen" (leistungen): VOLLE Liste — der Block filtert auf diesen Record. */
+  /** N:1-Ziel „BeraterInnen": volle Liste (Hook-Array) — der Block löst Name + Schlüsselfelder selbst auf. */
   beraterInnenList: BeraterInnen[];
+  /** Reserviert — BeraterInnen ist hier nur über ein Mehrfach-Feld verknüpft (Text-Join, keine Einzel-Relation); Übergabe erlaubt, aber ohne Wirkung. */
+  onOpenBeraterInnen?: (record: BeraterInnen) => void;
+  /** 1:N „Berater/innen" (leistungen): VOLLE Liste — der Block filtert auf diesen Record. */
+  beraterInnenLeistungenList: BeraterInnen[];
   /** Zeilen-Klick → overlay.push auf das BeraterInnen-Detail (nie der Edit-Dialog). */
-  onOpenBeraterInnen: (record: BeraterInnen) => void;
+  onOpenBeraterInnenLeistungen: (record: BeraterInnen) => void;
   /** Kontextuelles „+": öffnet den BeraterInnen-Dialog mit diesem Record vorgesetzt. */
-  onAddBeraterInnen?: () => void;
+  onAddBeraterInnenLeistungen?: () => void;
   /** „Vorhandene wählen": Listenfeld-Rückbezug — hängt diesen Record an einen bestehenden BeraterInnen-Datensatz. */
-  onPickBeraterInnen?: () => void;
+  onPickBeraterInnenLeistungen?: () => void;
   /** 1:N „Zeiterfassung" (leistung): VOLLE Liste — der Block filtert auf diesen Record. */
   zeiterfassungList: Zeiterfassung[];
   /** Zeilen-Klick → overlay.push auf das Zeiterfassung-Detail (nie der Edit-Dialog). */
@@ -30,9 +34,10 @@ export interface LeistungskatalogDetailsProps {
 export function LeistungskatalogDetails({
   record,
   beraterInnenList,
-  onOpenBeraterInnen,
-  onAddBeraterInnen,
-  onPickBeraterInnen,
+  beraterInnenLeistungenList,
+  onOpenBeraterInnenLeistungen,
+  onAddBeraterInnenLeistungen,
+  onPickBeraterInnenLeistungen,
   zeiterfassungList,
   onOpenZeiterfassung,
   onAddZeiterfassung,
@@ -50,15 +55,16 @@ export function LeistungskatalogDetails({
         <RecordField label={fieldLabel('leistungskatalog', 'einheit')} value={record.fields.einheit} format="pill" />
         <RecordField label={fieldLabel('leistungskatalog', 'verfuegbarkeit')} value={record.fields.verfuegbarkeit} format="longtext" className="md:col-span-2" />
         <RecordField label={fieldLabel('leistungskatalog', 'kuerzel')} value={record.fields.kuerzel} format="text" />
+        <RecordField label={fieldLabel('leistungskatalog', 'berater_innen')} value={Array.isArray(record.fields.berater_innen) ? record.fields.berater_innen.map((u: unknown) => beraterInnenList.find(t => t.record_id === extractRecordId(u))?.fields.nachname ?? '—').join(', ') : null} format="text" />
       </RecordSection>
 
       <SatelliteSection
-        title={appLabel('berater/innen')}
-        items={beraterInnenList.filter(r => Array.isArray(r.fields.leistungen) && r.fields.leistungen.some((u: unknown) => extractRecordId(u) === record.record_id))}
+        title={`${appLabel('berater/innen')} · ${fieldLabel('berater/innen', 'leistungen')}`}
+        items={beraterInnenLeistungenList.filter(r => Array.isArray(r.fields.leistungen) && r.fields.leistungen.some((u: unknown) => extractRecordId(u) === record.record_id))}
         map={r => ({ name: r.fields.nachname ?? appLabel('berater/innen'), meta: r.fields.einstiegsdatum })}
-        onOpen={onOpenBeraterInnen}
-        onAdd={onAddBeraterInnen}
-        onPick={onPickBeraterInnen}
+        onOpen={onOpenBeraterInnenLeistungen}
+        onAdd={onAddBeraterInnenLeistungen}
+        onPick={onPickBeraterInnenLeistungen}
         getKey={r => r.record_id}
       />
 

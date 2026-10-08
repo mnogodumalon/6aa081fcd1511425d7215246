@@ -183,7 +183,7 @@ WRONG: `{ type: 'rechnung'; record: Rechnungen }` … `top.record.kundeName` (TS
 
 ## src/types/enriched.ts
 ```
-import type { Angebote, BeraterInnen, Kunden, Projekte, Rechnungen, Zeiterfassung } from './app';
+import type { Angebote, BeraterInnen, Kunden, Leistungskatalog, Projekte, Rechnungen, Zeiterfassung } from './app';
 
 export type EnrichedBeraterInnen = BeraterInnen & {
   leistungenName: string;
@@ -192,6 +192,10 @@ export type EnrichedBeraterInnen = BeraterInnen & {
 
 export type EnrichedKunden = Kunden & {
   laufende_projekteName: string;
+};
+
+export type EnrichedLeistungskatalog = Leistungskatalog & {
+  berater_innenName: string;
 };
 
 export type EnrichedProjekte = Projekte & {
@@ -336,9 +340,9 @@ contracts; Read one only if the contract below is insufficient.
  *
  * Overlay content per entity (the host renders these — you never compose
  * Details blocks yourself):
- *   berater/innen: nachname, vorname, titel, strasse, hausnummer, plz, ort, email_beruflich, …  ·  → leistungskatalog · → projekte · ← projekte (list + contextual +) · ← zeiterfassung (list + contextual +) · ← rechnungen (list + contextual + + choose existing)
+ *   berater/innen: nachname, vorname, titel, strasse, hausnummer, plz, ort, email_beruflich, …  ·  → leistungskatalog · → projekte · ← leistungskatalog (list + contextual + + choose existing) · ← projekte (list + contextual +) · ← zeiterfassung (list + contextual +) · ← rechnungen (list + contextual + + choose existing)
  *   kunden: kundenname, kundentyp, email, telefon, strasse, hausnummer, plz, ort, …  ·  → projekte · ← projekte (list + contextual +) · ← angebote (list + contextual +) · ← rechnungen (list + contextual +)
- *   leistungskatalog: leistungsbezeichnung, leistungstyp, beschreibung, kostenvoranschlag, stundensatz_leistung, einheit, verfuegbarkeit, kuerzel  ·  ← berater/innen (list + contextual + + choose existing) · ← zeiterfassung (list + contextual +)
+ *   leistungskatalog: leistungsbezeichnung, leistungstyp, beschreibung, kostenvoranschlag, stundensatz_leistung, einheit, verfuegbarkeit, kuerzel, …  ·  → berater/innen · ← berater/innen (list + contextual + + choose existing) · ← zeiterfassung (list + contextual +)
  *   projekte: projektkennung, projektnummer, projektart, projektstart_jahr, projektstart_monat, status, ansprechpartner_kunde, letzter_schritt, …  ·  → kunden · → berater/innen · ← berater/innen (list + contextual + + choose existing) · ← kunden (list + contextual + + choose existing) · ← angebote (list + contextual +) · ← zeiterfassung (list + contextual +) · ← rechnungen (list + contextual +)
  *   angebote: angebotsnummer, angebotsjahr, angebotstyp, angebotsdatum, gueltig_bis, zeitrahmen_anfang, zeitrahmen_ende, dauer, …  ·  → projekte · → kunden
  *   zeiterfassung: datum, stunden, monat, jahr, taetigkeitsbeschreibung, verrechenbar, notizen, berater, …  ·  → berater/innen · → projekte · → leistungskatalog

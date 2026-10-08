@@ -1,6 +1,17 @@
 {
   "version": 1,
-  "changes": [],
-  "counts": {},
-  "harmless_only": true
+  "changes": [
+    {
+      "kind": "field_added",
+      "entity": "leistungskatalog",
+      "field": "berater_innen",
+      "fulltype": "multipleapplookup/select",
+      "label": "Zuständige Berater/innen",
+      "target_entity": "berater/innen"
+    }
+  ],
+  "counts": {
+    "field_added": 1
+  },
+  "harmless_only": false
 }
