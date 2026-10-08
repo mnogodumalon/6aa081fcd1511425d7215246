@@ -326,7 +326,7 @@ export function ZeiterfassungDialog({ open, onClose, onSubmit, defaultValues, re
         }
       }
       const photoContext = contextParts.length ? contextParts.join('\n') : undefined;
-      const schema = `{\n  "datum": string | null, // YYYY-MM-DD\n  "stunden": number | null, // Geleistete Stunden\n  "monat": LookupValue | null, // Abrechnungsmonat (select one key: "januar" | "februar" | "maerz" | "april" | "mai" | "juni" | "juli" | "august" | "september" | "oktober" | "november" | "dezember") mapping: januar=Januar, februar=Februar, maerz=März, april=April, mai=Mai, juni=Juni, juli=Juli, august=August, september=September, oktober=Oktober, november=November, dezember=Dezember\n  "jahr": string | null, // Abrechnungsjahr\n  "taetigkeitsbeschreibung": string | null, // Tätigkeitsbeschreibung\n  "verrechenbar": boolean | null, // Verrechenbar\n  "notizen": string | null, // Notizen\n  "berater": string | null, // Display name from Berater/innen (see <available-records>)\n  "projekt": string | null, // Display name from Projekte (see <available-records>)\n  "leistung": string | null, // Display name from Leistungskatalog (see <available-records>)\n}`;
+      const schema = `{\n  "datum": string | null, // YYYY-MM-DD\n  "stunden": number | null, // Geleistete Stunden\n  "monat": LookupValue | null, // Abrechnungsmonat (select one key: "mai" | "juni" | "juli" | "august" | "september" | "oktober" | "november" | "dezember" | "januar" | "februar" | "maerz" | "april") mapping: mai=Mai, juni=Juni, juli=Juli, august=August, september=September, oktober=Oktober, november=November, dezember=Dezember, januar=Januar, februar=Februar, maerz=März, april=April\n  "jahr": string | null, // Abrechnungsjahr\n  "taetigkeitsbeschreibung": string | null, // Tätigkeitsbeschreibung\n  "verrechenbar": boolean | null, // Verrechenbar\n  "notizen": string | null, // Notizen\n  "berater": string | null, // Display name from Berater/innen (see <available-records>)\n  "projekt": string | null, // Display name from Projekte (see <available-records>)\n  "leistung": string | null, // Display name from Leistungskatalog (see <available-records>)\n}`;
       const raw = await extractFromInput<Record<string, unknown>>(schema, {
         dataUri: uri,
         userText: aiText.trim() || undefined,
@@ -449,10 +449,6 @@ export function ZeiterfassungDialog({ open, onClose, onSubmit, defaultValues, re
           <SelectTrigger id="monat" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
-            <SelectItem value="januar">{lookupLabel('zeiterfassung', 'monat', 'januar') ?? 'Januar'}</SelectItem>
-            <SelectItem value="februar">{lookupLabel('zeiterfassung', 'monat', 'februar') ?? 'Februar'}</SelectItem>
-            <SelectItem value="maerz">{lookupLabel('zeiterfassung', 'monat', 'maerz') ?? 'März'}</SelectItem>
-            <SelectItem value="april">{lookupLabel('zeiterfassung', 'monat', 'april') ?? 'April'}</SelectItem>
             <SelectItem value="mai">{lookupLabel('zeiterfassung', 'monat', 'mai') ?? 'Mai'}</SelectItem>
             <SelectItem value="juni">{lookupLabel('zeiterfassung', 'monat', 'juni') ?? 'Juni'}</SelectItem>
             <SelectItem value="juli">{lookupLabel('zeiterfassung', 'monat', 'juli') ?? 'Juli'}</SelectItem>
@@ -461,6 +457,10 @@ export function ZeiterfassungDialog({ open, onClose, onSubmit, defaultValues, re
             <SelectItem value="oktober">{lookupLabel('zeiterfassung', 'monat', 'oktober') ?? 'Oktober'}</SelectItem>
             <SelectItem value="november">{lookupLabel('zeiterfassung', 'monat', 'november') ?? 'November'}</SelectItem>
             <SelectItem value="dezember">{lookupLabel('zeiterfassung', 'monat', 'dezember') ?? 'Dezember'}</SelectItem>
+            <SelectItem value="januar">{lookupLabel('zeiterfassung', 'monat', 'januar') ?? 'Januar'}</SelectItem>
+            <SelectItem value="februar">{lookupLabel('zeiterfassung', 'monat', 'februar') ?? 'Februar'}</SelectItem>
+            <SelectItem value="maerz">{lookupLabel('zeiterfassung', 'monat', 'maerz') ?? 'März'}</SelectItem>
+            <SelectItem value="april">{lookupLabel('zeiterfassung', 'monat', 'april') ?? 'April'}</SelectItem>
           </SelectContent>
         </Select>
         {showErrors && !fields.monat && (

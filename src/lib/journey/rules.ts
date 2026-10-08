@@ -708,13 +708,13 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
         "interimsgeschaeftsfuehrung",
         "projekte_inklusion",
         "strategieberatung",
+        "it_beratung",
         "coaching",
         "personalprojekte",
         "sonstige_projekte",
         "workshops_seminare",
         "immobilienprojekte",
-        "it_projekte",
-        "it_beratung"
+        "it_projekte"
       ]
     },
     "projektstart_jahr": {
@@ -735,6 +735,7 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "writable": true,
       "options": [
         "januar",
+        "februar",
         "maerz",
         "april",
         "mai",
@@ -744,8 +745,7 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
         "september",
         "oktober",
         "november",
-        "dezember",
-        "februar"
+        "dezember"
       ]
     },
     "status": {
@@ -1016,10 +1016,6 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "label": "Abrechnungsmonat",
       "writable": true,
       "options": [
-        "januar",
-        "februar",
-        "maerz",
-        "april",
         "mai",
         "juni",
         "juli",
@@ -1027,7 +1023,11 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
         "september",
         "oktober",
         "november",
-        "dezember"
+        "dezember",
+        "januar",
+        "februar",
+        "maerz",
+        "april"
       ]
     },
     "jahr": {

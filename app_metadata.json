@@ -94,7 +94,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "ort": {
@@ -109,7 +109,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "email_beruflich": {
@@ -124,7 +124,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "email_privat": {
@@ -139,7 +139,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "telefon": {
@@ -154,7 +154,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "einstiegsdatum": {
@@ -169,7 +169,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "status": {
@@ -181,10 +181,10 @@
           "description": "One selected option of multiple available options (or `null`/`None`).\n\nThe available options are defined in the `lookup_data` attribute of this control.\n\nThe field value will be the key in this `lookup_data` attribute (or `null`/`None`).\n\nDisplayed as radio button fields in HTML pages.",
           "required": true,
           "in_list": false,
-          "in_mobile_list": false,
+          "in_mobile_list": true,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": true,
           "in_expert_search": true,
           "lookup_data": {
             "aktiv": "Aktiv",
@@ -206,7 +206,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true,
           "precision": null
         },
@@ -222,7 +222,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "sonstiges_2": {
@@ -237,7 +237,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "strasse_geschaeftlich": {
@@ -252,7 +252,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "hausnummer_geschaeftlich": {
@@ -267,7 +267,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "plz_geschaeftlich": {
@@ -282,7 +282,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "ort_geschaeftlich": {
@@ -297,7 +297,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "telefon_geschaeftlich": {
@@ -312,7 +312,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "leistungen": {
@@ -447,7 +447,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "plz": {
@@ -462,7 +462,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "ort": {
@@ -477,7 +477,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "re_strasse": {
@@ -492,7 +492,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "re_hausnummer": {
@@ -507,7 +507,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "re_plz": {
@@ -522,7 +522,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "re_ort": {
@@ -537,7 +537,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "anlagedatum": {
@@ -552,7 +552,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "ap_titel": {
@@ -567,7 +567,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "ap_vorname": {
@@ -582,7 +582,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "ap_nachname": {
@@ -597,7 +597,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "ap_email": {
@@ -612,7 +612,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "ap_telefon": {
@@ -627,7 +627,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "bevorzugte_kontaktart": {
@@ -642,7 +642,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true,
           "lookup_data": {
             "email": "E-Mail",
@@ -663,7 +663,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "letzter_kontakt_ansprechpartner": {
@@ -678,7 +678,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "notizen": {
@@ -693,7 +693,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "laufende_projekte": {
@@ -917,13 +917,13 @@
             "interimsgeschaeftsfuehrung": "Interimsgeschäftsführung",
             "projekte_inklusion": "Projekte Inklusion",
             "strategieberatung": "Strategieberatung",
+            "it_beratung": "IT-Beratung",
             "coaching": "Coaching",
             "personalprojekte": "Personalprojekte",
             "sonstige_projekte": "Sonstiges / Andere Projekte",
             "workshops_seminare": "Workshops / Seminare",
             "immobilienprojekte": "Immobilienprojekte",
-            "it_projekte": "IT-Projekte",
-            "it_beratung": "IT-Beratung"
+            "it_projekte": "IT-Projekte"
           }
         },
         "projektstart_jahr": {
@@ -957,6 +957,7 @@
           "in_expert_search": true,
           "lookup_data": {
             "januar": "Januar",
+            "februar": "Februar",
             "maerz": "März",
             "april": "April",
             "mai": "Mai",
@@ -966,8 +967,7 @@
             "september": "September",
             "oktober": "Oktober",
             "november": "November",
-            "dezember": "Dezember",
-            "februar": "Februar"
+            "dezember": "Dezember"
           }
         },
         "status": {
@@ -1437,10 +1437,6 @@
           "in_fulltext_search": true,
           "in_expert_search": true,
           "lookup_data": {
-            "januar": "Januar",
-            "februar": "Februar",
-            "maerz": "März",
-            "april": "April",
             "mai": "Mai",
             "juni": "Juni",
             "juli": "Juli",
@@ -1448,7 +1444,11 @@
             "september": "September",
             "oktober": "Oktober",
             "november": "November",
-            "dezember": "Dezember"
+            "dezember": "Dezember",
+            "januar": "Januar",
+            "februar": "Februar",
+            "maerz": "März",
+            "april": "April"
           }
         },
         "jahr": {

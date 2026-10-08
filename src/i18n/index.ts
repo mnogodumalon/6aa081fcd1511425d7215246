@@ -1736,16 +1736,17 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "interimsgeschaeftsfuehrung": "Interimsgeschäftsführung",
             "projekte_inklusion": "Projekte Inklusion",
             "strategieberatung": "Strategieberatung",
+            "it_beratung": "IT-Beratung",
             "coaching": "Coaching",
             "personalprojekte": "Personalprojekte",
             "sonstige_projekte": "Sonstiges / Andere Projekte",
             "workshops_seminare": "Workshops / Seminare",
             "immobilienprojekte": "Immobilienprojekte",
-            "it_projekte": "IT-Projekte",
-            "it_beratung": "IT-Beratung"
+            "it_projekte": "IT-Projekte"
           },
           "projektstart_monat": {
             "januar": "Januar",
+            "februar": "Februar",
             "maerz": "März",
             "april": "April",
             "mai": "Mai",
@@ -1755,8 +1756,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "september": "September",
             "oktober": "Oktober",
             "november": "November",
-            "dezember": "Dezember",
-            "februar": "Februar"
+            "dezember": "Dezember"
           },
           "status": {
             "in_bearbeitung": "In Bearbeitung",
@@ -1830,10 +1830,6 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         },
         "lookups": {
           "monat": {
-            "januar": "Januar",
-            "februar": "Februar",
-            "maerz": "März",
-            "april": "April",
             "mai": "Mai",
             "juni": "Juni",
             "juli": "Juli",
@@ -1841,7 +1837,11 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "september": "September",
             "oktober": "Oktober",
             "november": "November",
-            "dezember": "Dezember"
+            "dezember": "Dezember",
+            "januar": "Januar",
+            "februar": "Februar",
+            "maerz": "März",
+            "april": "April"
           }
         }
       },
@@ -1963,7 +1963,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "kundentyp": {
             "einzelperson": "Individual",
             "firma": "Company",
-            "behoerde": "Authority",
+            "behoerde": "Public Authority",
             "sonstiges": "Other"
           },
           "bevorzugte_kontaktart": {
@@ -1982,7 +1982,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "leistungstyp": "Service Type",
           "beschreibung": "Description",
           "kostenvoranschlag": "Standard Cost Estimate (€)",
-          "stundensatz_leistung": "Hourly Rate for This Service (€/h)",
+          "stundensatz_leistung": "Hourly Rate for this Service (€/h)",
           "einheit": "Billing Unit",
           "verfuegbarkeit": "Availability / Notes",
           "kuerzel": "Abbreviation"
@@ -2032,16 +2032,17 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "interimsgeschaeftsfuehrung": "Interim Management",
             "projekte_inklusion": "Inclusion Projects",
             "strategieberatung": "Strategy Consulting",
+            "it_beratung": "IT Consulting",
             "coaching": "Coaching",
             "personalprojekte": "HR Projects",
-            "sonstige_projekte": "Other Projects",
+            "sonstige_projekte": "Other / Miscellaneous Projects",
             "workshops_seminare": "Workshops / Seminars",
             "immobilienprojekte": "Real Estate Projects",
-            "it_projekte": "IT Projects",
-            "it_beratung": "IT Consulting"
+            "it_projekte": "IT Projects"
           },
           "projektstart_monat": {
             "januar": "January",
+            "februar": "February",
             "maerz": "March",
             "april": "April",
             "mai": "May",
@@ -2051,8 +2052,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "september": "September",
             "oktober": "October",
             "november": "November",
-            "dezember": "December",
-            "februar": "February"
+            "dezember": "December"
           },
           "status": {
             "in_bearbeitung": "In Progress",
@@ -2078,7 +2078,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "kosten_beschreibung": "Cost Description",
           "angebotsbeschreibung": "Quote Description",
           "leistungspositionen": "Service Items",
-          "anmerkungen": "Notes / Other",
+          "anmerkungen": "Notes / Miscellaneous",
           "vorlage_datei": "Quote Template (PDF/Document)",
           "angebotsstatus": "Quote Status",
           "projekt": "Assigned Project",
@@ -2095,7 +2095,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "kostentyp": {
             "einmalig": "One-time",
             "monatlich": "Monthly",
-            "jaehrlich": "Yearly",
+            "jaehrlich": "Annual",
             "nach_aufwand": "Time and Materials",
             "pauschal": "Flat Rate",
             "sonstiges": "Other"
@@ -2126,10 +2126,6 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         },
         "lookups": {
           "monat": {
-            "januar": "January",
-            "februar": "February",
-            "maerz": "March",
-            "april": "April",
             "mai": "May",
             "juni": "June",
             "juli": "July",
@@ -2137,7 +2133,11 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "september": "September",
             "oktober": "October",
             "november": "November",
-            "dezember": "December"
+            "dezember": "December",
+            "januar": "January",
+            "februar": "February",
+            "maerz": "March",
+            "april": "April"
           }
         }
       },

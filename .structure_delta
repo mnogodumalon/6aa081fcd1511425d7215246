@@ -1,16 +1,6 @@
 {
   "version": 1,
-  "changes": [
-    {
-      "kind": "field_added",
-      "entity": "angebote",
-      "field": "angebotsstatus",
-      "fulltype": "lookup/radio",
-      "label": "Angebotsstatus"
-    }
-  ],
-  "counts": {
-    "field_added": 1
-  },
-  "harmless_only": false
+  "changes": [],
+  "counts": {},
+  "harmless_only": true
 }

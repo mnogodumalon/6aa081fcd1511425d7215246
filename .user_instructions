@@ -106,3 +106,7 @@ Füge bitte bei Beraterinnen den Status "Unternehmen Verlassen" hinzu
 Bei Berater soll es die Möglichkeit geben sowohl Geschäts- als auch Privatadressen, sowie Geschäftliche und Private Telefonnummern sowie Email hinzuzufügen.
 
 Bei Angeboten brauch es ein Pflichtfeld, bei denen der Status gepflegt wird: Entwurf, Freigegeben, Versendet, Angenommen, Abgelehnt
+
+Bitte sorge dafür das alle Tabelle sortierbar sind, bspw. aufsteigend/absteigend A bis Z
+
+Aktuell funktioniert das nicht für die Tabellen. Bitte überprüfe das nochmal

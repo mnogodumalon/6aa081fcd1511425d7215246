@@ -762,13 +762,13 @@
           "type": "lookup/select",
           "options": [
             "Januar",
+            "Februar",
             "März",
             "April",
             "Mai",
             "Juni",
             "Juli",
-            "August",
-            "September"
+            "August"
           ]
         },
         {
@@ -876,6 +876,10 @@
                 "label": "Januar"
               },
               {
+                "key": "februar",
+                "label": "Februar"
+              },
+              {
                 "key": "maerz",
                 "label": "März"
               },
@@ -898,10 +902,6 @@
               {
                 "key": "august",
                 "label": "August"
-              },
-              {
-                "key": "september",
-                "label": "September"
               }
             ]
           },
@@ -1269,14 +1269,14 @@
           "label": "Abrechnungsmonat",
           "type": "lookup/select",
           "options": [
-            "Januar",
-            "Februar",
-            "März",
-            "April",
             "Mai",
             "Juni",
             "Juli",
-            "August"
+            "August",
+            "September",
+            "Oktober",
+            "November",
+            "Dezember"
           ]
         },
         {
@@ -1335,22 +1335,6 @@
             "required": true,
             "options": [
               {
-                "key": "januar",
-                "label": "Januar"
-              },
-              {
-                "key": "februar",
-                "label": "Februar"
-              },
-              {
-                "key": "maerz",
-                "label": "März"
-              },
-              {
-                "key": "april",
-                "label": "April"
-              },
-              {
                 "key": "mai",
                 "label": "Mai"
               },
@@ -1365,6 +1349,22 @@
               {
                 "key": "august",
                 "label": "August"
+              },
+              {
+                "key": "september",
+                "label": "September"
+              },
+              {
+                "key": "oktober",
+                "label": "Oktober"
+              },
+              {
+                "key": "november",
+                "label": "November"
+              },
+              {
+                "key": "dezember",
+                "label": "Dezember"
               }
             ]
           },
