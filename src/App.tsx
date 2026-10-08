@@ -37,6 +37,7 @@ const IntentKundeBearbeitenPage = lazy(() => import('@/pages/intents/KundeBearbe
 // arrival) must not tear the element down mid-chat; the element follows
 // <html lang> itself. Hidden on anonymous public routes; its 401 guard is
 // the backstop, not the mechanism.
+const IntentLeistungenZuweisenPage = lazy(() => import('@/pages/intents/LeistungenZuweisenPage'));
 // </custom:imports>
 
 // Lazy: public pages live outside <Layout> and only load on /#/public/:slug —
@@ -112,6 +113,7 @@ export default function App() {
                 <Route path="intents/angebot-erstellen" element={<Suspense fallback={null}><IntentAngebotErstellenPage /></Suspense>} />
                 <Route path="intents/rechnung-erstellen" element={<Suspense fallback={null}><IntentRechnungErstellenPage /></Suspense>} />
                 <Route path="intents/kunde-bearbeiten" element={<Suspense fallback={<DashboardSkeleton />}><IntentKundeBearbeitenPage /></Suspense>} />
+                <Route path="intents/leistungen-zuweisen" element={<Suspense fallback={<DashboardSkeleton />}><IntentLeistungenZuweisenPage /></Suspense>} />
                 {/* </custom:routes> */}
                 {/* An unknown hash (a bookmark from before a rebuild renamed the
                     flows, a mistyped link) must not be a blank page. */}

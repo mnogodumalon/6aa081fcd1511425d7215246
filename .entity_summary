@@ -78,7 +78,7 @@ createRecordUrl from the service. Note the lowercase `l` in the service path.
   → kunde links to app_id 6aa081c7132fedb98dca2728
   → projektleitung links to app_id 6aa081c0c506683d75c76a89
 - Angebote (angebote): angebotsnummer!^[string/text], angebotsjahr!^[string/text] "Jahr", angebotstyp![lookup/select: dienstleistung=Dienstleistungsangebot|projekt=Projektangebot|wartung=Wartungsangebot|schulung=Schulungsangebot|sonstiges], angebotsdatum![date/date], gueltig_bis[date/date], zeitrahmen_anfang[date/date] "Beginn", zeitrahmen_ende[date/date] "Ende (falls vorhanden)", dauer[string/text], kostentyp[lookup/select: einmalig|monatlich|jaehrlich|nach_aufwand|pauschal|sonstiges], kostenbetrag[number] "Betrag (€)", kosten_beschreibung[string/textarea] "Kostenbeschreibung", angebotsbeschreibung[string/textarea], leistungspositionen[string/textarea], anmerkungen[string/textarea] "Anmerkungen / Sonstiges", vorlage_datei[file] "Angebotsvorlage (PDF/Dokument)", angebotsstatus![lookup/radio: entwurf|freigegeben|versendet|angenommen|abgelehnt], projekt[applookup/select] "Zugewiesenes Projekt", kunde[applookup/select]
-  ≡ 3 records at build time
+  ≡ 0 records at build time
   ◈ angebotstyp → choice (5 options, ChoiceGroup) · kostentyp → choice (6 options, ChoiceGroup) · angebotsstatus → choice (5 options, ChoiceGroup) · projekt → record (projekte, EntitySelectStep) · kunde → record (kunden, EntitySelectStep)
   ⚙ getAngebote() · getAngeboteEntry(id) · createAngeboteEntry(fields) · updateAngeboteEntry(id, fields) · deleteAngeboteEntry(id) · queryAngebote({ filter, orderby, limit, offset, fields }) · countAngebote(filter?)
   ✚ EnrichedAngebote adds ONLY projektName, kundeName — via enrichAngebote(angebote, { projekteMap, kundenMap }), all maps required

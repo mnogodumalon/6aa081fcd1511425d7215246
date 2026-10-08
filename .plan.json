@@ -1,0 +1,135 @@
+{
+  "version": 1,
+  "language": "de",
+  "understanding": {
+    "summary": "inclou. ERP",
+    "roles": [],
+    "main_tasks": [],
+    "platform_roles": []
+  },
+  "flows": [
+    {
+      "slug": "kunde-bearbeiten",
+      "label": {
+        "de": "Kunde bearbeiten",
+        "en": "Edit customer"
+      },
+      "description": "Bestehenden Kunden auswählen und seine Daten ändern",
+      "priority": "must",
+      "writes": [
+        {
+          "entity": "kunden",
+          "op": "update",
+          "when": "always",
+          "fields": {
+            "ort": "user",
+            "plz": "user",
+            "email": "user",
+            "re_ort": "user",
+            "re_plz": "user",
+            "notizen": "user",
+            "strasse": "user",
+            "telefon": "user",
+            "ap_email": "user",
+            "ap_titel": "user",
+            "kundentyp": "user",
+            "ap_telefon": "user",
+            "ap_vorname": "user",
+            "hausnummer": "user",
+            "kundenname": "user",
+            "re_strasse": "user",
+            "ap_nachname": "user",
+            "re_hausnummer": "user",
+            "bevorzugte_kontaktart": "user",
+            "letzter_kontakt_datum": "user",
+            "letzter_kontakt_ansprechpartner": "user"
+          },
+          "needs": {}
+        }
+      ],
+      "required": [],
+      "brief": "# Flow `kunde-bearbeiten` — Kunde bearbeiten\nBestehenden Kunden auswählen und seine Daten ändern\n\n## Your hook — import it, never rebuild what it owns\n`import { useKundeBearbeitenFlow } from '@/lib/journey/flows/KundeBearbeiten';` — generated from the Schreibliste below. It OWNS the form(s), one record search per picked field (columns and filter from the plan) and the submit plan with every fixed and derived value. You compose: `flow.forms.<entity>` for <Bound>/<Field>, `{...flow.picks.<field>.select} {...flow.pick('<field>')}` (or `flow.pickMany` for a multi pick) for <EntitySelectStep>, `flow.validateStep(n)` in StepNav.onNext, `flow.submit` + `flow.formList` for SummaryStep/SuccessStep, `flow.reset()`; what the hook does not own reads through its door `flow.port` — availability `useOccupancy(flow.port, '<entity>', { resource })`, a count `useRecordCount(flow.port, …)` — never import servicePort next to the hook. Options: `steps` (field → step), `items` (how a hit reads, per pick), `initial`, `messages`. The hook's docblock in .lane-context.md shows the exact call. This flow CHANGES a record of `kunden`: `{...flow.picks.kunden.select} {...flow.pick('kunden')}` picks it, the hook prefills the form with its current values and updates THAT record — never a create step, never a list from useDashboardData. Never import servicePort, useStepForm, useJourneySubmit, useRecordSearch or useDashboardData in this page — check-intents refuses a page that uses the hook and any of them.\n\n## Steps (in this order)\n\n## Schreibliste — the ONLY writes this flow makes (the gate compares your plan steps with this list)\n- updates `kunden`:\n    - `ort`: the user enters it (bind it through the layer: form.field/…)\n    - `plz`: the user enters it (bind it through the layer: form.field/…)\n    - `email`: the user enters it (bind it through the layer: form.field/…)\n    - `re_ort`: the user enters it (bind it through the layer: form.field/…)\n    - `re_plz`: the user enters it (bind it through the layer: form.field/…)\n    - `notizen`: the user enters it (bind it through the layer: form.field/…)\n    - `strasse`: the user enters it (bind it through the layer: form.field/…)\n    - `telefon`: the user enters it (bind it through the layer: form.field/…)\n    - `ap_email`: the user enters it (bind it through the layer: form.field/…)\n    - `ap_titel`: the user enters it (bind it through the layer: form.field/…)\n    - `kundentyp`: the user enters it (bind it through the layer: form.field/…)\n    - `ap_telefon`: the user enters it (bind it through the layer: form.field/…)\n    - `ap_vorname`: the user enters it (bind it through the layer: form.field/…)\n    - `hausnummer`: the user enters it (bind it through the layer: form.field/…)\n    - `kundenname`: the user enters it (bind it through the layer: form.field/…)\n    - `re_strasse`: the user enters it (bind it through the layer: form.field/…)\n    - `ap_nachname`: the user enters it (bind it through the layer: form.field/…)\n    - `re_hausnummer`: the user enters it (bind it through the layer: form.field/…)\n    - `bevorzugte_kontaktart`: the user enters it (bind it through the layer: form.field/…)\n    - `letzter_kontakt_datum`: the user enters it (bind it through the layer: form.field/…)\n    - `letzter_kontakt_ansprechpartner`: the user enters it (bind it through the layer: form.field/…)\n\n## Never write these — another flow or a tool owns them\n- `berater/innen.leistungen` (owner: intent `leistungen-zuweisen`)\n"
+    },
+    {
+      "slug": "leistungen-zuweisen",
+      "label": {
+        "de": "Berater/in Leistungen zuweisen",
+        "en": "Assign services to consultant"
+      },
+      "description": "Eine Beraterin oder einen Berater auswählen und die durchführbaren Leistungen aus dem Leistungskatalog zuweisen.",
+      "priority": "must",
+      "writes": [
+        {
+          "entity": "berater/innen",
+          "op": "update",
+          "when": "always",
+          "fields": {
+            "leistungen": "picked"
+          },
+          "needs": {}
+        }
+      ],
+      "required": [],
+      "brief": "# Flow `leistungen-zuweisen` — Berater/in Leistungen zuweisen\nEine Beraterin oder einen Berater auswählen und die durchführbaren Leistungen aus dem Leistungskatalog zuweisen.\n\n## Your hook — import it, never rebuild what it owns\n`import { useLeistungenZuweisenFlow } from '@/lib/journey/flows/LeistungenZuweisen';` — generated from the Schreibliste below. It OWNS the form(s), one record search per picked field (columns and filter from the plan) and the submit plan with every fixed and derived value. You compose: `flow.forms.<entity>` for <Bound>/<Field>, `{...flow.picks.<field>.select} {...flow.pick('<field>')}` (or `flow.pickMany` for a multi pick) for <EntitySelectStep>, `flow.validateStep(n)` in StepNav.onNext, `flow.submit` + `flow.formList` for SummaryStep/SuccessStep, `flow.reset()`; what the hook does not own reads through its door `flow.port` — availability `useOccupancy(flow.port, '<entity>', { resource })`, a count `useRecordCount(flow.port, …)` — never import servicePort next to the hook. Options: `steps` (field → step), `items` (how a hit reads, per pick: leistungen), `initial`, `messages`. The hook's docblock in .lane-context.md shows the exact call. This flow CHANGES a record of `berater/innen`: `{...flow.picks.berater/innen.select} {...flow.pick('berater/innen')}` picks it, the hook prefills the form with its current values and updates THAT record — never a create step, never a list from useDashboardData. Never import servicePort, useStepForm, useJourneySubmit, useRecordSearch or useDashboardData in this page — check-intents refuses a page that uses the hook and any of them.\n\n## Steps (in this order)\n1. Berater/in aus der Liste auswählen\n2. Leistungen aus dem Leistungskatalog auswählen und zuweisen\n\n## Schreibliste — the ONLY writes this flow makes (the gate compares your plan steps with this list)\n- updates `berater/innen`:\n    - `leistungen`: from the record the user picks in this flow\n\n## Reads\n- `leistungskatalog` columns leistungsbezeichnung, leistungstyp, kuerzel\n\n## Success page\n- shows: `berater/innen.leistungen`\n\n## Never write these — another flow or a tool owns them\n- `kunden.ort` (owner: intent `kunde-bearbeiten`)\n- `kunden.plz` (owner: intent `kunde-bearbeiten`)\n- `kunden.email` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_ort` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_plz` (owner: intent `kunde-bearbeiten`)\n- `kunden.notizen` (owner: intent `kunde-bearbeiten`)\n- `kunden.strasse` (owner: intent `kunde-bearbeiten`)\n- `kunden.telefon` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_email` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_titel` (owner: intent `kunde-bearbeiten`)\n- `kunden.kundentyp` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_telefon` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_vorname` (owner: intent `kunde-bearbeiten`)\n- `kunden.hausnummer` (owner: intent `kunde-bearbeiten`)\n- `kunden.kundenname` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_strasse` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_nachname` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_hausnummer` (owner: intent `kunde-bearbeiten`)\n- `kunden.bevorzugte_kontaktart` (owner: intent `kunde-bearbeiten`)\n- `kunden.letzter_kontakt_datum` (owner: intent `kunde-bearbeiten`)\n- `kunden.letzter_kontakt_ansprechpartner` (owner: intent `kunde-bearbeiten`)\n"
+    }
+  ],
+  "public_pages": [],
+  "tools": [
+    {
+      "id": "zeitstatistiken-aktualisieren",
+      "purpose": "Berechnet bei Änderungen in der Zeiterfassung die gebuchten Stunden je Berater/in für aktuellen und vorherigen Monat, Quartal und Jahr neu."
+    },
+    {
+      "id": "projektkennung-automatisch",
+      "purpose": "Bildet nach Abschluss jeder Projekterstellung automatisch die Projektkennung aus Startjahr, Projektart und Projektnummer."
+    },
+    {
+      "id": "angebot-pdf-generieren",
+      "purpose": "Vergibt automatisch eine fortlaufende Angebotsnummer je Jahr und erstellt ein PDF aus Angebots-, Kunden- und Projektdaten."
+    },
+    {
+      "id": "rechnung-berechnen-und-pdf",
+      "purpose": "Ermittelt verrechenbare Positionen aus der Zeiterfassung, berechnet Netto, Mehrwertsteuer und Gesamtbetrag, vergibt eine Jahresnummer und erstellt ein Rechnungs-PDF."
+    },
+    {
+      "id": "rechnungen-excel-exportieren",
+      "purpose": "Erstellt eine Excel-Arbeitsmappe aller Rechnungen mit einem zeitlich gegliederten Tabellenblatt pro Abrechnungsjahr."
+    }
+  ],
+  "covered_by_platform": [],
+  "ownership": {
+    "kunden": {
+      "ort": "intent:kunde-bearbeiten",
+      "plz": "intent:kunde-bearbeiten",
+      "email": "intent:kunde-bearbeiten",
+      "re_ort": "intent:kunde-bearbeiten",
+      "re_plz": "intent:kunde-bearbeiten",
+      "notizen": "intent:kunde-bearbeiten",
+      "strasse": "intent:kunde-bearbeiten",
+      "telefon": "intent:kunde-bearbeiten",
+      "ap_email": "intent:kunde-bearbeiten",
+      "ap_titel": "intent:kunde-bearbeiten",
+      "kundentyp": "intent:kunde-bearbeiten",
+      "ap_telefon": "intent:kunde-bearbeiten",
+      "ap_vorname": "intent:kunde-bearbeiten",
+      "hausnummer": "intent:kunde-bearbeiten",
+      "kundenname": "intent:kunde-bearbeiten",
+      "re_strasse": "intent:kunde-bearbeiten",
+      "ap_nachname": "intent:kunde-bearbeiten",
+      "re_hausnummer": "intent:kunde-bearbeiten",
+      "bevorzugte_kontaktart": "intent:kunde-bearbeiten",
+      "letzter_kontakt_datum": "intent:kunde-bearbeiten",
+      "letzter_kontakt_ansprechpartner": "intent:kunde-bearbeiten"
+    },
+    "berater/innen": {
+      "leistungen": "intent:leistungen-zuweisen"
+    }
+  },
+  "dashboard": {
+    "focus": [],
+    "hints": [],
+    "wishes": [
+      "Bestehende Kunden Bearbeiten"
+    ]
+  }
+}
