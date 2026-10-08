@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "language": "de",
+  "understanding": {
+    "summary": "inclou. ERP",
+    "roles": [],
+    "main_tasks": [],
+    "platform_roles": []
+  },
+  "flows": [
+    {
+      "slug": "stunden-erfassen",
+      "label": {
+        "de": "Stunden erfassen",
+        "en": "Stunden erfassen"
+      },
+      "description": "Arbeitszeit in 3 Schritten einem Projekt zubuchen",
+      "priority": "must",
+      "writes": [],
+      "required": [],
+      "brief": "# Flow `stunden-erfassen` — Stunden erfassen\nArbeitszeit in 3 Schritten einem Projekt zubuchen\n\n## Your hook — import it, never rebuild what it owns\n`import { useStundenErfassenFlow } from '@/lib/journey/flows/StundenErfassen';` — generated from the Schreibliste below. It OWNS the form(s), one record search per picked field (columns and filter from the plan) and the submit plan with every fixed and derived value. You compose: `flow.forms.<entity>` for <Bound>/<Field>, `{...flow.picks.<field>.select} {...flow.pick('<field>')}` (or `flow.pickMany` for a multi pick) for <EntitySelectStep>, `flow.validateStep(n)` in StepNav.onNext, `flow.submit` + `flow.formList` for SummaryStep/SuccessStep, `flow.reset()`; what the hook does not own reads through its door `flow.port` — availability `useOccupancy(flow.port, '<entity>', { resource })`, a count `useRecordCount(flow.port, …)` — never import servicePort next to the hook. Options: `steps` (field → step), `items` (how a hit reads, per pick), `initial`, `messages`. The hook's docblock in .lane-context.md shows the exact call. Never import servicePort, useStepForm, useJourneySubmit, useRecordSearch or useDashboardData in this page — check-intents refuses a page that uses the hook and any of them.\n\n## Steps (in this order)\n\n## Schreibliste — the ONLY writes this flow makes (the gate compares your plan steps with this list)\n"
+    },
+    {
+      "slug": "angebot-erstellen",
+      "label": {
+        "de": "Angebot erstellen",
+        "en": "Angebot erstellen"
+      },
+      "description": "Neues Angebot mit Nummer und Kundenzuordnung anlegen",
+      "priority": "must",
+      "writes": [],
+      "required": [],
+      "brief": "# Flow `angebot-erstellen` — Angebot erstellen\nNeues Angebot mit Nummer und Kundenzuordnung anlegen\n\n## Your hook — import it, never rebuild what it owns\n`import { useAngebotErstellenFlow } from '@/lib/journey/flows/AngebotErstellen';` — generated from the Schreibliste below. It OWNS the form(s), one record search per picked field (columns and filter from the plan) and the submit plan with every fixed and derived value. You compose: `flow.forms.<entity>` for <Bound>/<Field>, `{...flow.picks.<field>.select} {...flow.pick('<field>')}` (or `flow.pickMany` for a multi pick) for <EntitySelectStep>, `flow.validateStep(n)` in StepNav.onNext, `flow.submit` + `flow.formList` for SummaryStep/SuccessStep, `flow.reset()`; what the hook does not own reads through its door `flow.port` — availability `useOccupancy(flow.port, '<entity>', { resource })`, a count `useRecordCount(flow.port, …)` — never import servicePort next to the hook. Options: `steps` (field → step), `items` (how a hit reads, per pick), `initial`, `messages`. The hook's docblock in .lane-context.md shows the exact call. Never import servicePort, useStepForm, useJourneySubmit, useRecordSearch or useDashboardData in this page — check-intents refuses a page that uses the hook and any of them.\n\n## Steps (in this order)\n\n## Schreibliste — the ONLY writes this flow makes (the gate compares your plan steps with this list)\n"
+    },
+    {
+      "slug": "rechnung-erstellen",
+      "label": {
+        "de": "Rechnung erstellen",
+        "en": "Rechnung erstellen"
+      },
+      "description": "Rechnung aus Projekt und Zeiterfassung generieren",
+      "priority": "must",
+      "writes": [],
+      "required": [],
+      "brief": "# Flow `rechnung-erstellen` — Rechnung erstellen\nRechnung aus Projekt und Zeiterfassung generieren\n\n## Your hook — import it, never rebuild what it owns\n`import { useRechnungErstellenFlow } from '@/lib/journey/flows/RechnungErstellen';` — generated from the Schreibliste below. It OWNS the form(s), one record search per picked field (columns and filter from the plan) and the submit plan with every fixed and derived value. You compose: `flow.forms.<entity>` for <Bound>/<Field>, `{...flow.picks.<field>.select} {...flow.pick('<field>')}` (or `flow.pickMany` for a multi pick) for <EntitySelectStep>, `flow.validateStep(n)` in StepNav.onNext, `flow.submit` + `flow.formList` for SummaryStep/SuccessStep, `flow.reset()`; what the hook does not own reads through its door `flow.port` — availability `useOccupancy(flow.port, '<entity>', { resource })`, a count `useRecordCount(flow.port, …)` — never import servicePort next to the hook. Options: `steps` (field → step), `items` (how a hit reads, per pick), `initial`, `messages`. The hook's docblock in .lane-context.md shows the exact call. Never import servicePort, useStepForm, useJourneySubmit, useRecordSearch or useDashboardData in this page — check-intents refuses a page that uses the hook and any of them.\n\n## Steps (in this order)\n\n## Schreibliste — the ONLY writes this flow makes (the gate compares your plan steps with this list)\n"
+    }
+  ],
+  "public_pages": [],
+  "tools": [
+    {
+      "id": "zeitstatistiken-aktualisieren",
+      "purpose": "Berechnet bei Änderungen in der Zeiterfassung die gebuchten Stunden je Berater/in für aktuellen und vorherigen Monat, Quartal und Jahr neu."
+    },
+    {
+      "id": "projektkennung-automatisch",
+      "purpose": "Bildet nach Abschluss jeder Projekterstellung automatisch die Projektkennung aus Startjahr, Projektart und Projektnummer."
+    },
+    {
+      "id": "angebot-pdf-generieren",
+      "purpose": "Vergibt automatisch eine fortlaufende Angebotsnummer je Jahr und erstellt ein PDF aus Angebots-, Kunden- und Projektdaten."
+    },
+    {
+      "id": "rechnung-berechnen-und-pdf",
+      "purpose": "Ermittelt verrechenbare Positionen aus der Zeiterfassung, berechnet Netto, Mehrwertsteuer und Gesamtbetrag, vergibt eine Jahresnummer und erstellt ein Rechnungs-PDF."
+    },
+    {
+      "id": "rechnungen-excel-exportieren",
+      "purpose": "Erstellt eine Excel-Arbeitsmappe aller Rechnungen mit einem zeitlich gegliederten Tabellenblatt pro Abrechnungsjahr."
+    }
+  ],
+  "covered_by_platform": [],
+  "ownership": {},
+  "dashboard": {
+    "focus": [],
+    "hints": [],
+    "wishes": [
+      "Bestehende Kunden Bearbeiten"
+    ]
+  }
+}

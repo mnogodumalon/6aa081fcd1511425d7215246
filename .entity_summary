@@ -85,7 +85,7 @@ createRecordUrl from the service. Note the lowercase `l` in the service path.
   → projekt links to app_id 6aa081c907043fa96898c8ca
   → kunde links to app_id 6aa081c7132fedb98dca2728
 - Zeiterfassung (zeiterfassung): datum!^[date/date], stunden!^[number] "Geleistete Stunden", monat![lookup/select: januar|februar|maerz|april|mai|juni|juli|august|september|oktober|november|dezember] "Abrechnungsmonat", jahr![string/text] "Abrechnungsjahr", taetigkeitsbeschreibung[string/textarea], verrechenbar[bool], notizen[string/textarea], berater!^[applookup/select] "Berater/in", projekt!^[applookup/select], leistung^[applookup/select] "Erbrachte Leistung"
-  ≡ 5 records at build time
+  ≡ 6 records at build time
   ◈ berater → record (berater/innen, EntitySelectStep) · projekt → record (projekte, EntitySelectStep) · leistung → record (leistungskatalog, EntitySelectStep)
   ⚙ getZeiterfassung() · getZeiterfassungEntry(id) · createZeiterfassungEntry(fields) · updateZeiterfassungEntry(id, fields) · deleteZeiterfassungEntry(id) · queryZeiterfassung({ filter, orderby, limit, offset, fields }) · countZeiterfassung(filter?)
   ✚ EnrichedZeiterfassung adds ONLY beraterName, projektName, leistungName — via enrichZeiterfassung(zeiterfassung, { beraterInnenMap, projekteMap, leistungskatalogMap }), all maps required
@@ -93,7 +93,7 @@ createRecordUrl from the service. Note the lowercase `l` in the service path.
   → projekt links to app_id 6aa081c907043fa96898c8ca
   → leistung links to app_id 6aa081c82238262fa0d4700e
 - Rechnungen (rechnungen): rechnungsnummer!^[string/text], rechnungsdatum![date/date], faelligkeitsdatum[date/date], rechnungsstatus![lookup/radio: offen|bezahlt|storniert|ueberfaellig], abrechnungsmonat[lookup/select: januar|februar|maerz|april|mai|juni|juli|august|september|oktober|november|dezember], abrechnungsjahr[string/text], nettobetrag[number], mehrwertsteuer[number], gesamtbetrag![number], zahlungseingang[date/date], leistungspositionen[string/textarea], notizen[string/textarea], rechnungsdatei[file] "Rechnungsdokument (PDF)", kunde![applookup/select], projekt![applookup/select], berater[multipleapplookup/select] "Beteiligte Berater/innen"
-  ≡ 1 records at build time
+  ≡ 2 records at build time
   ◈ rechnungsstatus → choice (4 options, ChoiceGroup) · kunde → record (kunden, EntitySelectStep) · projekt → record (projekte, EntitySelectStep) · berater → record (berater/innen, EntitySelectStep)
   ⚙ getRechnungen() · getRechnungenEntry(id) · createRechnungenEntry(fields) · updateRechnungenEntry(id, fields) · deleteRechnungenEntry(id) · queryRechnungen({ filter, orderby, limit, offset, fields }) · countRechnungen(filter?)
   ✚ EnrichedRechnungen adds ONLY kundeName, projektName, beraterName — via enrichRechnungen(rechnungen, { kundenMap, projekteMap, beraterInnenMap }), all maps required
