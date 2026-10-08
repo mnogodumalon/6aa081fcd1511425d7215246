@@ -266,11 +266,11 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "label": "Status",
       "writable": true,
       "options": [
-        "aktiv",
         "urlaub",
         "elternzeit",
         "unternehmen_verlassen",
-        "sonstiges"
+        "sonstiges",
+        "aktiv"
       ]
     },
     "stundensatz": {
@@ -698,7 +698,7 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "fulltype": "number",
       "kind": "number",
       "required": true,
-      "label": "Projektnummer",
+      "label": "Projektnummer (ganze Zahl)",
       "writable": true
     },
     "projektart": {
@@ -1026,6 +1026,7 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "label": "Abrechnungsmonat",
       "writable": true,
       "options": [
+        "januar",
         "februar",
         "maerz",
         "april",
@@ -1036,7 +1037,6 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
         "september",
         "oktober",
         "november",
-        "januar",
         "dezember"
       ]
     },
@@ -1138,10 +1138,10 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "label": "Rechnungsstatus",
       "writable": true,
       "options": [
-        "offen",
         "bezahlt",
         "storniert",
-        "ueberfaellig"
+        "ueberfaellig",
+        "offen"
       ]
     },
     "abrechnungsmonat": {

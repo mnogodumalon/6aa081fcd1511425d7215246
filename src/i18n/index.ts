@@ -1627,11 +1627,11 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         },
         "lookups": {
           "status": {
-            "aktiv": "Aktiv",
             "urlaub": "Urlaub",
             "elternzeit": "Elternzeit",
             "unternehmen_verlassen": "Unternehmen verlassen",
-            "sonstiges": "Sonstiges"
+            "sonstiges": "Sonstiges",
+            "aktiv": "Aktiv"
           }
         }
       },
@@ -1714,7 +1714,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         "app_id": "6aa081c907043fa96898c8ca",
         "fields": {
           "projektkennung": "Projektkennung",
-          "projektnummer": "Projektnummer",
+          "projektnummer": "Projektnummer (ganze Zahl)",
           "projektart": "Projektart",
           "projektstart_jahr": "Startjahr",
           "projektstart_monat": "Startmonat",
@@ -1831,6 +1831,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         },
         "lookups": {
           "monat": {
+            "januar": "Januar",
             "februar": "Februar",
             "maerz": "März",
             "april": "April",
@@ -1841,7 +1842,6 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "september": "September",
             "oktober": "Oktober",
             "november": "November",
-            "januar": "Januar",
             "dezember": "Dezember"
           }
         }
@@ -1869,10 +1869,10 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         },
         "lookups": {
           "rechnungsstatus": {
-            "offen": "Offen",
             "bezahlt": "Bezahlt",
             "storniert": "Storniert",
-            "ueberfaellig": "Überfällig"
+            "ueberfaellig": "Überfällig",
+            "offen": "Offen"
           },
           "abrechnungsmonat": {
             "januar": "Januar",
@@ -1924,11 +1924,11 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         },
         "lookups": {
           "status": {
-            "aktiv": "Active",
             "urlaub": "Vacation",
             "elternzeit": "Parental Leave",
             "unternehmen_verlassen": "Left Company",
-            "sonstiges": "Other"
+            "sonstiges": "Other",
+            "aktiv": "Active"
           }
         }
       },
@@ -2011,7 +2011,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         "app_id": "6aa081c907043fa96898c8ca",
         "fields": {
           "projektkennung": "Project ID",
-          "projektnummer": "Project Number",
+          "projektnummer": "Project Number (integer)",
           "projektart": "Project Type",
           "projektstart_jahr": "Start Year",
           "projektstart_monat": "Start Month",
@@ -2037,7 +2037,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "strategieberatung": "Strategy Consulting",
             "coaching": "Coaching",
             "personalprojekte": "HR Projects",
-            "sonstige_projekte": "Other / Miscellaneous Projects",
+            "sonstige_projekte": "Other Projects",
             "workshops_seminare": "Workshops / Seminars",
             "immobilienprojekte": "Real Estate Projects",
             "it_projekte": "IT Projects"
@@ -2128,6 +2128,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         },
         "lookups": {
           "monat": {
+            "januar": "January",
             "februar": "February",
             "maerz": "March",
             "april": "April",
@@ -2138,7 +2139,6 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "september": "September",
             "oktober": "October",
             "november": "November",
-            "januar": "January",
             "dezember": "December"
           }
         }
@@ -2162,14 +2162,14 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "rechnungsdatei": "Invoice Document (PDF)",
           "kunde": "Customer",
           "projekt": "Project",
-          "berater": "Consultants Involved"
+          "berater": "Involved Consultants"
         },
         "lookups": {
           "rechnungsstatus": {
-            "offen": "Open",
             "bezahlt": "Paid",
             "storniert": "Canceled",
-            "ueberfaellig": "Overdue"
+            "ueberfaellig": "Overdue",
+            "offen": "Open"
           },
           "abrechnungsmonat": {
             "januar": "January",

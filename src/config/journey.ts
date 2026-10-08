@@ -12,13 +12,13 @@
  * a plain date field pair is shown instead.
  *
  * Facts from the metadata — candidates, NOT decisions:
- *   - berater/innen: applookups leistungen→leistungskatalog, projekte→projekte · lookups status[aktiv|urlaub|elternzeit|unternehmen_verlassen|sonstiges]
+ *   - berater/innen: applookups leistungen→leistungskatalog, projekte→projekte · lookups status[urlaub|elternzeit|unternehmen_verlassen|sonstiges|aktiv]
  *   - kunden: applookups laufende_projekte→projekte · lookups kundentyp[einzelperson|firma|behoerde|sonstiges], bevorzugte_kontaktart[email|telefon|post|persoenlich]
  *   - leistungskatalog: applookups berater_innen→berater/innen · lookups leistungstyp[beratung|entwicklung|schulung|support|konzeption|sonstiges], einheit[stunde|tag|pauschal|monat]
  *   - projekte: applookups kunde→kunden, projektleitung→berater/innen · lookups projektart[it_beratung|entwicklung|schulung|konzeption|support|sonstiges|inklusionsbetriebe|interimsgeschaeftsfuehrung|projekte_inklusion|strategieberatung|coaching|personalprojekte|sonstige_projekte|workshops_seminare|immobilienprojekte|it_projekte], projektstart_monat[januar|februar|maerz|april|mai|juni|juli|august|september|oktober|november|dezember], status[in_bearbeitung|akquise|abgeschlossen]
  *   - angebote: applookups projekt→projekte, kunde→kunden · lookups angebotstyp[dienstleistung|projekt|wartung|schulung|sonstiges], kostentyp[einmalig|monatlich|jaehrlich|nach_aufwand|pauschal|sonstiges], angebotsstatus[entwurf|freigegeben|versendet|angenommen|abgelehnt]
- *   - zeiterfassung: applookups berater→berater/innen, projekt→projekte, leistung→leistungskatalog · lookups monat[februar|maerz|april|mai|juni|juli|august|september|oktober|november|januar|dezember]
- *   - rechnungen: applookups kunde→kunden, projekt→projekte, berater→berater/innen · lookups rechnungsstatus[offen|bezahlt|storniert|ueberfaellig], abrechnungsmonat[januar|februar|maerz|april|mai|juni|juli|august|september|oktober|november|dezember]
+ *   - zeiterfassung: applookups berater→berater/innen, projekt→projekte, leistung→leistungskatalog · lookups monat[januar|februar|maerz|april|mai|juni|juli|august|september|oktober|november|dezember]
+ *   - rechnungen: applookups kunde→kunden, projekt→projekte, berater→berater/innen · lookups rechnungsstatus[bezahlt|storniert|ueberfaellig|offen], abrechnungsmonat[januar|februar|maerz|april|mai|juni|juli|august|september|oktober|november|dezember]
  */
 import type { EntityKey } from '@/lib/journey/rules';
 

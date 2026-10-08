@@ -328,7 +328,7 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
         }
       }
       const photoContext = contextParts.length ? contextParts.join('\n') : undefined;
-      const schema = `{\n  "rechnungsnummer": string | null, // Rechnungsnummer\n  "rechnungsdatum": string | null, // YYYY-MM-DD\n  "faelligkeitsdatum": string | null, // YYYY-MM-DD\n  "rechnungsstatus": LookupValue | null, // Rechnungsstatus (select one key: "offen" | "bezahlt" | "storniert" | "ueberfaellig") mapping: offen=Offen, bezahlt=Bezahlt, storniert=Storniert, ueberfaellig=Überfällig\n  "abrechnungsmonat": LookupValue | null, // Abrechnungsmonat (select one key: "januar" | "februar" | "maerz" | "april" | "mai" | "juni" | "juli" | "august" | "september" | "oktober" | "november" | "dezember") mapping: januar=Januar, februar=Februar, maerz=März, april=April, mai=Mai, juni=Juni, juli=Juli, august=August, september=September, oktober=Oktober, november=November, dezember=Dezember\n  "abrechnungsjahr": string | null, // Abrechnungsjahr\n  "nettobetrag": number | null, // Nettobetrag (€)\n  "mehrwertsteuer": number | null, // Mehrwertsteuer (%)\n  "gesamtbetrag": number | null, // Gesamtbetrag (€)\n  "zahlungseingang": string | null, // YYYY-MM-DD\n  "leistungspositionen": string | null, // Leistungspositionen\n  "notizen": string | null, // Notizen\n  "kunde": string | null, // Display name from Kunden (see <available-records>)\n  "projekt": string | null, // Display name from Projekte (see <available-records>)\n  "berater": string[] | null, // Display names from Berater/innen, one per referenced record (see <available-records>)\n}`;
+      const schema = `{\n  "rechnungsnummer": string | null, // Rechnungsnummer\n  "rechnungsdatum": string | null, // YYYY-MM-DD\n  "faelligkeitsdatum": string | null, // YYYY-MM-DD\n  "rechnungsstatus": LookupValue | null, // Rechnungsstatus (select one key: "bezahlt" | "storniert" | "ueberfaellig" | "offen") mapping: bezahlt=Bezahlt, storniert=Storniert, ueberfaellig=Überfällig, offen=Offen\n  "abrechnungsmonat": LookupValue | null, // Abrechnungsmonat (select one key: "januar" | "februar" | "maerz" | "april" | "mai" | "juni" | "juli" | "august" | "september" | "oktober" | "november" | "dezember") mapping: januar=Januar, februar=Februar, maerz=März, april=April, mai=Mai, juni=Juni, juli=Juli, august=August, september=September, oktober=Oktober, november=November, dezember=Dezember\n  "abrechnungsjahr": string | null, // Abrechnungsjahr\n  "nettobetrag": number | null, // Nettobetrag (€)\n  "mehrwertsteuer": number | null, // Mehrwertsteuer (%)\n  "gesamtbetrag": number | null, // Gesamtbetrag (€)\n  "zahlungseingang": string | null, // YYYY-MM-DD\n  "leistungspositionen": string | null, // Leistungspositionen\n  "notizen": string | null, // Notizen\n  "kunde": string | null, // Display name from Kunden (see <available-records>)\n  "projekt": string | null, // Display name from Projekte (see <available-records>)\n  "berater": string[] | null, // Display names from Berater/innen, one per referenced record (see <available-records>)\n}`;
       const raw = await extractFromInput<Record<string, unknown>>(schema, {
         dataUri: uri,
         userText: aiText.trim() || undefined,
@@ -470,19 +470,6 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
           <button
             type="button"
             role="radio"
-            aria-checked={lookupKey(fields.rechnungsstatus) === 'offen'}
-            onClick={() => setFields(f => ({ ...f, rechnungsstatus: (lookupKey(f.rechnungsstatus) === 'offen' ? undefined : 'offen') as any }))}
-            className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
-              lookupKey(fields.rechnungsstatus) === 'offen'
-                ? 'bg-foreground text-background border-foreground'
-                : 'bg-background text-foreground border-input hover:bg-accent'
-            }`}
-          >
-            {lookupLabel('rechnungen', 'rechnungsstatus', 'offen') ?? 'Offen'}
-          </button>
-          <button
-            type="button"
-            role="radio"
             aria-checked={lookupKey(fields.rechnungsstatus) === 'bezahlt'}
             onClick={() => setFields(f => ({ ...f, rechnungsstatus: (lookupKey(f.rechnungsstatus) === 'bezahlt' ? undefined : 'bezahlt') as any }))}
             className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
@@ -518,6 +505,19 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
             }`}
           >
             {lookupLabel('rechnungen', 'rechnungsstatus', 'ueberfaellig') ?? 'Überfällig'}
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={lookupKey(fields.rechnungsstatus) === 'offen'}
+            onClick={() => setFields(f => ({ ...f, rechnungsstatus: (lookupKey(f.rechnungsstatus) === 'offen' ? undefined : 'offen') as any }))}
+            className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+              lookupKey(fields.rechnungsstatus) === 'offen'
+                ? 'bg-foreground text-background border-foreground'
+                : 'bg-background text-foreground border-input hover:bg-accent'
+            }`}
+          >
+            {lookupLabel('rechnungen', 'rechnungsstatus', 'offen') ?? 'Offen'}
           </button>
         </div>
         {showErrors && !fields.rechnungsstatus && (
@@ -793,7 +793,7 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
   // eine Map { lookupKey: label } für ALLE Felder des Target-Schemas. Wird
   // beim Render-Walk gefiltert auf die in der computed-Formel tatsächlich
   // referenzierten lookupKeys (siehe applookupRefs unten).
-  const APPLOOKUP_LABELS: Record<string, Record<string, string>> = {"kunde": {"kundenname": "Name / Firmenname", "kundentyp": "Kundentyp", "email": "E-Mail", "telefon": "Telefon", "strasse": "Straße", "hausnummer": "Hausnummer", "plz": "Postleitzahl", "ort": "Ort", "re_strasse": "Rechnungsstraße", "re_hausnummer": "Rechnungs-Hausnummer", "re_plz": "Rechnungs-Postleitzahl", "re_ort": "Rechnungs-Ort", "anlagedatum": "Anlagedatum", "ap_titel": "Titel Ansprechpartner", "ap_vorname": "Vorname Ansprechpartner", "ap_nachname": "Nachname Ansprechpartner", "ap_email": "E-Mail Ansprechpartner", "ap_telefon": "Telefon Ansprechpartner", "bevorzugte_kontaktart": "Bevorzugte Kontaktart", "letzter_kontakt_datum": "Datum letzter Kontakt", "letzter_kontakt_ansprechpartner": "Ansprechpartner beim letzten Kontakt", "notizen": "Notizen", "laufende_projekte": "Aktuell laufende Projekte"}, "projekt": {"projektkennung": "Projektkennung", "projektnummer": "Projektnummer", "projektart": "Projektart", "projektstart_jahr": "Startjahr", "projektstart_monat": "Startmonat", "status": "Projektstatus", "ansprechpartner_kunde": "Ansprechpartner beim Kunden", "letzter_schritt": "Letzter Schritt / aktueller Stand", "projektende": "Geplantes Projektende", "notizen": "Notizen", "kunde": "Kunde", "projektleitung": "Projektleitung"}, "berater": {"nachname": "Nachname", "vorname": "Vorname", "titel": "Titel (optional)", "strasse": "Straße (privat)", "hausnummer": "Hausnummer (privat)", "plz": "Postleitzahl (privat)", "ort": "Ort (privat)", "email_beruflich": "E-Mail (beruflich)", "email_privat": "E-Mail (privat)", "telefon": "Telefon (privat)", "einstiegsdatum": "Einstiegsdatum", "status": "Status", "stundensatz": "Stundensatz (€/h)", "sonstiges_1": "Sonstige Anmerkungen (1)", "sonstiges_2": "Sonstige Anmerkungen (2)", "strasse_geschaeftlich": "Straße (geschäftlich)", "hausnummer_geschaeftlich": "Hausnummer (geschäftlich)", "plz_geschaeftlich": "Postleitzahl (geschäftlich)", "ort_geschaeftlich": "Ort (geschäftlich)", "telefon_geschaeftlich": "Telefon (geschäftlich)", "leistungen": "Durchführbare Leistungen", "projekte": "Aktuell zugewiesene Projekte"}};
+  const APPLOOKUP_LABELS: Record<string, Record<string, string>> = {"kunde": {"kundenname": "Name / Firmenname", "kundentyp": "Kundentyp", "email": "E-Mail", "telefon": "Telefon", "strasse": "Straße", "hausnummer": "Hausnummer", "plz": "Postleitzahl", "ort": "Ort", "re_strasse": "Rechnungsstraße", "re_hausnummer": "Rechnungs-Hausnummer", "re_plz": "Rechnungs-Postleitzahl", "re_ort": "Rechnungs-Ort", "anlagedatum": "Anlagedatum", "ap_titel": "Titel Ansprechpartner", "ap_vorname": "Vorname Ansprechpartner", "ap_nachname": "Nachname Ansprechpartner", "ap_email": "E-Mail Ansprechpartner", "ap_telefon": "Telefon Ansprechpartner", "bevorzugte_kontaktart": "Bevorzugte Kontaktart", "letzter_kontakt_datum": "Datum letzter Kontakt", "letzter_kontakt_ansprechpartner": "Ansprechpartner beim letzten Kontakt", "notizen": "Notizen", "laufende_projekte": "Aktuell laufende Projekte"}, "projekt": {"projektkennung": "Projektkennung", "projektnummer": "Projektnummer (ganze Zahl)", "projektart": "Projektart", "projektstart_jahr": "Startjahr", "projektstart_monat": "Startmonat", "status": "Projektstatus", "ansprechpartner_kunde": "Ansprechpartner beim Kunden", "letzter_schritt": "Letzter Schritt / aktueller Stand", "projektende": "Geplantes Projektende", "notizen": "Notizen", "kunde": "Kunde", "projektleitung": "Projektleitung"}, "berater": {"nachname": "Nachname", "vorname": "Vorname", "titel": "Titel (optional)", "strasse": "Straße (privat)", "hausnummer": "Hausnummer (privat)", "plz": "Postleitzahl (privat)", "ort": "Ort (privat)", "email_beruflich": "E-Mail (beruflich)", "email_privat": "E-Mail (privat)", "telefon": "Telefon (privat)", "einstiegsdatum": "Einstiegsdatum", "status": "Status", "stundensatz": "Stundensatz (€/h)", "sonstiges_1": "Sonstige Anmerkungen (1)", "sonstiges_2": "Sonstige Anmerkungen (2)", "strasse_geschaeftlich": "Straße (geschäftlich)", "hausnummer_geschaeftlich": "Hausnummer (geschäftlich)", "plz_geschaeftlich": "Postleitzahl (geschäftlich)", "ort_geschaeftlich": "Ort (geschäftlich)", "telefon_geschaeftlich": "Telefon (geschäftlich)", "leistungen": "Durchführbare Leistungen", "projekte": "Aktuell zugewiesene Projekte"}};
   const inputFields = useMemo(() => flattenFieldOrder(orderedFields), [orderedFieldsKey]);
   const backendFieldSet = useMemo(() => new Set(inputFields), [inputFields.join(',')]);
   const virtualComputed = useMemo(

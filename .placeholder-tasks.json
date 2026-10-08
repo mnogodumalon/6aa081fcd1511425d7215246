@@ -183,10 +183,6 @@
             "required": true,
             "options": [
               {
-                "key": "aktiv",
-                "label": "Aktiv"
-              },
-              {
                 "key": "urlaub",
                 "label": "Urlaub"
               },
@@ -201,6 +197,10 @@
               {
                 "key": "sonstiges",
                 "label": "Sonstiges"
+              },
+              {
+                "key": "aktiv",
+                "label": "Aktiv"
               }
             ]
           },
@@ -278,7 +278,7 @@
             "target_numeric_fields": [
               {
                 "key": "projektnummer",
-                "label": "Projektnummer"
+                "label": "Projektnummer (ganze Zahl)"
               }
             ]
           }
@@ -567,7 +567,7 @@
             "target_numeric_fields": [
               {
                 "key": "projektnummer",
-                "label": "Projektnummer"
+                "label": "Projektnummer (ganze Zahl)"
               }
             ]
           }
@@ -752,7 +752,7 @@
         },
         {
           "key": "projektnummer",
-          "label": "Projektnummer",
+          "label": "Projektnummer (ganze Zahl)",
           "type": "number"
         },
         {
@@ -834,7 +834,7 @@
           },
           {
             "key": "projektnummer",
-            "label": "Projektnummer",
+            "label": "Projektnummer (ganze Zahl)",
             "type": "number",
             "required": true
           },
@@ -1254,7 +1254,7 @@
             "target_numeric_fields": [
               {
                 "key": "projektnummer",
-                "label": "Projektnummer"
+                "label": "Projektnummer (ganze Zahl)"
               }
             ]
           },
@@ -1288,14 +1288,14 @@
           "label": "Abrechnungsmonat",
           "type": "lookup/select",
           "options": [
+            "Januar",
             "Februar",
             "März",
             "April",
             "Mai",
             "Juni",
             "Juli",
-            "August",
-            "September"
+            "August"
           ]
         },
         {
@@ -1354,6 +1354,10 @@
             "required": true,
             "options": [
               {
+                "key": "januar",
+                "label": "Januar"
+              },
+              {
                 "key": "februar",
                 "label": "Februar"
               },
@@ -1380,10 +1384,6 @@
               {
                 "key": "august",
                 "label": "August"
-              },
-              {
-                "key": "september",
-                "label": "September"
               }
             ]
           },
@@ -1433,7 +1433,7 @@
             "target_numeric_fields": [
               {
                 "key": "projektnummer",
-                "label": "Projektnummer"
+                "label": "Projektnummer (ganze Zahl)"
               }
             ]
           },
@@ -1574,10 +1574,6 @@
             "required": true,
             "options": [
               {
-                "key": "offen",
-                "label": "Offen"
-              },
-              {
                 "key": "bezahlt",
                 "label": "Bezahlt"
               },
@@ -1588,6 +1584,10 @@
               {
                 "key": "ueberfaellig",
                 "label": "Überfällig"
+              },
+              {
+                "key": "offen",
+                "label": "Offen"
               }
             ]
           },
@@ -1689,7 +1689,7 @@
             "target_numeric_fields": [
               {
                 "key": "projektnummer",
-                "label": "Projektnummer"
+                "label": "Projektnummer (ganze Zahl)"
               }
             ]
           },

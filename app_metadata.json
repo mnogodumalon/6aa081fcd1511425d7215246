@@ -187,11 +187,11 @@
           "in_fulltext_search": true,
           "in_expert_search": true,
           "lookup_data": {
-            "aktiv": "Aktiv",
             "urlaub": "Urlaub",
             "elternzeit": "Elternzeit",
             "unternehmen_verlassen": "Unternehmen verlassen",
-            "sonstiges": "Sonstiges"
+            "sonstiges": "Sonstiges",
+            "aktiv": "Aktiv"
           }
         },
         "stundensatz": {
@@ -895,7 +895,7 @@
         },
         "projektnummer": {
           "identifier": "projektnummer",
-          "label": "Projektnummer",
+          "label": "Projektnummer (ganze Zahl)",
           "type": "number",
           "subtype": null,
           "fulltype": "number",
@@ -920,7 +920,7 @@
           "in_list": false,
           "in_mobile_list": false,
           "in_text": false,
-          "in_structured_search": null,
+          "in_structured_search": "simple",
           "in_fulltext_search": true,
           "in_expert_search": true,
           "lookup_data": {
@@ -953,7 +953,7 @@
           "in_list": true,
           "in_mobile_list": false,
           "in_text": false,
-          "in_structured_search": null,
+          "in_structured_search": "extended",
           "in_fulltext_search": true,
           "in_expert_search": true
         },
@@ -995,10 +995,10 @@
           "description": "One selected option of multiple available options (or `null`/`None`).\n\nThe available options are defined in the `lookup_data` attribute of this control.\n\nThe field value will be the key in this `lookup_data` attribute (or `null`/`None`).\n\nDisplayed as radio button fields in HTML pages.",
           "required": true,
           "in_list": false,
-          "in_mobile_list": false,
+          "in_mobile_list": true,
           "in_text": false,
-          "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_structured_search": "simple",
+          "in_fulltext_search": false,
           "in_expert_search": true,
           "lookup_data": {
             "in_bearbeitung": "In Bearbeitung",
@@ -1018,7 +1018,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "letzter_schritt": {
@@ -1033,7 +1033,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "projektende": {
@@ -1048,7 +1048,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "notizen": {
@@ -1063,7 +1063,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true
         },
         "kunde": {
@@ -1075,10 +1075,10 @@
           "description": "A reference to a LivingApp record from the target lookup app 'Kunden' with the id `6aa081c7132fedb98dca2728` (or `null`/`None`).\n\nThe field value will be a valid record URL in the form `https://my.living-apps.de/rest/apps/6aa081c7132fedb98dca2728/records/<record-id>` (or `null`/`None`).\n\nWhen writing, either pass a record URL through exactly as this API returned it, or send the portable relative form `/apps/6aa081c7132fedb98dca2728/records/<record-id>`. Other equivalent record-URL forms are accepted as well.\n\nDisplayed as single-select field in HTML pages.",
           "required": true,
           "in_list": false,
-          "in_mobile_list": false,
+          "in_mobile_list": true,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true,
           "lookup_app": "https://my.living-apps.de/rest/apps/6aa081c7132fedb98dca2728"
         },
@@ -1094,7 +1094,7 @@
           "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
-          "in_fulltext_search": null,
+          "in_fulltext_search": false,
           "in_expert_search": true,
           "lookup_app": "https://my.living-apps.de/rest/apps/6aa081c0c506683d75c76a89"
         }
@@ -1453,6 +1453,7 @@
           "in_fulltext_search": true,
           "in_expert_search": true,
           "lookup_data": {
+            "januar": "Januar",
             "februar": "Februar",
             "maerz": "März",
             "april": "April",
@@ -1463,7 +1464,6 @@
             "september": "September",
             "oktober": "Oktober",
             "november": "November",
-            "januar": "Januar",
             "dezember": "Dezember"
           }
         },
@@ -1642,10 +1642,10 @@
           "in_fulltext_search": true,
           "in_expert_search": true,
           "lookup_data": {
-            "offen": "Offen",
             "bezahlt": "Bezahlt",
             "storniert": "Storniert",
-            "ueberfaellig": "Überfällig"
+            "ueberfaellig": "Überfällig",
+            "offen": "Offen"
           }
         },
         "abrechnungsmonat": {

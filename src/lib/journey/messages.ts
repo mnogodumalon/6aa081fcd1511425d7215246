@@ -19,7 +19,7 @@
  *   - berater/innen: nachname (Nachname), vorname (Vorname), email_beruflich (E-Mail (beruflich)), status (Status)
  *   - kunden: kundenname (Name / Firmenname), kundentyp (Kundentyp), email (E-Mail)
  *   - leistungskatalog: leistungsbezeichnung (Leistungsbezeichnung), leistungstyp (Leistungstyp)
- *   - projekte: projektkennung (Projektkennung), projektnummer (Projektnummer), projektart (Projektart), projektstart_jahr (Startjahr), status (Projektstatus), kunde (Kunde)
+ *   - projekte: projektkennung (Projektkennung), projektnummer (Projektnummer (ganze Zahl)), projektart (Projektart), projektstart_jahr (Startjahr), status (Projektstatus), kunde (Kunde)
  *   - angebote: angebotsnummer (Angebotsnummer), angebotsjahr (Jahr), angebotstyp (Angebotstyp), angebotsdatum (Angebotsdatum), angebotsstatus (Angebotsstatus)
  *   - zeiterfassung: datum (Datum), stunden (Geleistete Stunden), monat (Abrechnungsmonat), jahr (Abrechnungsjahr), berater (Berater/in), projekt (Projekt)
  *   - rechnungen: rechnungsnummer (Rechnungsnummer), rechnungsdatum (Rechnungsdatum), rechnungsstatus (Rechnungsstatus), gesamtbetrag (Gesamtbetrag (€)), kunde (Kunde), projekt (Projekt)

@@ -2,16 +2,16 @@
   "version": 1,
   "changes": [
     {
-      "kind": "field_added",
-      "entity": "leistungskatalog",
-      "field": "berater_innen",
-      "fulltype": "multipleapplookup/select",
-      "label": "Zuständige Berater/innen",
-      "target_entity": "berater/innen"
+      "kind": "label_changed",
+      "scope": "field",
+      "entity": "projekte",
+      "field": "projektnummer",
+      "old_label": "Projektnummer",
+      "new_label": "Projektnummer (ganze Zahl)"
     }
   ],
   "counts": {
-    "field_added": 1
+    "label_changed": 1
   },
-  "harmless_only": false
+  "harmless_only": true
 }
