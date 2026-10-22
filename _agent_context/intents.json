@@ -1,0 +1,111 @@
+{
+  "version": 1,
+  "flows": [
+    {
+      "path": "/intents/stunden-erfassen",
+      "label": "Stunden erfassen",
+      "description": "Arbeitszeit in 3 Schritten einem Projekt zubuchen",
+      "file": "src/pages/intents/StundenErfassenPage.tsx",
+      "summary": "/**\n * Stunden erfassen — 3-Schritt-Wizard zum Anlegen eines Zeiterfassungseintrags.\n * Steps: 1) Berater/in wählen → 2) Projekt + Leistung wählen → 3) Stunden & Details eingeben.\n * Reads: beraterInnen (filter: aktiv), projekte (filter: in_bearbeitung|akquise), leistungskatalog.\n * Writes: zeiterfassung (createZeiterfassungEntry).\n * Composes: IntentWizardShell, EntitySelectStep, StatusBadge.\n */",
+      "components": [
+        "Button",
+        "EntitySelectStep",
+        "Input",
+        "IntentWizardShell",
+        "Label",
+        "Select",
+        "SelectContent",
+        "SelectItem",
+        "SelectTrigger",
+        "SelectValue",
+        "StatusBadge",
+        "Textarea"
+      ],
+      "writes": [
+        "createZeiterfassungEntry"
+      ]
+    },
+    {
+      "path": "/intents/angebot-erstellen",
+      "label": "Angebot erstellen",
+      "description": "Neues Angebot mit Nummer und Kundenzuordnung anlegen",
+      "file": "src/pages/intents/AngebotErstellenPage.tsx",
+      "summary": "/**\n * Angebot erstellen — 3-Schritt-Wizard.\n * Steps: 1) Kunde wählen (+ optional Projekt) → 2) Angebotsdetails eintragen →\n *        3) Kosten & Zeitrahmen festlegen → Angebot anlegen.\n * Reads: kunden, projekte. Writes: angebote (createAngeboteEntry).\n * Composes: IntentWizardShell, EntitySelectStep, StatusBadge.\n */",
+      "components": [
+        "Button",
+        "Card",
+        "CardContent",
+        "EntitySelectStep",
+        "Input",
+        "IntentWizardShell",
+        "Label",
+        "Select",
+        "SelectContent",
+        "SelectItem",
+        "SelectTrigger",
+        "SelectValue",
+        "StatusBadge",
+        "Textarea"
+      ],
+      "writes": [
+        "createAngeboteEntry",
+        "createKundenEntry"
+      ]
+    },
+    {
+      "path": "/intents/rechnung-erstellen",
+      "label": "Rechnung erstellen",
+      "description": "Rechnung aus Projekt und Zeiterfassung generieren",
+      "file": "src/pages/intents/RechnungErstellenPage.tsx",
+      "summary": "/**\n * Rechnung erstellen — 3-Schritt-Wizard.\n * Steps: 1) Projekt wählen → 2) Zeiten prüfen (offene verrechenbare Zeiteinträge, Beträge ableiten) → 3) Rechnung prüfen & anlegen.\n * Reads: projekte (in_bearbeitung), zeiterfassung (Projekt + verrechenbar), berater/innen + leistungskatalog (Sätze), rechnungen (Nummernvorschlag).\n * Writes: rechnungen (create) + je Zeiteintrag ein Update auf zeiterfassung (verrechenbar = false → gilt als abgerechnet).\n * Composes: IntentWizardShell, EntitySelectStep, Bound, StepNav, SummaryStep, SuccessStep.\n */",
+      "components": [
+        "Bound",
+        "Button",
+        "Checkbox",
+        "EntitySelectStep",
+        "Input",
+        "IntentWizardShell",
+        "StepNav",
+        "SuccessStep",
+        "SummaryStep",
+        "WizardStep"
+      ],
+      "writes": []
+    },
+    {
+      "path": "/intents/kunde-bearbeiten",
+      "label": "Kunde bearbeiten",
+      "description": "Bestehenden Kunden auswählen und seine Daten ändern",
+      "file": "src/pages/intents/KundeBearbeitenPage.tsx",
+      "summary": "/**\n * Kunde bearbeiten — 4-Schritt-Wizard.\n * Steps: 1) Kunde wählen → 2) Stammdaten & Kontakt → 3) Rechnungsadresse & Ansprechpartner → 4) Prüfen & speichern.\n * Reads: kunden. Writes: kunden (Update des gewählten Kunden über den Plan).\n * Composes: IntentWizardShell, EntitySelectStep, Bound, StepNav, SummaryStep, SuccessStep.\n */",
+      "components": [
+        "Bound",
+        "EntitySelectStep",
+        "IntentWizardShell",
+        "StepNav",
+        "SuccessStep",
+        "SummaryStep",
+        "WizardStep"
+      ],
+      "writes": []
+    },
+    {
+      "path": "/intents/leistungen-zuweisen",
+      "label": "Berater/in Leistungen zuweisen",
+      "description": "Beratern durchführbare Leistungen aus dem Katalog zuweisen",
+      "file": "src/pages/intents/LeistungenZuweisenPage.tsx",
+      "summary": "/**\n * Leistungen zuweisen — 3-Schritt-Wizard.\n * Steps: 1) Berater/in wählen → 2) Durchführbare Leistungen wählen → 3) Prüfen & speichern.\n * Reads: berater/innen, leistungskatalog. Writes: berater/innen.leistungen (update des gewählten Datensatzes).\n * Composes: IntentWizardShell, EntitySelectStep, Field, StepNav, SummaryStep, SuccessStep.\n */",
+      "components": [
+        "EntitySelectStep",
+        "Field",
+        "IntentWizardShell",
+        "StepNav",
+        "SuccessStep",
+        "SummaryStep",
+        "WizardStep"
+      ],
+      "writes": []
+    }
+  ],
+  "unregistered_pages": []
+}
