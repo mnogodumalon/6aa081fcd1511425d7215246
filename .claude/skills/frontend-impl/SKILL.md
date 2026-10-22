@@ -317,6 +317,8 @@ const advance = useCallback((r: <Entity>) => {
 ```
 **EVERY optimistic LookupValue write — in ANY handler, for ANY entity — synthesizes its value with `lookupOption(app, field, key)` from `@/types/app`**, never with a re-typed literal: `{ key: 'offen', label: 'Offen' }` freezes one language (the label getter is gone) and the i18n wrap then forces an extra rebuild. Hard-coding the stage keys (`['offen', 'in_bearbeitung', …]`) instead of reading `LOOKUP_OPTIONS` re-introduces the invented-stage-name bug — the order is already in the schema.
 
+**A status a flow owns is not advanced here.** When the page skeleton lists `<app>.<statusfeld>` under CHANGES A FLOW OWNS, that transition belongs to its flow (it records reviewer, date, decision). `advance` then opens the flow for the record — `const go = flowActionFor('<app>', '<statusfeld>', r.record_id, to); go?.()` — and the action is rendered only when `go` exists (check-dashboard gate 25).
+
 **6. The overlay's footer carries the workflow's next step** — when the domain has an obvious advancing action (Fertig melden, Abholung bestätigen, Check-out), pass it via the `footer` option of `useEntityCrud(data, { footer: (top) => … })` (sticky bottom bar) and reuse the SAME write helper as the board/list quick-action. An overlay whose only action is "Bearbeiten" wastes the moment the user is looking at exactly this record.
 
 **Multi-entity drill stays in ONE overlay** — the EntityCrud host already drills relations (`onOpenX` inside the Details blocks pushes onto `crud.overlay`, Back appears automatically from depth 2). From your own surfaces, `crud.<entity>.openDetail(record)` opens; you never build a second shell or stack.

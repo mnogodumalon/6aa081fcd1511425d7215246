@@ -364,12 +364,20 @@ reservation arrives without a table and the team assigns one.
   foreign key. To show the referenced record's data, declare a second list
   endpoint for the target entity on the SAME page and join client-side
   (extract the record id from the URL).
-- **`file` fields: readable, not writable.** In a `list` projection the value
+- **`file` fields: readable AND uploadable.** In a `list` projection the value
   comes through as a plain file URL you can drop straight into `<img src=…>`
   — those URLs serve anonymously. That is how a logo, a hero image or a
-  gallery reaches a public page. In a `create` endpoint a file field is
-  impossible (a visitor cannot upload; `/files` is not grantable) and gets
-  the ENTIRE page rejected at ingest, after the deploy.
+  gallery reaches a public page. In a `create` endpoint a visitor uploads a
+  document into a file field: list the field in the endpoint's `fields` and
+  bind it with `<Bound form={f} name="angebot_pdf" />` (or
+  `<FileField {...f.file('angebot_pdf')} />` from
+  `@/components/blocks/FileField`). The file travels INSIDE the create as a
+  data URL; the block limits type (PDF, image, Word, Excel …) and size
+  (10 MB). ONE file per file field — there are no anonymous attachments
+  (`/files` and attachments are not grantable). A wish for more documents
+  than the entity has file fields: build the fields it has and say in your
+  summary how many more file fields the structure needs. Never replace an
+  upload with a link or text field.
 - Listing a file field HANDS OUT the link to that file. Right for a logo,
   wrong for a vaccination record or an ID scan — expose deliberately, and say
   in your summary which files the page makes public.

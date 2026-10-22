@@ -39,6 +39,7 @@ const IntentLeistungenZuweisenPage = lazy(() => import('@/pages/intents/Leistung
 // <html lang> itself. Hidden on anonymous public routes; its 401 guard is
 // the backstop, not the mechanism.
 const IntentFreigabenVerwaltenPage = lazy(() => import('@/pages/intents/FreigabenVerwaltenPage'));
+const IntentKundeZuweisenPage = lazy(() => import('@/pages/intents/KundeZuweisenPage'));
 // </custom:imports>
 
 // Lazy: public pages live outside <Layout> and only load on /#/public/:slug —
@@ -116,6 +117,7 @@ export default function App() {
                 <Route path="intents/kunde-bearbeiten" element={<Suspense fallback={<DashboardSkeleton />}><IntentKundeBearbeitenPage /></Suspense>} />
                 <Route path="intents/leistungen-zuweisen" element={<Suspense fallback={<DashboardSkeleton />}><IntentLeistungenZuweisenPage /></Suspense>} />
                 <Route path="intents/freigaben-verwalten" element={<Suspense fallback={<DashboardSkeleton />}><IntentFreigabenVerwaltenPage /></Suspense>} />
+                <Route path="intents/kunde-zuweisen" element={<Suspense fallback={<DashboardSkeleton />}><IntentKundeZuweisenPage /></Suspense>} />
                 {/* </custom:routes> */}
                 {/* An unknown hash (a bookmark from before a rebuild renamed the
                     flows, a mistyped link) must not be a blank page. */}

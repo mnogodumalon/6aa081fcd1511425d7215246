@@ -47,7 +47,7 @@
  *     {flow.submit.result && <SuccessStep result={flow.submit.result} forms={flow.formList} submit={flow.submit} />}
  *   </IntentWizardShell>
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   useStepForm, useJourneySubmit, useRecordSearch,
   fieldText, fieldLookup, fieldLookups, fieldNumber, fieldDate, fieldRef,
@@ -165,6 +165,21 @@ export function useKundeBearbeitenFlow(options: KundeBearbeitenFlowOptions = {})
       get record(): JourneyRecord | undefined { return kundenTargetId ? picks.kunden.recordOf(kundenTargetId) : undefined; },
     },
   };
+  // Opened for one record — `#/intents/kunde-bearbeiten?record=<id>`, the dashboard's
+  // flowActionFor(): that record is the one to change. Loaded, taken into the
+  // pick and selected — when this flow may change it at all (the pick's rule).
+  const [linkedId] = useState(() => new URLSearchParams(window.location.hash.split('?')[1] ?? '').get('record'));
+  useEffect(() => {
+    if (!linkedId) return;
+    let on = true;
+    void servicePort.get('kunden', linkedId).then(rec => {
+      if (!on || !rec) return;
+      picks.kunden.adopt(rec);
+      targets.kunden.onSelect(rec.id);
+    }).catch(() => undefined);
+    return () => { on = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once per link
+  }, [linkedId]);
   /** Props for a single-record pick step: {...flow.picks.x.select} {...flow.pick('x')} */
   const pick = (field: KundeBearbeitenFieldKey) => {
     if (field in targets) {

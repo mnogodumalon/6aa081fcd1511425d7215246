@@ -384,10 +384,10 @@
           "in_fulltext_search": true,
           "in_expert_search": true,
           "lookup_data": {
+            "einzelperson": "Einzelperson",
             "firma": "Firma",
             "behoerde": "Behörde",
-            "sonstiges": "Sonstiges",
-            "einzelperson": "Einzelperson"
+            "sonstiges": "Sonstiges"
           }
         },
         "email": {
@@ -749,12 +749,12 @@
           "in_fulltext_search": true,
           "in_expert_search": true,
           "lookup_data": {
-            "beratung": "Beratung",
             "entwicklung": "Entwicklung",
             "schulung": "Schulung",
             "support": "Support",
             "konzeption": "Konzeption",
-            "sonstiges": "Sonstiges"
+            "sonstiges": "Sonstiges",
+            "beratung": "Beratung"
           }
         },
         "beschreibung": {
@@ -917,7 +917,7 @@
           "fulltype": "lookup/select",
           "description": "One selected option of multiple available options (or `null`/`None`).\n\nThe available options are defined in the `lookup_data` attribute of this control.\n\nThe field value will be the key in this `lookup_data` attribute (or `null`/`None`).\n\nDisplayed as single-select field in HTML pages.",
           "required": true,
-          "in_list": false,
+          "in_list": true,
           "in_mobile_list": true,
           "in_text": false,
           "in_structured_search": "simple",
@@ -930,6 +930,7 @@
             "support": "Support",
             "sonstiges": "Sonstiges",
             "inklusionsbetriebe": "Inklusionsbetriebe",
+            "it_beratung": "IT-Beratung",
             "interimsgeschaeftsfuehrung": "Interimsgeschäftsführung",
             "projekte_inklusion": "Projekte Inklusion",
             "strategieberatung": "Strategieberatung",
@@ -938,7 +939,6 @@
             "sonstige_projekte": "Sonstiges / Andere Projekte",
             "workshops_seminare": "Workshops / Seminare",
             "immobilienprojekte": "Immobilienprojekte",
-            "it_beratung": "IT-Beratung",
             "it_projekte": "IT-Projekte"
           }
         },
@@ -994,7 +994,7 @@
           "fulltype": "lookup/radio",
           "description": "One selected option of multiple available options (or `null`/`None`).\n\nThe available options are defined in the `lookup_data` attribute of this control.\n\nThe field value will be the key in this `lookup_data` attribute (or `null`/`None`).\n\nDisplayed as radio button fields in HTML pages.",
           "required": true,
-          "in_list": false,
+          "in_list": true,
           "in_mobile_list": true,
           "in_text": false,
           "in_structured_search": "simple",
@@ -1060,7 +1060,7 @@
           "description": "A string value that can contain multiple lines of text (or `null`/`None`).",
           "required": false,
           "in_list": false,
-          "in_mobile_list": true,
+          "in_mobile_list": false,
           "in_text": false,
           "in_structured_search": null,
           "in_fulltext_search": false,
@@ -1074,11 +1074,11 @@
           "fulltype": "applookup/select",
           "description": "A reference to a LivingApp record from the target lookup app 'Kunden' with the id `6aa081c7132fedb98dca2728` (or `null`/`None`).\n\nThe field value will be a valid record URL in the form `https://my.living-apps.de/rest/apps/6aa081c7132fedb98dca2728/records/<record-id>` (or `null`/`None`).\n\nWhen writing, either pass a record URL through exactly as this API returned it, or send the portable relative form `/apps/6aa081c7132fedb98dca2728/records/<record-id>`. Other equivalent record-URL forms are accepted as well.\n\nDisplayed as single-select field in HTML pages.",
           "required": true,
-          "in_list": false,
+          "in_list": true,
           "in_mobile_list": true,
           "in_text": false,
-          "in_structured_search": null,
-          "in_fulltext_search": false,
+          "in_structured_search": "simple",
+          "in_fulltext_search": true,
           "in_expert_search": true,
           "lookup_app": "https://my.living-apps.de/rest/apps/6aa081c7132fedb98dca2728"
         },
@@ -1739,9 +1739,9 @@
             "juli": "Juli",
             "august": "August",
             "september": "September",
+            "oktober": "Oktober",
             "november": "November",
-            "dezember": "Dezember",
-            "oktober": "Oktober"
+            "dezember": "Dezember"
           }
         },
         "abrechnungsjahr": {

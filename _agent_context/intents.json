@@ -105,6 +105,28 @@
         "WizardStep"
       ],
       "writes": []
+    },
+    {
+      "path": "/intents/freigaben-verwalten",
+      "label": "Freigaben verwalten",
+      "description": "Mir zugewiesene Angebote und Rechnungen durchgehen und freigeben oder ablehnen",
+      "file": "src/pages/intents/FreigabenVerwaltenPage.tsx",
+      "summary": "/**\n * Freigaben verwalten — 4-Schritt-Wizard für Freigabe-Entscheidungen.\n * Steps: 1) Wer bist du? (Berater/in wählen) → 2) Zugewiesene Freigaben (Angebote + Rechnungen, ausstehend) →\n *        3) Einzeln durchgehen (freigeben / ablehnen / überspringen) → 4) Prüfen & speichern.\n * Reads: berater/innen (useRecordSearch), angebote, rechnungen, kunden, projekte (servicePort).\n * Writes: angebote, rechnungen (je ein Update pro entschiedenem Datensatz: freigabestatus, freigabedatum, freigabekommentar).\n * Composes: IntentWizardShell, EntitySelectStep, Field, ChoiceGroup, StepNav, SummaryStep, SuccessStep.\n */",
+      "components": [
+        "Button",
+        "Checkbox",
+        "ChoiceGroup",
+        "DatePicker",
+        "EntitySelectStep",
+        "Field",
+        "IntentWizardShell",
+        "StepNav",
+        "SuccessStep",
+        "SummaryStep",
+        "Textarea",
+        "WizardStep"
+      ],
+      "writes": []
     }
   ],
   "unregistered_pages": []

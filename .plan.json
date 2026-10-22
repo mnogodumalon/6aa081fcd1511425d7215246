@@ -9,10 +9,66 @@
   },
   "flows": [
     {
+      "slug": "stunden-erfassen",
+      "label": {
+        "de": "Stunden erfassen",
+        "en": "Stunden erfassen"
+      },
+      "description": "Arbeitszeit in 3 Schritten einem Projekt zubuchen",
+      "priority": "must",
+      "writes": [],
+      "required": [],
+      "brief": "# Flow `stunden-erfassen` — Stunden erfassen\nArbeitszeit in 3 Schritten einem Projekt zubuchen\n\n## Your hook — import it, never rebuild what it owns\n`import { useStundenErfassenFlow } from '@/lib/journey/flows/StundenErfassen';` — generated from the Schreibliste below. It OWNS the form(s), one record search per picked field (columns and filter from the plan) and the submit plan with every fixed and derived value. You compose: `flow.forms.<entity>` for <Bound>/<Field>, `{...flow.picks.<field>.select} {...flow.pick('<field>')}` (or `flow.pickMany` for a multi pick) for <EntitySelectStep>, `flow.validateStep(n)` in StepNav.onNext, `flow.submit` + `flow.formList` for SummaryStep/SuccessStep, `flow.reset()`; what the hook does not own reads through its door `flow.port` — availability `useOccupancy(flow.port, '<entity>', { resource })`, a count `useRecordCount(flow.port, …)` — never import servicePort next to the hook. Options: `steps` (field → step), `items` (how a hit reads, per pick), `initial`, `messages`. The hook's docblock in .lane-context.md shows the exact call. Never import servicePort, useStepForm, useJourneySubmit, useRecordSearch or useDashboardData in this page — check-intents refuses a page that uses the hook and any of them.\n\n## Steps (in this order)\n\n## Schreibliste — the ONLY writes this flow makes (the gate compares your plan steps with this list)\n\n## Never write these — another flow or a tool owns them\n- `rechnungen.kunde` (owner: intent `rechnung-erstellen`)\n- `rechnungen.berater` (owner: intent `rechnung-erstellen`)\n- `rechnungen.notizen` (owner: intent `rechnung-erstellen`)\n- `rechnungen.projekt` (owner: intent `rechnung-erstellen`)\n- `rechnungen.mehrwertsteuer` (owner: intent `rechnung-erstellen`)\n- `rechnungen.rechnungsdatum` (owner: intent `rechnung-erstellen`)\n- `rechnungen.abrechnungsjahr` (owner: intent `rechnung-erstellen`)\n- `rechnungen.rechnungsnummer` (owner: intent `rechnung-erstellen`)\n- `rechnungen.rechnungsstatus` (owner: intent `rechnung-erstellen`)\n- `rechnungen.abrechnungsmonat` (owner: intent `rechnung-erstellen`)\n- `rechnungen.faelligkeitsdatum` (owner: intent `rechnung-erstellen`)\n- `kunden.ort` (owner: intent `kunde-bearbeiten`)\n- `kunden.plz` (owner: intent `kunde-bearbeiten`)\n- `kunden.email` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_ort` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_plz` (owner: intent `kunde-bearbeiten`)\n- `kunden.notizen` (owner: intent `kunde-bearbeiten`)\n- `kunden.strasse` (owner: intent `kunde-bearbeiten`)\n- `kunden.telefon` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_email` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_titel` (owner: intent `kunde-bearbeiten`)\n- `kunden.kundentyp` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_telefon` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_vorname` (owner: intent `kunde-bearbeiten`)\n- `kunden.hausnummer` (owner: intent `kunde-bearbeiten`)\n- `kunden.kundenname` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_strasse` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_nachname` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_hausnummer` (owner: intent `kunde-bearbeiten`)\n- `kunden.bevorzugte_kontaktart` (owner: intent `kunde-bearbeiten`)\n- `kunden.letzter_kontakt_datum` (owner: intent `kunde-bearbeiten`)\n- `kunden.letzter_kontakt_ansprechpartner` (owner: intent `kunde-bearbeiten`)\n- `angebote.freigabedatum` (owner: intent `freigaben-verwalten`)\n- `angebote.freigabestatus` (owner: intent `freigaben-verwalten`)\n- `angebote.freigabekommentar` (owner: intent `freigaben-verwalten`)\n"
+    },
+    {
+      "slug": "angebot-erstellen",
+      "label": {
+        "de": "Angebot erstellen",
+        "en": "Angebot erstellen"
+      },
+      "description": "Neues Angebot mit Nummer und Kundenzuordnung anlegen",
+      "priority": "must",
+      "writes": [],
+      "required": [],
+      "brief": "# Flow `angebot-erstellen` — Angebot erstellen\nNeues Angebot mit Nummer und Kundenzuordnung anlegen\n\n## Your hook — import it, never rebuild what it owns\n`import { useAngebotErstellenFlow } from '@/lib/journey/flows/AngebotErstellen';` — generated from the Schreibliste below. It OWNS the form(s), one record search per picked field (columns and filter from the plan) and the submit plan with every fixed and derived value. You compose: `flow.forms.<entity>` for <Bound>/<Field>, `{...flow.picks.<field>.select} {...flow.pick('<field>')}` (or `flow.pickMany` for a multi pick) for <EntitySelectStep>, `flow.validateStep(n)` in StepNav.onNext, `flow.submit` + `flow.formList` for SummaryStep/SuccessStep, `flow.reset()`; what the hook does not own reads through its door `flow.port` — availability `useOccupancy(flow.port, '<entity>', { resource })`, a count `useRecordCount(flow.port, …)` — never import servicePort next to the hook. Options: `steps` (field → step), `items` (how a hit reads, per pick), `initial`, `messages`. The hook's docblock in .lane-context.md shows the exact call. Never import servicePort, useStepForm, useJourneySubmit, useRecordSearch or useDashboardData in this page — check-intents refuses a page that uses the hook and any of them.\n\n## Steps (in this order)\n\n## Schreibliste — the ONLY writes this flow makes (the gate compares your plan steps with this list)\n\n## Never write these — another flow or a tool owns them\n- `rechnungen.kunde` (owner: intent `rechnung-erstellen`)\n- `rechnungen.berater` (owner: intent `rechnung-erstellen`)\n- `rechnungen.notizen` (owner: intent `rechnung-erstellen`)\n- `rechnungen.projekt` (owner: intent `rechnung-erstellen`)\n- `rechnungen.mehrwertsteuer` (owner: intent `rechnung-erstellen`)\n- `rechnungen.rechnungsdatum` (owner: intent `rechnung-erstellen`)\n- `rechnungen.abrechnungsjahr` (owner: intent `rechnung-erstellen`)\n- `rechnungen.rechnungsnummer` (owner: intent `rechnung-erstellen`)\n- `rechnungen.rechnungsstatus` (owner: intent `rechnung-erstellen`)\n- `rechnungen.abrechnungsmonat` (owner: intent `rechnung-erstellen`)\n- `rechnungen.faelligkeitsdatum` (owner: intent `rechnung-erstellen`)\n- `kunden.ort` (owner: intent `kunde-bearbeiten`)\n- `kunden.plz` (owner: intent `kunde-bearbeiten`)\n- `kunden.email` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_ort` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_plz` (owner: intent `kunde-bearbeiten`)\n- `kunden.notizen` (owner: intent `kunde-bearbeiten`)\n- `kunden.strasse` (owner: intent `kunde-bearbeiten`)\n- `kunden.telefon` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_email` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_titel` (owner: intent `kunde-bearbeiten`)\n- `kunden.kundentyp` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_telefon` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_vorname` (owner: intent `kunde-bearbeiten`)\n- `kunden.hausnummer` (owner: intent `kunde-bearbeiten`)\n- `kunden.kundenname` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_strasse` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_nachname` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_hausnummer` (owner: intent `kunde-bearbeiten`)\n- `kunden.bevorzugte_kontaktart` (owner: intent `kunde-bearbeiten`)\n- `kunden.letzter_kontakt_datum` (owner: intent `kunde-bearbeiten`)\n- `kunden.letzter_kontakt_ansprechpartner` (owner: intent `kunde-bearbeiten`)\n- `angebote.freigabedatum` (owner: intent `freigaben-verwalten`)\n- `angebote.freigabestatus` (owner: intent `freigaben-verwalten`)\n- `angebote.freigabekommentar` (owner: intent `freigaben-verwalten`)\n"
+    },
+    {
+      "slug": "rechnung-erstellen",
+      "label": {
+        "de": "Rechnung erstellen",
+        "en": "Rechnung erstellen"
+      },
+      "description": "Rechnung aus Projekt und Zeiterfassung generieren",
+      "priority": "must",
+      "writes": [
+        {
+          "entity": "rechnungen",
+          "op": "update",
+          "when": "always",
+          "fields": {
+            "kunde": "user",
+            "berater": "user",
+            "notizen": "user",
+            "projekt": "user",
+            "mehrwertsteuer": "user",
+            "rechnungsdatum": "user",
+            "abrechnungsjahr": "user",
+            "rechnungsnummer": "user",
+            "rechnungsstatus": "user",
+            "abrechnungsmonat": "user",
+            "faelligkeitsdatum": "user"
+          },
+          "needs": {}
+        }
+      ],
+      "required": [],
+      "brief": "# Flow `rechnung-erstellen` — Rechnung erstellen\nRechnung aus Projekt und Zeiterfassung generieren\n\n## Your hook — import it, never rebuild what it owns\n`import { useRechnungErstellenFlow } from '@/lib/journey/flows/RechnungErstellen';` — generated from the Schreibliste below. It OWNS the form(s), one record search per picked field (columns and filter from the plan) and the submit plan with every fixed and derived value. You compose: `flow.forms.<entity>` for <Bound>/<Field>, `{...flow.picks.<field>.select} {...flow.pick('<field>')}` (or `flow.pickMany` for a multi pick) for <EntitySelectStep>, `flow.validateStep(n)` in StepNav.onNext, `flow.submit` + `flow.formList` for SummaryStep/SuccessStep, `flow.reset()`; what the hook does not own reads through its door `flow.port` — availability `useOccupancy(flow.port, '<entity>', { resource })`, a count `useRecordCount(flow.port, …)` — never import servicePort next to the hook. Options: `steps` (field → step), `items` (how a hit reads, per pick), `initial`, `messages`. The hook's docblock in .lane-context.md shows the exact call. This flow CHANGES a record of `rechnungen`: `{...flow.picks.rechnungen.select} {...flow.pick('rechnungen')}` picks it, the hook prefills the form with its current values and updates THAT record — never a create step, never a list from useDashboardData. Never import servicePort, useStepForm, useJourneySubmit, useRecordSearch or useDashboardData in this page — check-intents refuses a page that uses the hook and any of them.\n\n## Steps (in this order)\n\n## Schreibliste — the ONLY writes this flow makes (the gate compares your plan steps with this list)\n- updates `rechnungen`:\n    - `kunde`: the user enters it (bind it through the layer: form.field/…)\n    - `berater`: the user enters it (bind it through the layer: form.field/…)\n    - `notizen`: the user enters it (bind it through the layer: form.field/…)\n    - `projekt`: the user enters it (bind it through the layer: form.field/…)\n    - `mehrwertsteuer`: the user enters it (bind it through the layer: form.field/…)\n    - `rechnungsdatum`: the user enters it (bind it through the layer: form.field/…)\n    - `abrechnungsjahr`: the user enters it (bind it through the layer: form.field/…)\n    - `rechnungsnummer`: the user enters it (bind it through the layer: form.field/…)\n    - `rechnungsstatus`: the user enters it (bind it through the layer: form.field/…)\n    - `abrechnungsmonat`: the user enters it (bind it through the layer: form.field/…)\n    - `faelligkeitsdatum`: the user enters it (bind it through the layer: form.field/…)\n\n## Never write these — another flow or a tool owns them\n- `kunden.ort` (owner: intent `kunde-bearbeiten`)\n- `kunden.plz` (owner: intent `kunde-bearbeiten`)\n- `kunden.email` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_ort` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_plz` (owner: intent `kunde-bearbeiten`)\n- `kunden.notizen` (owner: intent `kunde-bearbeiten`)\n- `kunden.strasse` (owner: intent `kunde-bearbeiten`)\n- `kunden.telefon` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_email` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_titel` (owner: intent `kunde-bearbeiten`)\n- `kunden.kundentyp` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_telefon` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_vorname` (owner: intent `kunde-bearbeiten`)\n- `kunden.hausnummer` (owner: intent `kunde-bearbeiten`)\n- `kunden.kundenname` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_strasse` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_nachname` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_hausnummer` (owner: intent `kunde-bearbeiten`)\n- `kunden.bevorzugte_kontaktart` (owner: intent `kunde-bearbeiten`)\n- `kunden.letzter_kontakt_datum` (owner: intent `kunde-bearbeiten`)\n- `kunden.letzter_kontakt_ansprechpartner` (owner: intent `kunde-bearbeiten`)\n- `angebote.freigabedatum` (owner: intent `freigaben-verwalten`)\n- `angebote.freigabestatus` (owner: intent `freigaben-verwalten`)\n- `angebote.freigabekommentar` (owner: intent `freigaben-verwalten`)\n"
+    },
+    {
       "slug": "kunde-bearbeiten",
       "label": {
         "de": "Kunde bearbeiten",
-        "en": "Edit customer"
+        "en": "Kunde bearbeiten"
       },
       "description": "Bestehenden Kunden auswählen und seine Daten ändern",
       "priority": "must",
@@ -48,39 +104,43 @@
         }
       ],
       "required": [],
-      "brief": "# Flow `kunde-bearbeiten` — Kunde bearbeiten\nBestehenden Kunden auswählen und seine Daten ändern\n\n## Your hook — import it, never rebuild what it owns\n`import { useKundeBearbeitenFlow } from '@/lib/journey/flows/KundeBearbeiten';` — generated from the Schreibliste below. It OWNS the form(s), one record search per picked field (columns and filter from the plan) and the submit plan with every fixed and derived value. You compose: `flow.forms.<entity>` for <Bound>/<Field>, `{...flow.picks.<field>.select} {...flow.pick('<field>')}` (or `flow.pickMany` for a multi pick) for <EntitySelectStep>, `flow.validateStep(n)` in StepNav.onNext, `flow.submit` + `flow.formList` for SummaryStep/SuccessStep, `flow.reset()`; what the hook does not own reads through its door `flow.port` — availability `useOccupancy(flow.port, '<entity>', { resource })`, a count `useRecordCount(flow.port, …)` — never import servicePort next to the hook. Options: `steps` (field → step), `items` (how a hit reads, per pick), `initial`, `messages`. The hook's docblock in .lane-context.md shows the exact call. This flow CHANGES a record of `kunden`: `{...flow.picks.kunden.select} {...flow.pick('kunden')}` picks it, the hook prefills the form with its current values and updates THAT record — never a create step, never a list from useDashboardData. Never import servicePort, useStepForm, useJourneySubmit, useRecordSearch or useDashboardData in this page — check-intents refuses a page that uses the hook and any of them.\n\n## Steps (in this order)\n\n## Schreibliste — the ONLY writes this flow makes (the gate compares your plan steps with this list)\n- updates `kunden`:\n    - `ort`: the user enters it (bind it through the layer: form.field/…)\n    - `plz`: the user enters it (bind it through the layer: form.field/…)\n    - `email`: the user enters it (bind it through the layer: form.field/…)\n    - `re_ort`: the user enters it (bind it through the layer: form.field/…)\n    - `re_plz`: the user enters it (bind it through the layer: form.field/…)\n    - `notizen`: the user enters it (bind it through the layer: form.field/…)\n    - `strasse`: the user enters it (bind it through the layer: form.field/…)\n    - `telefon`: the user enters it (bind it through the layer: form.field/…)\n    - `ap_email`: the user enters it (bind it through the layer: form.field/…)\n    - `ap_titel`: the user enters it (bind it through the layer: form.field/…)\n    - `kundentyp`: the user enters it (bind it through the layer: form.field/…)\n    - `ap_telefon`: the user enters it (bind it through the layer: form.field/…)\n    - `ap_vorname`: the user enters it (bind it through the layer: form.field/…)\n    - `hausnummer`: the user enters it (bind it through the layer: form.field/…)\n    - `kundenname`: the user enters it (bind it through the layer: form.field/…)\n    - `re_strasse`: the user enters it (bind it through the layer: form.field/…)\n    - `ap_nachname`: the user enters it (bind it through the layer: form.field/…)\n    - `re_hausnummer`: the user enters it (bind it through the layer: form.field/…)\n    - `bevorzugte_kontaktart`: the user enters it (bind it through the layer: form.field/…)\n    - `letzter_kontakt_datum`: the user enters it (bind it through the layer: form.field/…)\n    - `letzter_kontakt_ansprechpartner`: the user enters it (bind it through the layer: form.field/…)\n\n## Never write these — another flow or a tool owns them\n- `rechnungen.kunde` (owner: intent `rechnung-erstellen`)\n- `rechnungen.berater` (owner: intent `rechnung-erstellen`)\n- `rechnungen.notizen` (owner: intent `rechnung-erstellen`)\n- `rechnungen.projekt` (owner: intent `rechnung-erstellen`)\n- `rechnungen.mehrwertsteuer` (owner: intent `rechnung-erstellen`)\n- `rechnungen.rechnungsdatum` (owner: intent `rechnung-erstellen`)\n- `rechnungen.abrechnungsjahr` (owner: intent `rechnung-erstellen`)\n- `rechnungen.rechnungsnummer` (owner: intent `rechnung-erstellen`)\n- `rechnungen.rechnungsstatus` (owner: intent `rechnung-erstellen`)\n- `rechnungen.abrechnungsmonat` (owner: intent `rechnung-erstellen`)\n- `rechnungen.faelligkeitsdatum` (owner: intent `rechnung-erstellen`)\n"
+      "brief": "# Flow `kunde-bearbeiten` — Kunde bearbeiten\nBestehenden Kunden auswählen und seine Daten ändern\n\n## Your hook — import it, never rebuild what it owns\n`import { useKundeBearbeitenFlow } from '@/lib/journey/flows/KundeBearbeiten';` — generated from the Schreibliste below. It OWNS the form(s), one record search per picked field (columns and filter from the plan) and the submit plan with every fixed and derived value. You compose: `flow.forms.<entity>` for <Bound>/<Field>, `{...flow.picks.<field>.select} {...flow.pick('<field>')}` (or `flow.pickMany` for a multi pick) for <EntitySelectStep>, `flow.validateStep(n)` in StepNav.onNext, `flow.submit` + `flow.formList` for SummaryStep/SuccessStep, `flow.reset()`; what the hook does not own reads through its door `flow.port` — availability `useOccupancy(flow.port, '<entity>', { resource })`, a count `useRecordCount(flow.port, …)` — never import servicePort next to the hook. Options: `steps` (field → step), `items` (how a hit reads, per pick), `initial`, `messages`. The hook's docblock in .lane-context.md shows the exact call. This flow CHANGES a record of `kunden`: `{...flow.picks.kunden.select} {...flow.pick('kunden')}` picks it, the hook prefills the form with its current values and updates THAT record — never a create step, never a list from useDashboardData. Never import servicePort, useStepForm, useJourneySubmit, useRecordSearch or useDashboardData in this page — check-intents refuses a page that uses the hook and any of them.\n\n## Steps (in this order)\n\n## Schreibliste — the ONLY writes this flow makes (the gate compares your plan steps with this list)\n- updates `kunden`:\n    - `ort`: the user enters it (bind it through the layer: form.field/…)\n    - `plz`: the user enters it (bind it through the layer: form.field/…)\n    - `email`: the user enters it (bind it through the layer: form.field/…)\n    - `re_ort`: the user enters it (bind it through the layer: form.field/…)\n    - `re_plz`: the user enters it (bind it through the layer: form.field/…)\n    - `notizen`: the user enters it (bind it through the layer: form.field/…)\n    - `strasse`: the user enters it (bind it through the layer: form.field/…)\n    - `telefon`: the user enters it (bind it through the layer: form.field/…)\n    - `ap_email`: the user enters it (bind it through the layer: form.field/…)\n    - `ap_titel`: the user enters it (bind it through the layer: form.field/…)\n    - `kundentyp`: the user enters it (bind it through the layer: form.field/…)\n    - `ap_telefon`: the user enters it (bind it through the layer: form.field/…)\n    - `ap_vorname`: the user enters it (bind it through the layer: form.field/…)\n    - `hausnummer`: the user enters it (bind it through the layer: form.field/…)\n    - `kundenname`: the user enters it (bind it through the layer: form.field/…)\n    - `re_strasse`: the user enters it (bind it through the layer: form.field/…)\n    - `ap_nachname`: the user enters it (bind it through the layer: form.field/…)\n    - `re_hausnummer`: the user enters it (bind it through the layer: form.field/…)\n    - `bevorzugte_kontaktart`: the user enters it (bind it through the layer: form.field/…)\n    - `letzter_kontakt_datum`: the user enters it (bind it through the layer: form.field/…)\n    - `letzter_kontakt_ansprechpartner`: the user enters it (bind it through the layer: form.field/…)\n\n## Never write these — another flow or a tool owns them\n- `rechnungen.kunde` (owner: intent `rechnung-erstellen`)\n- `rechnungen.berater` (owner: intent `rechnung-erstellen`)\n- `rechnungen.notizen` (owner: intent `rechnung-erstellen`)\n- `rechnungen.projekt` (owner: intent `rechnung-erstellen`)\n- `rechnungen.mehrwertsteuer` (owner: intent `rechnung-erstellen`)\n- `rechnungen.rechnungsdatum` (owner: intent `rechnung-erstellen`)\n- `rechnungen.abrechnungsjahr` (owner: intent `rechnung-erstellen`)\n- `rechnungen.rechnungsnummer` (owner: intent `rechnung-erstellen`)\n- `rechnungen.rechnungsstatus` (owner: intent `rechnung-erstellen`)\n- `rechnungen.abrechnungsmonat` (owner: intent `rechnung-erstellen`)\n- `rechnungen.faelligkeitsdatum` (owner: intent `rechnung-erstellen`)\n- `angebote.freigabedatum` (owner: intent `freigaben-verwalten`)\n- `angebote.freigabestatus` (owner: intent `freigaben-verwalten`)\n- `angebote.freigabekommentar` (owner: intent `freigaben-verwalten`)\n"
     },
     {
-      "slug": "rechnung-erstellen",
+      "slug": "leistungen-zuweisen",
       "label": {
-        "de": "Rechnung erstellen",
-        "en": "Create invoice"
+        "de": "Berater/in Leistungen zuweisen",
+        "en": "Berater/in Leistungen zuweisen"
       },
-      "description": "{\"de\": \"Rechnung aus Projekt und Zeiterfassung generieren\", \"en\": \"Generate invoice from project and time tracking\"}",
+      "description": "Beratern durchführbare Leistungen aus dem Katalog zuweisen",
+      "priority": "must",
+      "writes": [],
+      "required": [],
+      "brief": "# Flow `leistungen-zuweisen` — Berater/in Leistungen zuweisen\nBeratern durchführbare Leistungen aus dem Katalog zuweisen\n\n## Your hook — import it, never rebuild what it owns\n`import { useLeistungenZuweisenFlow } from '@/lib/journey/flows/LeistungenZuweisen';` — generated from the Schreibliste below. It OWNS the form(s), one record search per picked field (columns and filter from the plan) and the submit plan with every fixed and derived value. You compose: `flow.forms.<entity>` for <Bound>/<Field>, `{...flow.picks.<field>.select} {...flow.pick('<field>')}` (or `flow.pickMany` for a multi pick) for <EntitySelectStep>, `flow.validateStep(n)` in StepNav.onNext, `flow.submit` + `flow.formList` for SummaryStep/SuccessStep, `flow.reset()`; what the hook does not own reads through its door `flow.port` — availability `useOccupancy(flow.port, '<entity>', { resource })`, a count `useRecordCount(flow.port, …)` — never import servicePort next to the hook. Options: `steps` (field → step), `items` (how a hit reads, per pick), `initial`, `messages`. The hook's docblock in .lane-context.md shows the exact call. Never import servicePort, useStepForm, useJourneySubmit, useRecordSearch or useDashboardData in this page — check-intents refuses a page that uses the hook and any of them.\n\n## Steps (in this order)\n\n## Schreibliste — the ONLY writes this flow makes (the gate compares your plan steps with this list)\n\n## Never write these — another flow or a tool owns them\n- `rechnungen.kunde` (owner: intent `rechnung-erstellen`)\n- `rechnungen.berater` (owner: intent `rechnung-erstellen`)\n- `rechnungen.notizen` (owner: intent `rechnung-erstellen`)\n- `rechnungen.projekt` (owner: intent `rechnung-erstellen`)\n- `rechnungen.mehrwertsteuer` (owner: intent `rechnung-erstellen`)\n- `rechnungen.rechnungsdatum` (owner: intent `rechnung-erstellen`)\n- `rechnungen.abrechnungsjahr` (owner: intent `rechnung-erstellen`)\n- `rechnungen.rechnungsnummer` (owner: intent `rechnung-erstellen`)\n- `rechnungen.rechnungsstatus` (owner: intent `rechnung-erstellen`)\n- `rechnungen.abrechnungsmonat` (owner: intent `rechnung-erstellen`)\n- `rechnungen.faelligkeitsdatum` (owner: intent `rechnung-erstellen`)\n- `kunden.ort` (owner: intent `kunde-bearbeiten`)\n- `kunden.plz` (owner: intent `kunde-bearbeiten`)\n- `kunden.email` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_ort` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_plz` (owner: intent `kunde-bearbeiten`)\n- `kunden.notizen` (owner: intent `kunde-bearbeiten`)\n- `kunden.strasse` (owner: intent `kunde-bearbeiten`)\n- `kunden.telefon` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_email` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_titel` (owner: intent `kunde-bearbeiten`)\n- `kunden.kundentyp` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_telefon` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_vorname` (owner: intent `kunde-bearbeiten`)\n- `kunden.hausnummer` (owner: intent `kunde-bearbeiten`)\n- `kunden.kundenname` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_strasse` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_nachname` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_hausnummer` (owner: intent `kunde-bearbeiten`)\n- `kunden.bevorzugte_kontaktart` (owner: intent `kunde-bearbeiten`)\n- `kunden.letzter_kontakt_datum` (owner: intent `kunde-bearbeiten`)\n- `kunden.letzter_kontakt_ansprechpartner` (owner: intent `kunde-bearbeiten`)\n- `angebote.freigabedatum` (owner: intent `freigaben-verwalten`)\n- `angebote.freigabestatus` (owner: intent `freigaben-verwalten`)\n- `angebote.freigabekommentar` (owner: intent `freigaben-verwalten`)\n"
+    },
+    {
+      "slug": "freigaben-verwalten",
+      "label": {
+        "de": "Freigaben verwalten",
+        "en": "Freigaben verwalten"
+      },
+      "description": "Mir zugewiesene Angebote und Rechnungen durchgehen und freigeben oder ablehnen",
       "priority": "must",
       "writes": [
         {
-          "entity": "rechnungen",
+          "entity": "angebote",
           "op": "update",
           "when": "always",
           "fields": {
-            "kunde": "user",
-            "berater": "user",
-            "notizen": "user",
-            "projekt": "user",
-            "mehrwertsteuer": "user",
-            "rechnungsdatum": "user",
-            "abrechnungsjahr": "user",
-            "rechnungsnummer": "user",
-            "rechnungsstatus": "user",
-            "abrechnungsmonat": "user",
-            "faelligkeitsdatum": "user"
+            "freigabedatum": "user",
+            "freigabestatus": "user",
+            "freigabekommentar": "user"
           },
           "needs": {}
         }
       ],
       "required": [],
-      "brief": "# Flow `rechnung-erstellen` — Rechnung erstellen\n{\"de\": \"Rechnung aus Projekt und Zeiterfassung generieren\", \"en\": \"Generate invoice from project and time tracking\"}\n\n## Your hook — import it, never rebuild what it owns\n`import { useRechnungErstellenFlow } from '@/lib/journey/flows/RechnungErstellen';` — generated from the Schreibliste below. It OWNS the form(s), one record search per picked field (columns and filter from the plan) and the submit plan with every fixed and derived value. You compose: `flow.forms.<entity>` for <Bound>/<Field>, `{...flow.picks.<field>.select} {...flow.pick('<field>')}` (or `flow.pickMany` for a multi pick) for <EntitySelectStep>, `flow.validateStep(n)` in StepNav.onNext, `flow.submit` + `flow.formList` for SummaryStep/SuccessStep, `flow.reset()`; what the hook does not own reads through its door `flow.port` — availability `useOccupancy(flow.port, '<entity>', { resource })`, a count `useRecordCount(flow.port, …)` — never import servicePort next to the hook. Options: `steps` (field → step), `items` (how a hit reads, per pick), `initial`, `messages`. The hook's docblock in .lane-context.md shows the exact call. This flow CHANGES a record of `rechnungen`: `{...flow.picks.rechnungen.select} {...flow.pick('rechnungen')}` picks it, the hook prefills the form with its current values and updates THAT record — never a create step, never a list from useDashboardData. Never import servicePort, useStepForm, useJourneySubmit, useRecordSearch or useDashboardData in this page — check-intents refuses a page that uses the hook and any of them.\n\n## Steps (in this order)\n\n## Schreibliste — the ONLY writes this flow makes (the gate compares your plan steps with this list)\n- updates `rechnungen`:\n    - `kunde`: the user enters it (bind it through the layer: form.field/…)\n    - `berater`: the user enters it (bind it through the layer: form.field/…)\n    - `notizen`: the user enters it (bind it through the layer: form.field/…)\n    - `projekt`: the user enters it (bind it through the layer: form.field/…)\n    - `mehrwertsteuer`: the user enters it (bind it through the layer: form.field/…)\n    - `rechnungsdatum`: the user enters it (bind it through the layer: form.field/…)\n    - `abrechnungsjahr`: the user enters it (bind it through the layer: form.field/…)\n    - `rechnungsnummer`: the user enters it (bind it through the layer: form.field/…)\n    - `rechnungsstatus`: the user enters it (bind it through the layer: form.field/…)\n    - `abrechnungsmonat`: the user enters it (bind it through the layer: form.field/…)\n    - `faelligkeitsdatum`: the user enters it (bind it through the layer: form.field/…)\n\n## Never write these — another flow or a tool owns them\n- `kunden.ort` (owner: intent `kunde-bearbeiten`)\n- `kunden.plz` (owner: intent `kunde-bearbeiten`)\n- `kunden.email` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_ort` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_plz` (owner: intent `kunde-bearbeiten`)\n- `kunden.notizen` (owner: intent `kunde-bearbeiten`)\n- `kunden.strasse` (owner: intent `kunde-bearbeiten`)\n- `kunden.telefon` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_email` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_titel` (owner: intent `kunde-bearbeiten`)\n- `kunden.kundentyp` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_telefon` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_vorname` (owner: intent `kunde-bearbeiten`)\n- `kunden.hausnummer` (owner: intent `kunde-bearbeiten`)\n- `kunden.kundenname` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_strasse` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_nachname` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_hausnummer` (owner: intent `kunde-bearbeiten`)\n- `kunden.bevorzugte_kontaktart` (owner: intent `kunde-bearbeiten`)\n- `kunden.letzter_kontakt_datum` (owner: intent `kunde-bearbeiten`)\n- `kunden.letzter_kontakt_ansprechpartner` (owner: intent `kunde-bearbeiten`)\n"
+      "brief": "# Flow `freigaben-verwalten` — Freigaben verwalten\nMir zugewiesene Angebote und Rechnungen durchgehen und freigeben oder ablehnen\n\n## Your hook — import it, never rebuild what it owns\n`import { useFreigabenVerwaltenFlow } from '@/lib/journey/flows/FreigabenVerwalten';` — generated from the Schreibliste below. It OWNS the form(s), one record search per picked field (columns and filter from the plan) and the submit plan with every fixed and derived value. You compose: `flow.forms.<entity>` for <Bound>/<Field>, `{...flow.picks.<field>.select} {...flow.pick('<field>')}` (or `flow.pickMany` for a multi pick) for <EntitySelectStep>, `flow.validateStep(n)` in StepNav.onNext, `flow.submit` + `flow.formList` for SummaryStep/SuccessStep, `flow.reset()`; what the hook does not own reads through its door `flow.port` — availability `useOccupancy(flow.port, '<entity>', { resource })`, a count `useRecordCount(flow.port, …)` — never import servicePort next to the hook. Options: `steps` (field → step), `items` (how a hit reads, per pick), `initial`, `messages`. The hook's docblock in .lane-context.md shows the exact call. This flow CHANGES a record of `angebote`: `{...flow.picks.angebote.select} {...flow.pick('angebote')}` picks it, the hook prefills the form with its current values and updates THAT record — never a create step, never a list from useDashboardData. Never import servicePort, useStepForm, useJourneySubmit, useRecordSearch or useDashboardData in this page — check-intents refuses a page that uses the hook and any of them.\n\n## Steps (in this order)\n\n## Schreibliste — the ONLY writes this flow makes (the gate compares your plan steps with this list)\n- updates `angebote`:\n    - `freigabedatum`: the user enters it (bind it through the layer: form.field/…)\n    - `freigabestatus`: the user enters it (bind it through the layer: form.field/…)\n    - `freigabekommentar`: the user enters it (bind it through the layer: form.field/…)\n\n## Never write these — another flow or a tool owns them\n- `rechnungen.kunde` (owner: intent `rechnung-erstellen`)\n- `rechnungen.berater` (owner: intent `rechnung-erstellen`)\n- `rechnungen.notizen` (owner: intent `rechnung-erstellen`)\n- `rechnungen.projekt` (owner: intent `rechnung-erstellen`)\n- `rechnungen.mehrwertsteuer` (owner: intent `rechnung-erstellen`)\n- `rechnungen.rechnungsdatum` (owner: intent `rechnung-erstellen`)\n- `rechnungen.abrechnungsjahr` (owner: intent `rechnung-erstellen`)\n- `rechnungen.rechnungsnummer` (owner: intent `rechnung-erstellen`)\n- `rechnungen.rechnungsstatus` (owner: intent `rechnung-erstellen`)\n- `rechnungen.abrechnungsmonat` (owner: intent `rechnung-erstellen`)\n- `rechnungen.faelligkeitsdatum` (owner: intent `rechnung-erstellen`)\n- `kunden.ort` (owner: intent `kunde-bearbeiten`)\n- `kunden.plz` (owner: intent `kunde-bearbeiten`)\n- `kunden.email` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_ort` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_plz` (owner: intent `kunde-bearbeiten`)\n- `kunden.notizen` (owner: intent `kunde-bearbeiten`)\n- `kunden.strasse` (owner: intent `kunde-bearbeiten`)\n- `kunden.telefon` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_email` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_titel` (owner: intent `kunde-bearbeiten`)\n- `kunden.kundentyp` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_telefon` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_vorname` (owner: intent `kunde-bearbeiten`)\n- `kunden.hausnummer` (owner: intent `kunde-bearbeiten`)\n- `kunden.kundenname` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_strasse` (owner: intent `kunde-bearbeiten`)\n- `kunden.ap_nachname` (owner: intent `kunde-bearbeiten`)\n- `kunden.re_hausnummer` (owner: intent `kunde-bearbeiten`)\n- `kunden.bevorzugte_kontaktart` (owner: intent `kunde-bearbeiten`)\n- `kunden.letzter_kontakt_datum` (owner: intent `kunde-bearbeiten`)\n- `kunden.letzter_kontakt_ansprechpartner` (owner: intent `kunde-bearbeiten`)\n"
     }
   ],
   "public_pages": [],
@@ -90,8 +150,12 @@
       "purpose": "Berechnet bei Änderungen in der Zeiterfassung die gebuchten Stunden je Berater/in für aktuellen und vorherigen Monat, Quartal und Jahr neu."
     },
     {
+      "id": "projekte-excel-export",
+      "purpose": "Exportiert sämtliche Projekte in eine formatierte Excel-Datei."
+    },
+    {
       "id": "projektkennung-automatisch",
-      "purpose": "Bildet nach Abschluss jeder Projekterstellung automatisch die Projektkennung aus Startjahr, Projektart und Projektnummer."
+      "purpose": "Bildet nach Abschluss jeder Projekterstellung automatisch eine Projektkennung aus Startjahr, Projektart und Projektnummer, sofern noch keine Kennung vorhanden ist."
     },
     {
       "id": "angebot-pdf-generieren",
@@ -99,19 +163,28 @@
     },
     {
       "id": "rechnung-berechnen-und-pdf",
-      "purpose": "Ermittelt verrechenbare Positionen aus der Zeiterfassung, berechnet Netto, Mehrwertsteuer und Gesamtbetrag, vergibt eine Jahresnummer und erstellt ein Rechnungs-PDF."
+      "purpose": "Ermittelt standardmäßig verrechenbare Positionen aus der Zeiterfassung, berechnet Netto, Mehrwertsteuer und Gesamtbetrag, vergibt eine Jahresnummer und erstellt ein Rechnungs-PDF mit inclou.-Logo."
     },
     {
       "id": "rechnungen-excel-exportieren",
       "purpose": "Erstellt eine Excel-Arbeitsmappe aller Rechnungen mit einem zeitlich gegliederten Tabellenblatt pro Abrechnungsjahr."
-    },
-    {
-      "id": "projekte-excel-export",
-      "purpose": "Exportiert sämtliche Projekte in eine formatierte Excel-Datei."
     }
   ],
   "covered_by_platform": [],
   "ownership": {
+    "rechnungen": {
+      "kunde": "intent:rechnung-erstellen",
+      "berater": "intent:rechnung-erstellen",
+      "notizen": "intent:rechnung-erstellen",
+      "projekt": "intent:rechnung-erstellen",
+      "mehrwertsteuer": "intent:rechnung-erstellen",
+      "rechnungsdatum": "intent:rechnung-erstellen",
+      "abrechnungsjahr": "intent:rechnung-erstellen",
+      "rechnungsnummer": "intent:rechnung-erstellen",
+      "rechnungsstatus": "intent:rechnung-erstellen",
+      "abrechnungsmonat": "intent:rechnung-erstellen",
+      "faelligkeitsdatum": "intent:rechnung-erstellen"
+    },
     "kunden": {
       "ort": "intent:kunde-bearbeiten",
       "plz": "intent:kunde-bearbeiten",
@@ -135,27 +208,17 @@
       "letzter_kontakt_datum": "intent:kunde-bearbeiten",
       "letzter_kontakt_ansprechpartner": "intent:kunde-bearbeiten"
     },
-    "rechnungen": {
-      "kunde": "intent:rechnung-erstellen",
-      "berater": "intent:rechnung-erstellen",
-      "notizen": "intent:rechnung-erstellen",
-      "projekt": "intent:rechnung-erstellen",
-      "mehrwertsteuer": "intent:rechnung-erstellen",
-      "rechnungsdatum": "intent:rechnung-erstellen",
-      "abrechnungsjahr": "intent:rechnung-erstellen",
-      "rechnungsnummer": "intent:rechnung-erstellen",
-      "rechnungsstatus": "intent:rechnung-erstellen",
-      "abrechnungsmonat": "intent:rechnung-erstellen",
-      "faelligkeitsdatum": "intent:rechnung-erstellen"
+    "angebote": {
+      "freigabedatum": "intent:freigaben-verwalten",
+      "freigabestatus": "intent:freigaben-verwalten",
+      "freigabekommentar": "intent:freigaben-verwalten"
     }
   },
   "dashboard": {
     "focus": [],
     "hints": [],
     "wishes": [
-      "Bestehende Kunden Bearbeiten",
-      "„rechnung-erstellen“ ändern: Nimmt für das ausgewählte Projekt die erfassten Zeiten, die noch nicht abgerechnet wurden, und erzeugt damit eine Rechnung.",
-      "Zugewiesene Freigaben verwalten. Alle mir zur Freigabe zugewiesenen Angebote und Rechnungen anzeigen, und dann einzeln durchgehen und die Freigaben verwalten"
+      "Ich möchte Projekten, die bisher keinen Kunden haben, aus bestehenden Kunden den passenden Zuweisen"
     ]
   }
 }

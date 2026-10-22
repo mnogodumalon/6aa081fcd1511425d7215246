@@ -20,7 +20,7 @@
 import type { ComponentType } from 'react';
 
 // <custom:intent-imports>
-import { IconClockPlus, IconFileText, IconReceipt, IconUserEdit, IconUserCheck, IconChecklist } from '@tabler/icons-react';
+import { IconClockPlus, IconFileText, IconReceipt, IconUserEdit, IconUserCheck, IconChecklist, IconUserPlus } from '@tabler/icons-react';
 // </custom:intent-imports>
 
 export interface IntentLink {
@@ -49,6 +49,7 @@ export const INTENTS: IntentLink[] = [
   { path: '/intents/kunde-bearbeiten', label: { de: 'Kunde bearbeiten', en: 'Edit customer' }, icon: IconUserEdit, description: { de: 'Bestehenden Kunden auswählen und seine Daten ändern', en: 'Select an existing customer and edit their details' } },
   { path: '/intents/leistungen-zuweisen', label: { de: 'Berater/in Leistungen zuweisen', en: 'Assign services to consultant' }, icon: IconUserCheck, description: { de: 'Beratern durchführbare Leistungen aus dem Katalog zuweisen', en: 'Assign deliverable services from the catalog to consultants' } },
   { path: '/intents/freigaben-verwalten', label: { de: 'Freigaben verwalten', en: 'Manage approvals' }, icon: IconChecklist, description: 'Mir zugewiesene Angebote und Rechnungen durchgehen und freigeben oder ablehnen' },
+  { path: '/intents/kunde-zuweisen', label: { de: 'Kunde zuweisen', en: 'Assign client' }, icon: IconUserPlus, description: 'Projekten ohne Kunde einen bestehenden Kunden zuweisen' },
   // </custom:intents>
 ];
 
