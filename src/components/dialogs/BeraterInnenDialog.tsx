@@ -299,7 +299,7 @@ export function BeraterInnenDialog({ open, onClose, onSubmit, defaultValues, rec
         }
       }
       const photoContext = contextParts.length ? contextParts.join('\n') : undefined;
-      const schema = `{\n  "nachname": string | null, // Nachname\n  "vorname": string | null, // Vorname\n  "titel": string | null, // Titel (optional)\n  "strasse": string | null, // Straße (privat)\n  "hausnummer": string | null, // Hausnummer (privat)\n  "plz": string | null, // Postleitzahl (privat)\n  "ort": string | null, // Ort (privat)\n  "email_beruflich": string | null, // E-Mail (beruflich)\n  "email_privat": string | null, // E-Mail (privat)\n  "telefon": string | null, // Telefon (privat)\n  "einstiegsdatum": string | null, // YYYY-MM-DD\n  "status": LookupValue | null, // Status (select one key: "urlaub" | "elternzeit" | "unternehmen_verlassen" | "sonstiges" | "aktiv") mapping: urlaub=Urlaub, elternzeit=Elternzeit, unternehmen_verlassen=Unternehmen verlassen, sonstiges=Sonstiges, aktiv=Aktiv\n  "stundensatz": number | null, // Stundensatz (€/h)\n  "sonstiges_1": string | null, // Sonstige Anmerkungen (1)\n  "sonstiges_2": string | null, // Sonstige Anmerkungen (2)\n  "strasse_geschaeftlich": string | null, // Straße (geschäftlich)\n  "hausnummer_geschaeftlich": string | null, // Hausnummer (geschäftlich)\n  "plz_geschaeftlich": string | null, // Postleitzahl (geschäftlich)\n  "ort_geschaeftlich": string | null, // Ort (geschäftlich)\n  "telefon_geschaeftlich": string | null, // Telefon (geschäftlich)\n  "leistungen": string[] | null, // Display names from Leistungskatalog, one per referenced record (see <available-records>)\n  "projekte": string[] | null, // Display names from Projekte, one per referenced record (see <available-records>)\n}`;
+      const schema = `{\n  "nachname": string | null, // Nachname\n  "vorname": string | null, // Vorname\n  "titel": string | null, // Titel (optional)\n  "strasse": string | null, // Straße (privat)\n  "hausnummer": string | null, // Hausnummer (privat)\n  "plz": string | null, // Postleitzahl (privat)\n  "ort": string | null, // Ort (privat)\n  "email_beruflich": string | null, // E-Mail (beruflich)\n  "email_privat": string | null, // E-Mail (privat)\n  "telefon": string | null, // Telefon (privat)\n  "einstiegsdatum": string | null, // YYYY-MM-DD\n  "status": LookupValue | null, // Status (select one key: "aktiv" | "urlaub" | "elternzeit" | "unternehmen_verlassen" | "sonstiges") mapping: aktiv=Aktiv, urlaub=Urlaub, elternzeit=Elternzeit, unternehmen_verlassen=Unternehmen verlassen, sonstiges=Sonstiges\n  "stundensatz": number | null, // Stundensatz (€/h)\n  "sonstiges_1": string | null, // Sonstige Anmerkungen (1)\n  "sonstiges_2": string | null, // Sonstige Anmerkungen (2)\n  "strasse_geschaeftlich": string | null, // Straße (geschäftlich)\n  "hausnummer_geschaeftlich": string | null, // Hausnummer (geschäftlich)\n  "plz_geschaeftlich": string | null, // Postleitzahl (geschäftlich)\n  "ort_geschaeftlich": string | null, // Ort (geschäftlich)\n  "telefon_geschaeftlich": string | null, // Telefon (geschäftlich)\n  "leistungen": string[] | null, // Display names from Leistungskatalog, one per referenced record (see <available-records>)\n  "projekte": string[] | null, // Display names from Projekte, one per referenced record (see <available-records>)\n}`;
       const raw = await extractFromInput<Record<string, unknown>>(schema, {
         dataUri: uri,
         userText: aiText.trim() || undefined,
@@ -526,6 +526,19 @@ export function BeraterInnenDialog({ open, onClose, onSubmit, defaultValues, rec
           <button
             type="button"
             role="radio"
+            aria-checked={lookupKey(fields.status) === 'aktiv'}
+            onClick={() => setFields(f => ({ ...f, status: (lookupKey(f.status) === 'aktiv' ? undefined : 'aktiv') as any }))}
+            className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+              lookupKey(fields.status) === 'aktiv'
+                ? 'bg-foreground text-background border-foreground'
+                : 'bg-background text-foreground border-input hover:bg-accent'
+            }`}
+          >
+            {lookupLabel('berater/innen', 'status', 'aktiv') ?? 'Aktiv'}
+          </button>
+          <button
+            type="button"
+            role="radio"
             aria-checked={lookupKey(fields.status) === 'urlaub'}
             onClick={() => setFields(f => ({ ...f, status: (lookupKey(f.status) === 'urlaub' ? undefined : 'urlaub') as any }))}
             className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
@@ -574,19 +587,6 @@ export function BeraterInnenDialog({ open, onClose, onSubmit, defaultValues, rec
             }`}
           >
             {lookupLabel('berater/innen', 'status', 'sonstiges') ?? 'Sonstiges'}
-          </button>
-          <button
-            type="button"
-            role="radio"
-            aria-checked={lookupKey(fields.status) === 'aktiv'}
-            onClick={() => setFields(f => ({ ...f, status: (lookupKey(f.status) === 'aktiv' ? undefined : 'aktiv') as any }))}
-            className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
-              lookupKey(fields.status) === 'aktiv'
-                ? 'bg-foreground text-background border-foreground'
-                : 'bg-background text-foreground border-input hover:bg-accent'
-            }`}
-          >
-            {lookupLabel('berater/innen', 'status', 'aktiv') ?? 'Aktiv'}
           </button>
         </div>
         {showErrors && !fields.status && (

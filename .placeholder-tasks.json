@@ -183,6 +183,10 @@
             "required": true,
             "options": [
               {
+                "key": "aktiv",
+                "label": "Aktiv"
+              },
+              {
                 "key": "urlaub",
                 "label": "Urlaub"
               },
@@ -197,10 +201,6 @@
               {
                 "key": "sonstiges",
                 "label": "Sonstiges"
-              },
-              {
-                "key": "aktiv",
-                "label": "Aktiv"
               }
             ]
           },
@@ -403,10 +403,6 @@
             "required": true,
             "options": [
               {
-                "key": "einzelperson",
-                "label": "Einzelperson"
-              },
-              {
                 "key": "firma",
                 "label": "Firma"
               },
@@ -417,6 +413,10 @@
               {
                 "key": "sonstiges",
                 "label": "Sonstiges"
+              },
+              {
+                "key": "einzelperson",
+                "label": "Einzelperson"
               }
             ]
           },
@@ -760,14 +760,14 @@
           "label": "Projektart",
           "type": "lookup/select",
           "options": [
-            "IT-Beratung",
             "Entwicklung",
             "Schulung",
             "Konzeption",
             "Support",
             "Sonstiges",
             "Inklusionsbetriebe",
-            "Interimsgeschäftsführung"
+            "Interimsgeschäftsführung",
+            "Projekte Inklusion"
           ]
         },
         {
@@ -845,10 +845,6 @@
             "required": true,
             "options": [
               {
-                "key": "it_beratung",
-                "label": "IT-Beratung"
-              },
-              {
                 "key": "entwicklung",
                 "label": "Entwicklung"
               },
@@ -875,6 +871,10 @@
               {
                 "key": "interimsgeschaeftsfuehrung",
                 "label": "Interimsgeschäftsführung"
+              },
+              {
+                "key": "projekte_inklusion",
+                "label": "Projekte Inklusion"
               }
             ]
           },
@@ -1080,6 +1080,22 @@
           "label": "Kunde",
           "type": "applookup/select",
           "target_entity": "Kunden"
+        },
+        {
+          "key": "freigabe_zustaendig",
+          "label": "Zur Freigabe zugewiesen an",
+          "type": "applookup/select",
+          "target_entity": "Berater/innen"
+        },
+        {
+          "key": "freigabedatum",
+          "label": "Freigabedatum",
+          "type": "date/date"
+        },
+        {
+          "key": "freigabekommentar",
+          "label": "Freigabekommentar",
+          "type": "string/textarea"
         }
       ],
       "formEnhancements": {
@@ -1264,6 +1280,55 @@
             "type": "applookup/select",
             "required": false,
             "target_entity": "Kunden"
+          },
+          {
+            "key": "freigabe_zustaendig",
+            "label": "Zur Freigabe zugewiesen an",
+            "type": "applookup/select",
+            "required": false,
+            "target_entity": "Berater/innen",
+            "target_numeric_fields": [
+              {
+                "key": "stundensatz",
+                "label": "Stundensatz (€/h)"
+              }
+            ]
+          },
+          {
+            "key": "freigabestatus",
+            "label": "Freigabestatus",
+            "type": "lookup/radio",
+            "required": false,
+            "options": [
+              {
+                "key": "nicht_zugewiesen",
+                "label": "Noch nicht zugewiesen"
+              },
+              {
+                "key": "ausstehend",
+                "label": "Freigabe ausstehend"
+              },
+              {
+                "key": "freigegeben",
+                "label": "Freigegeben"
+              },
+              {
+                "key": "abgelehnt",
+                "label": "Abgelehnt"
+              }
+            ]
+          },
+          {
+            "key": "freigabedatum",
+            "label": "Freigabedatum",
+            "type": "date/date",
+            "required": false
+          },
+          {
+            "key": "freigabekommentar",
+            "label": "Freigabekommentar",
+            "type": "string/textarea",
+            "required": false
           }
         ]
       }
@@ -1544,6 +1609,22 @@
           "label": "Beteiligte Berater/innen",
           "type": "multipleapplookup/select",
           "target_entity": "Berater/innen"
+        },
+        {
+          "key": "freigabe_zustaendig",
+          "label": "Zur Freigabe zugewiesen an",
+          "type": "applookup/select",
+          "target_entity": "Berater/innen"
+        },
+        {
+          "key": "freigabedatum",
+          "label": "Freigabedatum",
+          "type": "date/date"
+        },
+        {
+          "key": "freigabekommentar",
+          "label": "Freigabekommentar",
+          "type": "string/textarea"
         }
       ],
       "formEnhancements": {
@@ -1574,6 +1655,10 @@
             "required": true,
             "options": [
               {
+                "key": "offen",
+                "label": "Offen"
+              },
+              {
                 "key": "bezahlt",
                 "label": "Bezahlt"
               },
@@ -1584,10 +1669,6 @@
               {
                 "key": "ueberfaellig",
                 "label": "Überfällig"
-              },
-              {
-                "key": "offen",
-                "label": "Offen"
               }
             ]
           },
@@ -1705,6 +1786,55 @@
                 "label": "Stundensatz (€/h)"
               }
             ]
+          },
+          {
+            "key": "freigabe_zustaendig",
+            "label": "Zur Freigabe zugewiesen an",
+            "type": "applookup/select",
+            "required": false,
+            "target_entity": "Berater/innen",
+            "target_numeric_fields": [
+              {
+                "key": "stundensatz",
+                "label": "Stundensatz (€/h)"
+              }
+            ]
+          },
+          {
+            "key": "freigabestatus",
+            "label": "Freigabestatus",
+            "type": "lookup/radio",
+            "required": false,
+            "options": [
+              {
+                "key": "nicht_zugewiesen",
+                "label": "Noch nicht zugewiesen"
+              },
+              {
+                "key": "ausstehend",
+                "label": "Freigabe ausstehend"
+              },
+              {
+                "key": "freigegeben",
+                "label": "Freigegeben"
+              },
+              {
+                "key": "abgelehnt",
+                "label": "Abgelehnt"
+              }
+            ]
+          },
+          {
+            "key": "freigabedatum",
+            "label": "Freigabedatum",
+            "type": "date/date",
+            "required": false
+          },
+          {
+            "key": "freigabekommentar",
+            "label": "Freigabekommentar",
+            "type": "string/textarea",
+            "required": false
           }
         ]
       }

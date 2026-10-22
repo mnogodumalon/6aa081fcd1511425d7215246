@@ -1,6 +1,67 @@
 {
   "version": 1,
-  "changes": [],
-  "counts": {},
-  "harmless_only": true
+  "changes": [
+    {
+      "kind": "field_added",
+      "entity": "angebote",
+      "field": "freigabe_zustaendig",
+      "fulltype": "applookup/select",
+      "label": "Zur Freigabe zugewiesen an",
+      "target_entity": "berater/innen"
+    },
+    {
+      "kind": "field_added",
+      "entity": "angebote",
+      "field": "freigabedatum",
+      "fulltype": "date/date",
+      "label": "Freigabedatum"
+    },
+    {
+      "kind": "field_added",
+      "entity": "angebote",
+      "field": "freigabekommentar",
+      "fulltype": "string/textarea",
+      "label": "Freigabekommentar"
+    },
+    {
+      "kind": "field_added",
+      "entity": "angebote",
+      "field": "freigabestatus",
+      "fulltype": "lookup/radio",
+      "label": "Freigabestatus"
+    },
+    {
+      "kind": "field_added",
+      "entity": "rechnungen",
+      "field": "freigabe_zustaendig",
+      "fulltype": "applookup/select",
+      "label": "Zur Freigabe zugewiesen an",
+      "target_entity": "berater/innen"
+    },
+    {
+      "kind": "field_added",
+      "entity": "rechnungen",
+      "field": "freigabedatum",
+      "fulltype": "date/date",
+      "label": "Freigabedatum"
+    },
+    {
+      "kind": "field_added",
+      "entity": "rechnungen",
+      "field": "freigabekommentar",
+      "fulltype": "string/textarea",
+      "label": "Freigabekommentar"
+    },
+    {
+      "kind": "field_added",
+      "entity": "rechnungen",
+      "field": "freigabestatus",
+      "fulltype": "lookup/radio",
+      "label": "Freigabestatus"
+    }
+  ],
+  "counts": {
+    "field_added": 8
+  },
+  "harmless_only": false
 }

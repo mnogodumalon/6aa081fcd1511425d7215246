@@ -75,6 +75,7 @@ export function enrichProjekte(
 interface AngeboteMaps {
   projekteMap: Map<string, Projekte>;
   kundenMap: Map<string, Kunden>;
+  beraterInnenMap: Map<string, BeraterInnen>;
 }
 
 export function enrichAngebote(
@@ -85,6 +86,7 @@ export function enrichAngebote(
     ...r,
     projektName: resolveDisplay(r.fields.projekt, maps.projekteMap, 'projektkennung'),
     kundeName: resolveDisplay(r.fields.kunde, maps.kundenMap, 'kundenname'),
+    freigabe_zustaendigName: resolveDisplay(r.fields.freigabe_zustaendig, maps.beraterInnenMap, 'vorname', 'nachname'),
   }));
 }
 
@@ -121,5 +123,6 @@ export function enrichRechnungen(
     kundeName: resolveDisplay(r.fields.kunde, maps.kundenMap, 'kundenname'),
     projektName: resolveDisplay(r.fields.projekt, maps.projekteMap, 'projektkennung'),
     beraterName: resolveDisplay(r.fields.berater, maps.beraterInnenMap, 'vorname', 'nachname'),
+    freigabe_zustaendigName: resolveDisplay(r.fields.freigabe_zustaendig, maps.beraterInnenMap, 'vorname', 'nachname'),
   }));
 }

@@ -55,6 +55,12 @@ const VALID_KEYS = {
     "stunde",
     "tag"
   ],
+  "freigabestatus": [
+    "abgelehnt",
+    "ausstehend",
+    "freigegeben",
+    "nicht_zugewiesen"
+  ],
   "kostentyp": [
     "einmalig",
     "jaehrlich",

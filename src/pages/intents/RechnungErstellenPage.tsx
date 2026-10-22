@@ -48,7 +48,7 @@ export default function RechnungErstellenPage() {
   const [projektId, setProjektId] = useState<string | null>(null);
 
   const projekte = useRecordSearch(servicePort, 'projekte', {
-    filter: "r.v_status == 'in_bearbeitung'",
+    filter: "r.v_status == 'in_bearbeitung'", /* i18n-exempt */
     where: p => fieldLookup(p, 'status')?.key === 'in_bearbeitung',
     searchFields: ['projektkennung'],
     toItem: (p, ctx) => ({

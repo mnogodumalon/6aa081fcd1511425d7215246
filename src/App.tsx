@@ -20,6 +20,7 @@ const IntentStundenErfassenPage = lazy(() => import('@/pages/intents/StundenErfa
 const IntentAngebotErstellenPage = lazy(() => import('@/pages/intents/AngebotErstellenPage'));
 const IntentRechnungErstellenPage = lazy(() => import('@/pages/intents/RechnungErstellenPage'));
 const IntentKundeBearbeitenPage = lazy(() => import('@/pages/intents/KundeBearbeitenPage'));
+const IntentLeistungenZuweisenPage = lazy(() => import('@/pages/intents/LeistungenZuweisenPage'));
 
 // Lazy: public pages live outside <Layout> and only load on /#/public/:slug —
 // dashboard users never pay for them, anonymous visitors skip the dashboard.
@@ -37,7 +38,6 @@ const IntentKundeBearbeitenPage = lazy(() => import('@/pages/intents/KundeBearbe
 // arrival) must not tear the element down mid-chat; the element follows
 // <html lang> itself. Hidden on anonymous public routes; its 401 guard is
 // the backstop, not the mechanism.
-const IntentLeistungenZuweisenPage = lazy(() => import('@/pages/intents/LeistungenZuweisenPage'));
 // </custom:imports>
 
 // Lazy: public pages live outside <Layout> and only load on /#/public/:slug —

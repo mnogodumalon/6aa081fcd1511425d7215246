@@ -22,9 +22,9 @@ export interface StringFields {
   "kunden": "kundenname" | "email" | "telefon" | "strasse" | "hausnummer" | "plz" | "ort" | "re_strasse" | "re_hausnummer" | "re_plz" | "re_ort" | "ap_titel" | "ap_vorname" | "ap_nachname" | "ap_email" | "ap_telefon" | "letzter_kontakt_ansprechpartner" | "notizen";
   "leistungskatalog": "leistungsbezeichnung" | "beschreibung" | "verfuegbarkeit" | "kuerzel";
   "projekte": "projektkennung" | "projektstart_jahr" | "ansprechpartner_kunde" | "letzter_schritt" | "notizen";
-  "angebote": "angebotsnummer" | "angebotsjahr" | "dauer" | "kosten_beschreibung" | "angebotsbeschreibung" | "leistungspositionen" | "anmerkungen";
+  "angebote": "angebotsnummer" | "angebotsjahr" | "dauer" | "kosten_beschreibung" | "angebotsbeschreibung" | "leistungspositionen" | "anmerkungen" | "freigabekommentar";
   "zeiterfassung": "jahr" | "taetigkeitsbeschreibung" | "notizen";
-  "rechnungen": "rechnungsnummer" | "abrechnungsjahr" | "leistungspositionen" | "notizen";
+  "rechnungen": "rechnungsnummer" | "abrechnungsjahr" | "leistungspositionen" | "notizen" | "freigabekommentar";
 }
 export type StringFieldKey<E extends EntityKey> = E extends keyof StringFields ? StringFields[E] : never;
 
@@ -36,9 +36,9 @@ export interface RecordFields {
   "kunden": "laufende_projekte";
   "leistungskatalog": "berater_innen";
   "projekte": "kunde" | "projektleitung";
-  "angebote": "projekt" | "kunde";
+  "angebote": "projekt" | "kunde" | "freigabe_zustaendig";
   "zeiterfassung": "berater" | "projekt" | "leistung";
-  "rechnungen": "kunde" | "projekt" | "berater";
+  "rechnungen": "kunde" | "projekt" | "berater" | "freigabe_zustaendig";
 }
 export type RecordFieldKey<E extends EntityKey> = E extends keyof RecordFields ? RecordFields[E] : never;
 
@@ -266,11 +266,11 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "label": "Status",
       "writable": true,
       "options": [
+        "aktiv",
         "urlaub",
         "elternzeit",
         "unternehmen_verlassen",
-        "sonstiges",
-        "aktiv"
+        "sonstiges"
       ]
     },
     "stundensatz": {
@@ -382,10 +382,10 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "label": "Kundentyp",
       "writable": true,
       "options": [
-        "einzelperson",
         "firma",
         "behoerde",
-        "sonstiges"
+        "sonstiges",
+        "einzelperson"
       ]
     },
     "email": {
@@ -709,7 +709,6 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "label": "Projektart",
       "writable": true,
       "options": [
-        "it_beratung",
         "entwicklung",
         "schulung",
         "konzeption",
@@ -724,6 +723,7 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
         "sonstige_projekte",
         "workshops_seminare",
         "immobilienprojekte",
+        "it_beratung",
         "it_projekte"
       ]
     },
@@ -999,6 +999,46 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "writable": true,
       "targetAppId": "6aa081c7132fedb98dca2728",
       "targetEntity": "kunden"
+    },
+    "freigabe_zustaendig": {
+      "key": "freigabe_zustaendig",
+      "fulltype": "applookup/select",
+      "kind": "record",
+      "required": false,
+      "label": "Zur Freigabe zugewiesen an",
+      "writable": true,
+      "targetAppId": "6aa081c0c506683d75c76a89",
+      "targetEntity": "berater/innen"
+    },
+    "freigabestatus": {
+      "key": "freigabestatus",
+      "fulltype": "lookup/radio",
+      "kind": "lookup",
+      "required": false,
+      "label": "Freigabestatus",
+      "writable": true,
+      "options": [
+        "nicht_zugewiesen",
+        "ausstehend",
+        "freigegeben",
+        "abgelehnt"
+      ]
+    },
+    "freigabedatum": {
+      "key": "freigabedatum",
+      "fulltype": "date/date",
+      "kind": "date",
+      "required": false,
+      "label": "Freigabedatum",
+      "writable": true
+    },
+    "freigabekommentar": {
+      "key": "freigabekommentar",
+      "fulltype": "string/textarea",
+      "kind": "textarea",
+      "required": false,
+      "label": "Freigabekommentar",
+      "writable": true
     }
   },
   "zeiterfassung": {
@@ -1138,10 +1178,10 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "label": "Rechnungsstatus",
       "writable": true,
       "options": [
+        "offen",
         "bezahlt",
         "storniert",
-        "ueberfaellig",
-        "offen"
+        "ueberfaellig"
       ]
     },
     "abrechnungsmonat": {
@@ -1161,9 +1201,9 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
         "juli",
         "august",
         "september",
-        "oktober",
         "november",
-        "dezember"
+        "dezember",
+        "oktober"
       ]
     },
     "abrechnungsjahr": {
@@ -1262,6 +1302,46 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "writable": true,
       "targetAppId": "6aa081c0c506683d75c76a89",
       "targetEntity": "berater/innen"
+    },
+    "freigabe_zustaendig": {
+      "key": "freigabe_zustaendig",
+      "fulltype": "applookup/select",
+      "kind": "record",
+      "required": false,
+      "label": "Zur Freigabe zugewiesen an",
+      "writable": true,
+      "targetAppId": "6aa081c0c506683d75c76a89",
+      "targetEntity": "berater/innen"
+    },
+    "freigabestatus": {
+      "key": "freigabestatus",
+      "fulltype": "lookup/radio",
+      "kind": "lookup",
+      "required": false,
+      "label": "Freigabestatus",
+      "writable": true,
+      "options": [
+        "nicht_zugewiesen",
+        "ausstehend",
+        "freigegeben",
+        "abgelehnt"
+      ]
+    },
+    "freigabedatum": {
+      "key": "freigabedatum",
+      "fulltype": "date/date",
+      "kind": "date",
+      "required": false,
+      "label": "Freigabedatum",
+      "writable": true
+    },
+    "freigabekommentar": {
+      "key": "freigabekommentar",
+      "fulltype": "string/textarea",
+      "kind": "textarea",
+      "required": false,
+      "label": "Freigabekommentar",
+      "writable": true
     }
   }
 };
@@ -1352,6 +1432,11 @@ export const SHAPES: Record<EntityKey, Shape[]> = {
       "count": 5
     },
     {
+      "kind": "choice",
+      "field": "freigabestatus",
+      "count": 4
+    },
+    {
       "kind": "record",
       "field": "projekt",
       "targetEntity": "projekte"
@@ -1360,6 +1445,11 @@ export const SHAPES: Record<EntityKey, Shape[]> = {
       "kind": "record",
       "field": "kunde",
       "targetEntity": "kunden"
+    },
+    {
+      "kind": "record",
+      "field": "freigabe_zustaendig",
+      "targetEntity": "berater/innen"
     }
   ],
   "zeiterfassung": [
@@ -1386,6 +1476,11 @@ export const SHAPES: Record<EntityKey, Shape[]> = {
       "count": 4
     },
     {
+      "kind": "choice",
+      "field": "freigabestatus",
+      "count": 4
+    },
+    {
       "kind": "record",
       "field": "kunde",
       "targetEntity": "kunden"
@@ -1398,6 +1493,11 @@ export const SHAPES: Record<EntityKey, Shape[]> = {
     {
       "kind": "record",
       "field": "berater",
+      "targetEntity": "berater/innen"
+    },
+    {
+      "kind": "record",
+      "field": "freigabe_zustaendig",
       "targetEntity": "berater/innen"
     }
   ]

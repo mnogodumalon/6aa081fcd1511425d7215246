@@ -1,12 +1,12 @@
-import type { Angebote, Projekte, Kunden } from '@/types/app';
+import type { Angebote, Projekte, Kunden, BeraterInnen } from '@/types/app';
 import { APP_IDS } from '@/types/app';
 import { extractRecordId } from '@/services/livingAppsService';
 import {
   RecordSection, RecordField, RecordRelation, RecordAttachments,
 } from '@/components/widgets/RecordView';
 import { t, appLabel, fieldLabel } from '@/i18n';
-import { usePermissions } from '@/lib/permissions';
 import { MediaThumbnail } from '@/components/widgets/MediaViewer';
+import { usePermissions } from '@/lib/permissions';
 
 export interface AngeboteDetailsProps {
   /** Der Record — enriched oder roh; alle Felder werden hier gerendert. */
@@ -19,6 +19,10 @@ export interface AngeboteDetailsProps {
   kundenList: Kunden[];
   /** Klick auf die Kunden-Relation → overlay.push auf dessen Detail. */
   onOpenKunden?: (record: Kunden) => void;
+  /** N:1-Ziel „BeraterInnen": volle Liste (Hook-Array) — der Block löst Name + Schlüsselfelder selbst auf. */
+  beraterInnenList: BeraterInnen[];
+  /** Klick auf die BeraterInnen-Relation → overlay.push auf dessen Detail. */
+  onOpenBeraterInnen?: (record: BeraterInnen) => void;
 }
 
 export function AngeboteDetails({
@@ -27,11 +31,14 @@ export function AngeboteDetails({
   onOpenProjekte,
   kundenList,
   onOpenKunden,
+  beraterInnenList,
+  onOpenBeraterInnen,
 }: AngeboteDetailsProps) {
   // attachments are a write to this record — read-only without the platform right
   const perms = usePermissions();
   const projektTarget = projekteList.find(r => r.record_id === extractRecordId(record.fields.projekt));
   const kundeTarget = kundenList.find(r => r.record_id === extractRecordId(record.fields.kunde));
+  const freigabe_zustaendigTarget = beraterInnenList.find(r => r.record_id === extractRecordId(record.fields.freigabe_zustaendig));
   return (
     <>
       <RecordSection title={t('details')} cols={2}>
@@ -55,6 +62,9 @@ export function AngeboteDetails({
           ) : '—'}
         </RecordField>
         <RecordField label={fieldLabel('angebote', 'angebotsstatus')} value={record.fields.angebotsstatus} format="pill" />
+        <RecordField label={fieldLabel('angebote', 'freigabestatus')} value={record.fields.freigabestatus} format="pill" />
+        <RecordField label={fieldLabel('angebote', 'freigabedatum')} value={record.fields.freigabedatum} format="date" />
+        <RecordField label={fieldLabel('angebote', 'freigabekommentar')} value={record.fields.freigabekommentar} format="longtext" className="md:col-span-2" />
       </RecordSection>
 
       {/* N:1 — verknüpfte Records: IMMER klickbar, nie eine Text-Sackgasse. */}
@@ -70,6 +80,12 @@ export function AngeboteDetails({
           name={kundeTarget?.fields.kundenname ?? '—'}
           meta={[kundeTarget?.fields.email, kundeTarget?.fields.telefon].filter(Boolean).join(' · ') || undefined}
           onClick={kundeTarget && onOpenKunden ? () => onOpenKunden!(kundeTarget!) : undefined}
+        />
+        <RecordRelation
+          label={fieldLabel('angebote', 'freigabe_zustaendig')}
+          name={freigabe_zustaendigTarget?.fields.nachname ?? '—'}
+          meta={[freigabe_zustaendigTarget?.fields.email_beruflich, freigabe_zustaendigTarget?.fields.email_privat].filter(Boolean).join(' · ') || undefined}
+          onClick={freigabe_zustaendigTarget && onOpenBeraterInnen ? () => onOpenBeraterInnen!(freigabe_zustaendigTarget!) : undefined}
         />
       </RecordSection>
 

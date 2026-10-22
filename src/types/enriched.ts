@@ -21,6 +21,7 @@ export type EnrichedProjekte = Projekte & {
 export type EnrichedAngebote = Angebote & {
   projektName: string;
   kundeName: string;
+  freigabe_zustaendigName: string;
 };
 
 export type EnrichedZeiterfassung = Zeiterfassung & {
@@ -33,4 +34,5 @@ export type EnrichedRechnungen = Rechnungen & {
   kundeName: string;
   projektName: string;
   beraterName: string;
+  freigabe_zustaendigName: string;
 };

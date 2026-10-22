@@ -5,6 +5,7 @@
  * recordId? (pass when EDITING — enables the attachments section),
  * projekteList (full hook array — resolves the Projekte applookup),
  * kundenList (full hook array — resolves the Kunden applookup),
+ * beraterInnenList (full hook array — resolves the BeraterInnen applookup),
  * enablePhotoScan?, enablePhotoLocation?.
  *
  * defaultValues is SHAPE-TOLERANT and its prop type is the EXPORTED
@@ -15,7 +16,7 @@
  *  ✓ useState<AngeboteDialogDefaults | undefined>(undefined)
  */
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import type { Angebote, Projekte, Kunden, LookupValue } from '@/types/app';
+import type { Angebote, Projekte, Kunden, BeraterInnen, LookupValue } from '@/types/app';
 import { APP_IDS, LOOKUP_OPTIONS } from '@/types/app';
 import { extractRecordId, createRecordUrl, cleanFieldsForApi, uploadFile, getUserProfile, LivingAppsService } from '@/services/livingAppsService';
 import {
@@ -39,6 +40,7 @@ import {
 import { Combobox } from '@/components/Combobox';
 import { ProjekteDialog } from '@/components/dialogs/ProjekteDialog';
 import { KundenDialog } from '@/components/dialogs/KundenDialog';
+import { BeraterInnenDialog } from '@/components/dialogs/BeraterInnenDialog';
 import { DatePicker } from '@/components/DatePicker';
 import { Checkbox } from '@/components/ui/checkbox';
 import { IconAlertCircle, IconCamera, IconChevronDown, IconCircleCheck, IconClipboard, IconFileText, IconLoader2, IconPhotoPlus, IconSparkles, IconUpload, IconX } from '@tabler/icons-react';
@@ -46,10 +48,11 @@ import { fileToDataUri, extractFromInput, extractPhotoMeta, reverseGeocode, data
 import { lookupKey } from '@/lib/formatters';
 
 /** Widened prefill type for AngeboteDialog.defaultValues — see file header. */
-export type AngeboteDialogDefaults = Omit<Angebote['fields'], 'angebotstyp' | 'kostentyp' | 'angebotsstatus'> & {
+export type AngeboteDialogDefaults = Omit<Angebote['fields'], 'angebotstyp' | 'kostentyp' | 'angebotsstatus' | 'freigabestatus'> & {
     angebotstyp?: LookupValue | string;
     kostentyp?: LookupValue | string;
     angebotsstatus?: LookupValue | string;
+    freigabestatus?: LookupValue | string;
   };
 
 interface AngeboteDialogProps {
@@ -64,6 +67,7 @@ interface AngeboteDialogProps {
   recordId?: string;
   projekteList: Projekte[];
   kundenList: Kunden[];
+  beraterInnenList: BeraterInnen[];
   enablePhotoScan?: boolean;
   enablePhotoLocation?: boolean;
 }
@@ -75,10 +79,12 @@ const NORMALIZE_LOOKUPS: Record<string, readonly { key: string; label: string }[
   angebotstyp: LOOKUP_OPTIONS['angebote']?.['angebotstyp'] ?? [],
   kostentyp: LOOKUP_OPTIONS['angebote']?.['kostentyp'] ?? [],
   angebotsstatus: LOOKUP_OPTIONS['angebote']?.['angebotsstatus'] ?? [],
+  freigabestatus: LOOKUP_OPTIONS['angebote']?.['freigabestatus'] ?? [],
 };
 const NORMALIZE_APPLOOKUPS: Record<string, string> = {
   projekt: APP_IDS.PROJEKTE,
   kunde: APP_IDS.KUNDEN,
+  freigabe_zustaendig: APP_IDS.BERATERINNEN,
 };
 function normalizeDefaults(values: Record<string, unknown>): Record<string, unknown> {
   const out: Record<string, unknown> = { ...values };
@@ -95,7 +101,7 @@ function normalizeDefaults(values: Record<string, unknown>): Record<string, unkn
   return out;
 }
 
-export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordId, projekteList, kundenList, enablePhotoScan = true, enablePhotoLocation = true }: AngeboteDialogProps) {
+export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordId, projekteList, kundenList, beraterInnenList, enablePhotoScan = true, enablePhotoLocation = true }: AngeboteDialogProps) {
   const [fields, setFields] = useState<Partial<Angebote['fields']>>({});
   const [saving, setSaving] = useState(false);
   const normalizedDefaults = useMemo<Record<string, unknown> | undefined>(
@@ -147,6 +153,23 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
     setCreateKundenInitial(q);
     setCreateKundenOpen(true);
   }
+  // Inline-Create state for "BeraterInnen" target. The dropdown's
+  // "+ Neuer …" option opens a sub-dialog; on submit we POST, add the new
+  // record to the local `extraBeraterInnen` list, and select it in
+  // the originating Combobox via the captured `createBeraterInnenField`.
+  const [createBeraterInnenOpen, setCreateBeraterInnenOpen] = useState(false);
+  const [createBeraterInnenInitial, setCreateBeraterInnenInitial] = useState('');
+  const [createBeraterInnenField, setCreateBeraterInnenField] = useState<string>('');
+  const [extraBeraterInnen, setExtraBeraterInnen] = useState< BeraterInnen[]>([]);
+  const beraterInnenListAll = useMemo(
+    () => [...beraterInnenList, ...extraBeraterInnen],
+    [beraterInnenList, extraBeraterInnen],
+  );
+  function openCreateBeraterInnen(fieldKey: string, q: string) {
+    setCreateBeraterInnenField(fieldKey);
+    setCreateBeraterInnenInitial(q);
+    setCreateBeraterInnenOpen(true);
+  }
   // Fields the plan assigns to a tool (empty without a plan).
   const SYSTEM_ASSIGNED: string[] = [];
   const [showErrors, setShowErrors] = useState(false);
@@ -179,8 +202,9 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
     lookupLists: {
       'projekt': projekteList,
       'kunde': kundenList,
+      'freigabe_zustaendig': beraterInnenList,
     },
-  }), [projekteList, kundenList, ]);
+  }), [projekteList, kundenList, beraterInnenList, ]);
   const computedValues = useMemo<Record<string, number | null>>(() => {
     let out: Record<string, number | null> = {};
     const entries = Object.entries(formEnhancements.computed);
@@ -298,6 +322,7 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
       }
       contextParts.push(`<available-records field="projekt" entity="Projekte">\n${JSON.stringify(projekteList.map(r => ({ record_id: r.record_id, ...r.fields })), null, 2)}\n</available-records>`);
       contextParts.push(`<available-records field="kunde" entity="Kunden">\n${JSON.stringify(kundenList.map(r => ({ record_id: r.record_id, ...r.fields })), null, 2)}\n</available-records>`);
+      contextParts.push(`<available-records field="freigabe_zustaendig" entity="Berater/innen">\n${JSON.stringify(beraterInnenList.map(r => ({ record_id: r.record_id, ...r.fields })), null, 2)}\n</available-records>`);
       if (usePersonalInfo) {
         try {
           const profile = await getUserProfile();
@@ -307,7 +332,7 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
         }
       }
       const photoContext = contextParts.length ? contextParts.join('\n') : undefined;
-      const schema = `{\n  "angebotsnummer": string | null, // Angebotsnummer\n  "angebotsjahr": string | null, // Jahr\n  "angebotstyp": LookupValue | null, // Angebotstyp (select one key: "dienstleistung" | "projekt" | "wartung" | "schulung" | "sonstiges") mapping: dienstleistung=Dienstleistungsangebot, projekt=Projektangebot, wartung=Wartungsangebot, schulung=Schulungsangebot, sonstiges=Sonstiges\n  "angebotsdatum": string | null, // YYYY-MM-DD\n  "gueltig_bis": string | null, // YYYY-MM-DD\n  "zeitrahmen_anfang": string | null, // YYYY-MM-DD\n  "zeitrahmen_ende": string | null, // YYYY-MM-DD\n  "dauer": string | null, // Dauer\n  "kostentyp": LookupValue | null, // Kostentyp (select one key: "einmalig" | "monatlich" | "jaehrlich" | "nach_aufwand" | "pauschal" | "sonstiges") mapping: einmalig=Einmalig, monatlich=Monatlich, jaehrlich=Jährlich, nach_aufwand=Nach Aufwand, pauschal=Pauschal, sonstiges=Sonstiges\n  "kostenbetrag": number | null, // Betrag (€)\n  "kosten_beschreibung": string | null, // Kostenbeschreibung\n  "angebotsbeschreibung": string | null, // Angebotsbeschreibung\n  "leistungspositionen": string | null, // Leistungspositionen\n  "anmerkungen": string | null, // Anmerkungen / Sonstiges\n  "angebotsstatus": LookupValue | null, // Angebotsstatus (select one key: "entwurf" | "freigegeben" | "versendet" | "angenommen" | "abgelehnt") mapping: entwurf=Entwurf, freigegeben=Freigegeben, versendet=Versendet, angenommen=Angenommen, abgelehnt=Abgelehnt\n  "projekt": string | null, // Display name from Projekte (see <available-records>)\n  "kunde": string | null, // Display name from Kunden (see <available-records>)\n}`;
+      const schema = `{\n  "angebotsnummer": string | null, // Angebotsnummer\n  "angebotsjahr": string | null, // Jahr\n  "angebotstyp": LookupValue | null, // Angebotstyp (select one key: "dienstleistung" | "projekt" | "wartung" | "schulung" | "sonstiges") mapping: dienstleistung=Dienstleistungsangebot, projekt=Projektangebot, wartung=Wartungsangebot, schulung=Schulungsangebot, sonstiges=Sonstiges\n  "angebotsdatum": string | null, // YYYY-MM-DD\n  "gueltig_bis": string | null, // YYYY-MM-DD\n  "zeitrahmen_anfang": string | null, // YYYY-MM-DD\n  "zeitrahmen_ende": string | null, // YYYY-MM-DD\n  "dauer": string | null, // Dauer\n  "kostentyp": LookupValue | null, // Kostentyp (select one key: "einmalig" | "monatlich" | "jaehrlich" | "nach_aufwand" | "pauschal" | "sonstiges") mapping: einmalig=Einmalig, monatlich=Monatlich, jaehrlich=Jährlich, nach_aufwand=Nach Aufwand, pauschal=Pauschal, sonstiges=Sonstiges\n  "kostenbetrag": number | null, // Betrag (€)\n  "kosten_beschreibung": string | null, // Kostenbeschreibung\n  "angebotsbeschreibung": string | null, // Angebotsbeschreibung\n  "leistungspositionen": string | null, // Leistungspositionen\n  "anmerkungen": string | null, // Anmerkungen / Sonstiges\n  "angebotsstatus": LookupValue | null, // Angebotsstatus (select one key: "entwurf" | "freigegeben" | "versendet" | "angenommen" | "abgelehnt") mapping: entwurf=Entwurf, freigegeben=Freigegeben, versendet=Versendet, angenommen=Angenommen, abgelehnt=Abgelehnt\n  "projekt": string | null, // Display name from Projekte (see <available-records>)\n  "kunde": string | null, // Display name from Kunden (see <available-records>)\n  "freigabe_zustaendig": string | null, // Display name from Berater/innen (see <available-records>)\n  "freigabestatus": LookupValue | null, // Freigabestatus (select one key: "nicht_zugewiesen" | "ausstehend" | "freigegeben" | "abgelehnt") mapping: nicht_zugewiesen=Noch nicht zugewiesen, ausstehend=Freigabe ausstehend, freigegeben=Freigegeben, abgelehnt=Abgelehnt\n  "freigabedatum": string | null, // YYYY-MM-DD\n  "freigabekommentar": string | null, // Freigabekommentar\n}`;
       const raw = await extractFromInput<Record<string, unknown>>(schema, {
         dataUri: uri,
         userText: aiText.trim() || undefined,
@@ -320,7 +345,7 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
           const n = name.toLowerCase().trim();
           return candidates.some(c => c.toLowerCase().includes(n) || n.includes(c.toLowerCase()));
         }
-        const applookupKeys = new Set<string>(["projekt", "kunde"]);
+        const applookupKeys = new Set<string>(["projekt", "kunde", "freigabe_zustaendig"]);
         for (const [k, v] of Object.entries(raw)) {
           if (applookupKeys.has(k)) continue;
           if (v != null) merged[k] = v;
@@ -334,6 +359,11 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
         if (kundeName) {
           const kundeMatch = kundenList.find(r => matchName(kundeName!, [String(r.fields.kundenname ?? '')]));
           if (kundeMatch) merged['kunde'] = createRecordUrl(APP_IDS.KUNDEN, kundeMatch.record_id);
+        }
+        const freigabe_zustaendigName = raw['freigabe_zustaendig'] as string | null;
+        if (freigabe_zustaendigName) {
+          const freigabe_zustaendigMatch = beraterInnenList.find(r => matchName(freigabe_zustaendigName!, [[r.fields.vorname ?? '', r.fields.nachname ?? ''].filter(Boolean).join(' ')]));
+          if (freigabe_zustaendigMatch) merged['freigabe_zustaendig'] = createRecordUrl(APP_IDS.BERATERINNEN, freigabe_zustaendigMatch.record_id);
         }
         return merged as Partial<Angebote['fields']>;
       });
@@ -821,6 +851,106 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
         />
       </div>
     ),
+    'freigabe_zustaendig': (
+      <div key="freigabe_zustaendig" className="space-y-1.5">
+        <Label htmlFor="freigabe_zustaendig">{fieldLabel('angebote', 'freigabe_zustaendig')}</Label>
+        <Combobox
+          id="freigabe_zustaendig"
+          placeholder=""
+          items={beraterInnenListAll.map(r => ({
+            id: r.record_id,
+            label: String(r.fields.nachname ?? r.record_id),
+          }))}
+          value={extractRecordId(fields.freigabe_zustaendig)}
+          onChange={id => setFields(f => ({ ...f, freigabe_zustaendig: id ? createRecordUrl(APP_IDS.BERATERINNEN, id) : undefined }))}
+          onCreateNew={(q) => openCreateBeraterInnen("freigabe_zustaendig", q)}
+          createLabel={t('create_in', { entity: appLabel('berater/innen') })}
+        />
+      </div>
+    ),
+    'freigabestatus': (
+      <div key="freigabestatus" className="space-y-1.5">
+        <Label htmlFor="freigabestatus">{fieldLabel('angebote', 'freigabestatus')}</Label>
+        <div role="radiogroup" className="flex flex-wrap gap-1.5">
+          <button
+            type="button"
+            role="radio"
+            aria-checked={lookupKey(fields.freigabestatus) === 'nicht_zugewiesen'}
+            onClick={() => setFields(f => ({ ...f, freigabestatus: (lookupKey(f.freigabestatus) === 'nicht_zugewiesen' ? undefined : 'nicht_zugewiesen') as any }))}
+            className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+              lookupKey(fields.freigabestatus) === 'nicht_zugewiesen'
+                ? 'bg-foreground text-background border-foreground'
+                : 'bg-background text-foreground border-input hover:bg-accent'
+            }`}
+          >
+            {lookupLabel('angebote', 'freigabestatus', 'nicht_zugewiesen') ?? 'Noch nicht zugewiesen'}
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={lookupKey(fields.freigabestatus) === 'ausstehend'}
+            onClick={() => setFields(f => ({ ...f, freigabestatus: (lookupKey(f.freigabestatus) === 'ausstehend' ? undefined : 'ausstehend') as any }))}
+            className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+              lookupKey(fields.freigabestatus) === 'ausstehend'
+                ? 'bg-foreground text-background border-foreground'
+                : 'bg-background text-foreground border-input hover:bg-accent'
+            }`}
+          >
+            {lookupLabel('angebote', 'freigabestatus', 'ausstehend') ?? 'Freigabe ausstehend'}
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={lookupKey(fields.freigabestatus) === 'freigegeben'}
+            onClick={() => setFields(f => ({ ...f, freigabestatus: (lookupKey(f.freigabestatus) === 'freigegeben' ? undefined : 'freigegeben') as any }))}
+            className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+              lookupKey(fields.freigabestatus) === 'freigegeben'
+                ? 'bg-foreground text-background border-foreground'
+                : 'bg-background text-foreground border-input hover:bg-accent'
+            }`}
+          >
+            {lookupLabel('angebote', 'freigabestatus', 'freigegeben') ?? 'Freigegeben'}
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={lookupKey(fields.freigabestatus) === 'abgelehnt'}
+            onClick={() => setFields(f => ({ ...f, freigabestatus: (lookupKey(f.freigabestatus) === 'abgelehnt' ? undefined : 'abgelehnt') as any }))}
+            className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+              lookupKey(fields.freigabestatus) === 'abgelehnt'
+                ? 'bg-foreground text-background border-foreground'
+                : 'bg-background text-foreground border-input hover:bg-accent'
+            }`}
+          >
+            {lookupLabel('angebote', 'freigabestatus', 'abgelehnt') ?? 'Abgelehnt'}
+          </button>
+        </div>
+      </div>
+    ),
+    'freigabedatum': (
+      <div key="freigabedatum" className="space-y-1.5">
+        <Label htmlFor="freigabedatum">{fieldLabel('angebote', 'freigabedatum')}</Label>
+        <DatePicker
+          id="freigabedatum"
+          placeholder=""
+          mode="date"
+          value={fields.freigabedatum ?? null}
+          onChange={v => setFields(f => ({ ...f, freigabedatum: v ?? undefined }))}
+        />
+      </div>
+    ),
+    'freigabekommentar': (
+      <div key="freigabekommentar" className="space-y-1.5">
+        <Label htmlFor="freigabekommentar">{fieldLabel('angebote', 'freigabekommentar')}</Label>
+        <Textarea
+          id="freigabekommentar"
+          placeholder=""
+          value={fields.freigabekommentar ?? ''}
+          onChange={e => setFields(f => ({ ...f, freigabekommentar: e.target.value }))}
+          rows={3}
+        />
+      </div>
+    ),
   };
   const orderedFields = applyFieldOrder(Object.keys(fieldBlocks), formEnhancements.fieldOrder);
   const orderedFieldsKey = orderedFields.map((it) => typeof it === 'string' ? it : it.row.join('+')).join(',');
@@ -835,13 +965,13 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
   //     kein passendes Backend-Feld in orderedFields) erscheinen NICHT als
   //     Input, sondern unten als kompakte 'Berechnungen'-Übersicht oder als
   //     Inline-Hint unter dem letzten beitragenden Input.
-  const FIELD_LABELS: Record<string, string> = {"angebotsnummer": "Angebotsnummer", "angebotsjahr": "Jahr", "angebotstyp": "Angebotstyp", "angebotsdatum": "Angebotsdatum", "gueltig_bis": "Gültig bis", "zeitrahmen_anfang": "Beginn", "zeitrahmen_ende": "Ende (falls vorhanden)", "dauer": "Dauer", "kostentyp": "Kostentyp", "kostenbetrag": "Betrag (€)", "kosten_beschreibung": "Kostenbeschreibung", "angebotsbeschreibung": "Angebotsbeschreibung", "leistungspositionen": "Leistungspositionen", "anmerkungen": "Anmerkungen / Sonstiges", "vorlage_datei": "Angebotsvorlage (PDF/Dokument)", "angebotsstatus": "Angebotsstatus", "projekt": "Zugewiesenes Projekt", "kunde": "Kunde"};
+  const FIELD_LABELS: Record<string, string> = {"angebotsnummer": "Angebotsnummer", "angebotsjahr": "Jahr", "angebotstyp": "Angebotstyp", "angebotsdatum": "Angebotsdatum", "gueltig_bis": "Gültig bis", "zeitrahmen_anfang": "Beginn", "zeitrahmen_ende": "Ende (falls vorhanden)", "dauer": "Dauer", "kostentyp": "Kostentyp", "kostenbetrag": "Betrag (€)", "kosten_beschreibung": "Kostenbeschreibung", "angebotsbeschreibung": "Angebotsbeschreibung", "leistungspositionen": "Leistungspositionen", "anmerkungen": "Anmerkungen / Sonstiges", "vorlage_datei": "Angebotsvorlage (PDF/Dokument)", "angebotsstatus": "Angebotsstatus", "projekt": "Zugewiesenes Projekt", "kunde": "Kunde", "freigabe_zustaendig": "Zur Freigabe zugewiesen an", "freigabestatus": "Freigabestatus", "freigabedatum": "Freigabedatum", "freigabekommentar": "Freigabekommentar"};
   const CURRENCY_KEYS = new Set<string>(["kostenbetrag"]);
   // Applookup-Referenz-Labels: pro applookup-Feld in dieser Form (ownKey)
   // eine Map { lookupKey: label } für ALLE Felder des Target-Schemas. Wird
   // beim Render-Walk gefiltert auf die in der computed-Formel tatsächlich
   // referenzierten lookupKeys (siehe applookupRefs unten).
-  const APPLOOKUP_LABELS: Record<string, Record<string, string>> = {"projekt": {"projektkennung": "Projektkennung", "projektnummer": "Projektnummer (ganze Zahl)", "projektart": "Projektart", "projektstart_jahr": "Startjahr", "projektstart_monat": "Startmonat", "status": "Projektstatus", "ansprechpartner_kunde": "Ansprechpartner beim Kunden", "letzter_schritt": "Letzter Schritt / aktueller Stand", "projektende": "Geplantes Projektende", "notizen": "Notizen", "kunde": "Kunde", "projektleitung": "Projektleitung"}, "kunde": {"kundenname": "Name / Firmenname", "kundentyp": "Kundentyp", "email": "E-Mail", "telefon": "Telefon", "strasse": "Straße", "hausnummer": "Hausnummer", "plz": "Postleitzahl", "ort": "Ort", "re_strasse": "Rechnungsstraße", "re_hausnummer": "Rechnungs-Hausnummer", "re_plz": "Rechnungs-Postleitzahl", "re_ort": "Rechnungs-Ort", "anlagedatum": "Anlagedatum", "ap_titel": "Titel Ansprechpartner", "ap_vorname": "Vorname Ansprechpartner", "ap_nachname": "Nachname Ansprechpartner", "ap_email": "E-Mail Ansprechpartner", "ap_telefon": "Telefon Ansprechpartner", "bevorzugte_kontaktart": "Bevorzugte Kontaktart", "letzter_kontakt_datum": "Datum letzter Kontakt", "letzter_kontakt_ansprechpartner": "Ansprechpartner beim letzten Kontakt", "notizen": "Notizen", "laufende_projekte": "Aktuell laufende Projekte"}};
+  const APPLOOKUP_LABELS: Record<string, Record<string, string>> = {"projekt": {"projektkennung": "Projektkennung", "projektnummer": "Projektnummer (ganze Zahl)", "projektart": "Projektart", "projektstart_jahr": "Startjahr", "projektstart_monat": "Startmonat", "status": "Projektstatus", "ansprechpartner_kunde": "Ansprechpartner beim Kunden", "letzter_schritt": "Letzter Schritt / aktueller Stand", "projektende": "Geplantes Projektende", "notizen": "Notizen", "kunde": "Kunde", "projektleitung": "Projektleitung"}, "kunde": {"kundenname": "Name / Firmenname", "kundentyp": "Kundentyp", "email": "E-Mail", "telefon": "Telefon", "strasse": "Straße", "hausnummer": "Hausnummer", "plz": "Postleitzahl", "ort": "Ort", "re_strasse": "Rechnungsstraße", "re_hausnummer": "Rechnungs-Hausnummer", "re_plz": "Rechnungs-Postleitzahl", "re_ort": "Rechnungs-Ort", "anlagedatum": "Anlagedatum", "ap_titel": "Titel Ansprechpartner", "ap_vorname": "Vorname Ansprechpartner", "ap_nachname": "Nachname Ansprechpartner", "ap_email": "E-Mail Ansprechpartner", "ap_telefon": "Telefon Ansprechpartner", "bevorzugte_kontaktart": "Bevorzugte Kontaktart", "letzter_kontakt_datum": "Datum letzter Kontakt", "letzter_kontakt_ansprechpartner": "Ansprechpartner beim letzten Kontakt", "notizen": "Notizen", "laufende_projekte": "Aktuell laufende Projekte"}, "freigabe_zustaendig": {"nachname": "Nachname", "vorname": "Vorname", "titel": "Titel (optional)", "strasse": "Straße (privat)", "hausnummer": "Hausnummer (privat)", "plz": "Postleitzahl (privat)", "ort": "Ort (privat)", "email_beruflich": "E-Mail (beruflich)", "email_privat": "E-Mail (privat)", "telefon": "Telefon (privat)", "einstiegsdatum": "Einstiegsdatum", "status": "Status", "stundensatz": "Stundensatz (€/h)", "sonstiges_1": "Sonstige Anmerkungen (1)", "sonstiges_2": "Sonstige Anmerkungen (2)", "strasse_geschaeftlich": "Straße (geschäftlich)", "hausnummer_geschaeftlich": "Hausnummer (geschäftlich)", "plz_geschaeftlich": "Postleitzahl (geschäftlich)", "ort_geschaeftlich": "Ort (geschäftlich)", "telefon_geschaeftlich": "Telefon (geschäftlich)", "leistungen": "Durchführbare Leistungen", "projekte": "Aktuell zugewiesene Projekte"}};
   const inputFields = useMemo(() => flattenFieldOrder(orderedFields), [orderedFieldsKey]);
   const backendFieldSet = useMemo(() => new Set(inputFields), [inputFields.join(',')]);
   const virtualComputed = useMemo(
@@ -1240,7 +1370,7 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
           ? ({ projektkennung: createProjekteInitial } as any)
           : undefined}
         kundenList={kundenList}
-        beraterInnenList={[]}
+        beraterInnenList={beraterInnenList}
       />
     )}
     {createKundenOpen && (
@@ -1260,6 +1390,27 @@ export function AngeboteDialog({ open, onClose, onSubmit, defaultValues, recordI
         defaultValues={createKundenInitial
           ? ({ kundenname: createKundenInitial } as any)
           : undefined}
+        projekteList={projekteList}
+      />
+    )}
+    {createBeraterInnenOpen && (
+      <BeraterInnenDialog
+        open={createBeraterInnenOpen}
+        onClose={() => setCreateBeraterInnenOpen(false)}
+        onSubmit={async (newFields) => {
+          const result = await LivingAppsService.createBeraterInnenEntry(newFields as any) as { id?: string };
+          if (result?.id) {
+            const newRec = { record_id: result.id, fields: newFields } as unknown as BeraterInnen;
+            setExtraBeraterInnen(prev => [...prev, newRec]);
+            const url = createRecordUrl(APP_IDS.BERATERINNEN, result.id);
+            setFields(prev => ({ ...prev, [createBeraterInnenField]: url } as any));
+          }
+          setCreateBeraterInnenOpen(false);
+        }}
+        defaultValues={createBeraterInnenInitial
+          ? ({ nachname: createBeraterInnenInitial } as any)
+          : undefined}
+        leistungskatalogList={[]}
         projekteList={projekteList}
       />
     )}

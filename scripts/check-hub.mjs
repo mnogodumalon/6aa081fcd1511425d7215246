@@ -33,7 +33,9 @@ const HUBS = {
     "satellites": [
       "leistungskatalog",
       "projekte",
+      "angebote",
       "zeiterfassung",
+      "rechnungen",
       "rechnungen"
     ]
   },

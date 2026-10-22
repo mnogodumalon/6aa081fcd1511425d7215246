@@ -48,9 +48,10 @@ import { fileToDataUri, extractFromInput, extractPhotoMeta, reverseGeocode, data
 import { lookupKey } from '@/lib/formatters';
 
 /** Widened prefill type for RechnungenDialog.defaultValues — see file header. */
-export type RechnungenDialogDefaults = Omit<Rechnungen['fields'], 'rechnungsstatus' | 'abrechnungsmonat'> & {
+export type RechnungenDialogDefaults = Omit<Rechnungen['fields'], 'rechnungsstatus' | 'abrechnungsmonat' | 'freigabestatus'> & {
     rechnungsstatus?: LookupValue | string;
     abrechnungsmonat?: LookupValue | string;
+    freigabestatus?: LookupValue | string;
   };
 
 interface RechnungenDialogProps {
@@ -76,11 +77,13 @@ interface RechnungenDialogProps {
 const NORMALIZE_LOOKUPS: Record<string, readonly { key: string; label: string }[]> = {
   rechnungsstatus: LOOKUP_OPTIONS['rechnungen']?.['rechnungsstatus'] ?? [],
   abrechnungsmonat: LOOKUP_OPTIONS['rechnungen']?.['abrechnungsmonat'] ?? [],
+  freigabestatus: LOOKUP_OPTIONS['rechnungen']?.['freigabestatus'] ?? [],
 };
 const NORMALIZE_APPLOOKUPS: Record<string, string> = {
   kunde: APP_IDS.KUNDEN,
   projekt: APP_IDS.PROJEKTE,
   berater: APP_IDS.BERATERINNEN,
+  freigabe_zustaendig: APP_IDS.BERATERINNEN,
 };
 function normalizeDefaults(values: Record<string, unknown>): Record<string, unknown> {
   const out: Record<string, unknown> = { ...values };
@@ -199,8 +202,9 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
       'kunde': kundenList,
       'projekt': projekteList,
       'berater': beraterInnenList,
+      'freigabe_zustaendig': beraterInnenList,
     },
-  }), [kundenList, projekteList, beraterInnenList, ]);
+  }), [kundenList, projekteList, beraterInnenList, beraterInnenList, ]);
   const computedValues = useMemo<Record<string, number | null>>(() => {
     let out: Record<string, number | null> = {};
     const entries = Object.entries(formEnhancements.computed);
@@ -319,6 +323,7 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
       contextParts.push(`<available-records field="kunde" entity="Kunden">\n${JSON.stringify(kundenList.map(r => ({ record_id: r.record_id, ...r.fields })), null, 2)}\n</available-records>`);
       contextParts.push(`<available-records field="projekt" entity="Projekte">\n${JSON.stringify(projekteList.map(r => ({ record_id: r.record_id, ...r.fields })), null, 2)}\n</available-records>`);
       contextParts.push(`<available-records field="berater" entity="Berater/innen">\n${JSON.stringify(beraterInnenList.map(r => ({ record_id: r.record_id, ...r.fields })), null, 2)}\n</available-records>`);
+      contextParts.push(`<available-records field="freigabe_zustaendig" entity="Berater/innen">\n${JSON.stringify(beraterInnenList.map(r => ({ record_id: r.record_id, ...r.fields })), null, 2)}\n</available-records>`);
       if (usePersonalInfo) {
         try {
           const profile = await getUserProfile();
@@ -328,7 +333,7 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
         }
       }
       const photoContext = contextParts.length ? contextParts.join('\n') : undefined;
-      const schema = `{\n  "rechnungsnummer": string | null, // Rechnungsnummer\n  "rechnungsdatum": string | null, // YYYY-MM-DD\n  "faelligkeitsdatum": string | null, // YYYY-MM-DD\n  "rechnungsstatus": LookupValue | null, // Rechnungsstatus (select one key: "bezahlt" | "storniert" | "ueberfaellig" | "offen") mapping: bezahlt=Bezahlt, storniert=Storniert, ueberfaellig=Überfällig, offen=Offen\n  "abrechnungsmonat": LookupValue | null, // Abrechnungsmonat (select one key: "januar" | "februar" | "maerz" | "april" | "mai" | "juni" | "juli" | "august" | "september" | "oktober" | "november" | "dezember") mapping: januar=Januar, februar=Februar, maerz=März, april=April, mai=Mai, juni=Juni, juli=Juli, august=August, september=September, oktober=Oktober, november=November, dezember=Dezember\n  "abrechnungsjahr": string | null, // Abrechnungsjahr\n  "nettobetrag": number | null, // Nettobetrag (€)\n  "mehrwertsteuer": number | null, // Mehrwertsteuer (%)\n  "gesamtbetrag": number | null, // Gesamtbetrag (€)\n  "zahlungseingang": string | null, // YYYY-MM-DD\n  "leistungspositionen": string | null, // Leistungspositionen\n  "notizen": string | null, // Notizen\n  "kunde": string | null, // Display name from Kunden (see <available-records>)\n  "projekt": string | null, // Display name from Projekte (see <available-records>)\n  "berater": string[] | null, // Display names from Berater/innen, one per referenced record (see <available-records>)\n}`;
+      const schema = `{\n  "rechnungsnummer": string | null, // Rechnungsnummer\n  "rechnungsdatum": string | null, // YYYY-MM-DD\n  "faelligkeitsdatum": string | null, // YYYY-MM-DD\n  "rechnungsstatus": LookupValue | null, // Rechnungsstatus (select one key: "offen" | "bezahlt" | "storniert" | "ueberfaellig") mapping: offen=Offen, bezahlt=Bezahlt, storniert=Storniert, ueberfaellig=Überfällig\n  "abrechnungsmonat": LookupValue | null, // Abrechnungsmonat (select one key: "januar" | "februar" | "maerz" | "april" | "mai" | "juni" | "juli" | "august" | "september" | "november" | "dezember" | "oktober") mapping: januar=Januar, februar=Februar, maerz=März, april=April, mai=Mai, juni=Juni, juli=Juli, august=August, september=September, november=November, dezember=Dezember, oktober=Oktober\n  "abrechnungsjahr": string | null, // Abrechnungsjahr\n  "nettobetrag": number | null, // Nettobetrag (€)\n  "mehrwertsteuer": number | null, // Mehrwertsteuer (%)\n  "gesamtbetrag": number | null, // Gesamtbetrag (€)\n  "zahlungseingang": string | null, // YYYY-MM-DD\n  "leistungspositionen": string | null, // Leistungspositionen\n  "notizen": string | null, // Notizen\n  "kunde": string | null, // Display name from Kunden (see <available-records>)\n  "projekt": string | null, // Display name from Projekte (see <available-records>)\n  "berater": string[] | null, // Display names from Berater/innen, one per referenced record (see <available-records>)\n  "freigabe_zustaendig": string | null, // Display name from Berater/innen (see <available-records>)\n  "freigabestatus": LookupValue | null, // Freigabestatus (select one key: "nicht_zugewiesen" | "ausstehend" | "freigegeben" | "abgelehnt") mapping: nicht_zugewiesen=Noch nicht zugewiesen, ausstehend=Freigabe ausstehend, freigegeben=Freigegeben, abgelehnt=Abgelehnt\n  "freigabedatum": string | null, // YYYY-MM-DD\n  "freigabekommentar": string | null, // Freigabekommentar\n}`;
       const raw = await extractFromInput<Record<string, unknown>>(schema, {
         dataUri: uri,
         userText: aiText.trim() || undefined,
@@ -341,7 +346,7 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
           const n = name.toLowerCase().trim();
           return candidates.some(c => c.toLowerCase().includes(n) || n.includes(c.toLowerCase()));
         }
-        const applookupKeys = new Set<string>(["kunde", "projekt", "berater"]);
+        const applookupKeys = new Set<string>(["kunde", "projekt", "berater", "freigabe_zustaendig"]);
         for (const [k, v] of Object.entries(raw)) {
           if (applookupKeys.has(k)) continue;
           if (v != null) merged[k] = v;
@@ -363,6 +368,11 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
             .filter((r): r is NonNullable<typeof r> => Boolean(r))
             .map(r => createRecordUrl(APP_IDS.BERATERINNEN, r.record_id));
           if (beraterUrls.length > 0) merged['berater'] = beraterUrls;
+        }
+        const freigabe_zustaendigName = raw['freigabe_zustaendig'] as string | null;
+        if (freigabe_zustaendigName) {
+          const freigabe_zustaendigMatch = beraterInnenList.find(r => matchName(freigabe_zustaendigName!, [[r.fields.vorname ?? '', r.fields.nachname ?? ''].filter(Boolean).join(' ')]));
+          if (freigabe_zustaendigMatch) merged['freigabe_zustaendig'] = createRecordUrl(APP_IDS.BERATERINNEN, freigabe_zustaendigMatch.record_id);
         }
         return merged as Partial<Rechnungen['fields']>;
       });
@@ -470,6 +480,19 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
           <button
             type="button"
             role="radio"
+            aria-checked={lookupKey(fields.rechnungsstatus) === 'offen'}
+            onClick={() => setFields(f => ({ ...f, rechnungsstatus: (lookupKey(f.rechnungsstatus) === 'offen' ? undefined : 'offen') as any }))}
+            className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+              lookupKey(fields.rechnungsstatus) === 'offen'
+                ? 'bg-foreground text-background border-foreground'
+                : 'bg-background text-foreground border-input hover:bg-accent'
+            }`}
+          >
+            {lookupLabel('rechnungen', 'rechnungsstatus', 'offen') ?? 'Offen'}
+          </button>
+          <button
+            type="button"
+            role="radio"
             aria-checked={lookupKey(fields.rechnungsstatus) === 'bezahlt'}
             onClick={() => setFields(f => ({ ...f, rechnungsstatus: (lookupKey(f.rechnungsstatus) === 'bezahlt' ? undefined : 'bezahlt') as any }))}
             className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
@@ -506,19 +529,6 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
           >
             {lookupLabel('rechnungen', 'rechnungsstatus', 'ueberfaellig') ?? 'Überfällig'}
           </button>
-          <button
-            type="button"
-            role="radio"
-            aria-checked={lookupKey(fields.rechnungsstatus) === 'offen'}
-            onClick={() => setFields(f => ({ ...f, rechnungsstatus: (lookupKey(f.rechnungsstatus) === 'offen' ? undefined : 'offen') as any }))}
-            className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
-              lookupKey(fields.rechnungsstatus) === 'offen'
-                ? 'bg-foreground text-background border-foreground'
-                : 'bg-background text-foreground border-input hover:bg-accent'
-            }`}
-          >
-            {lookupLabel('rechnungen', 'rechnungsstatus', 'offen') ?? 'Offen'}
-          </button>
         </div>
         {showErrors && !fields.rechnungsstatus && (
           <p className="text-xs text-destructive mt-1" role="alert">{requiredMessage('rechnungen', 'rechnungsstatus')}</p>
@@ -544,9 +554,9 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
             <SelectItem value="juli">{lookupLabel('rechnungen', 'abrechnungsmonat', 'juli') ?? 'Juli'}</SelectItem>
             <SelectItem value="august">{lookupLabel('rechnungen', 'abrechnungsmonat', 'august') ?? 'August'}</SelectItem>
             <SelectItem value="september">{lookupLabel('rechnungen', 'abrechnungsmonat', 'september') ?? 'September'}</SelectItem>
-            <SelectItem value="oktober">{lookupLabel('rechnungen', 'abrechnungsmonat', 'oktober') ?? 'Oktober'}</SelectItem>
             <SelectItem value="november">{lookupLabel('rechnungen', 'abrechnungsmonat', 'november') ?? 'November'}</SelectItem>
             <SelectItem value="dezember">{lookupLabel('rechnungen', 'abrechnungsmonat', 'dezember') ?? 'Dezember'}</SelectItem>
+            <SelectItem value="oktober">{lookupLabel('rechnungen', 'abrechnungsmonat', 'oktober') ?? 'Oktober'}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -773,6 +783,106 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
         />
       </div>
     ),
+    'freigabe_zustaendig': (
+      <div key="freigabe_zustaendig" className="space-y-1.5">
+        <Label htmlFor="freigabe_zustaendig">{fieldLabel('rechnungen', 'freigabe_zustaendig')}</Label>
+        <Combobox
+          id="freigabe_zustaendig"
+          placeholder=""
+          items={beraterInnenListAll.map(r => ({
+            id: r.record_id,
+            label: String(r.fields.nachname ?? r.record_id),
+          }))}
+          value={extractRecordId(fields.freigabe_zustaendig)}
+          onChange={id => setFields(f => ({ ...f, freigabe_zustaendig: id ? createRecordUrl(APP_IDS.BERATERINNEN, id) : undefined }))}
+          onCreateNew={(q) => openCreateBeraterInnen("freigabe_zustaendig", q)}
+          createLabel={t('create_in', { entity: appLabel('berater/innen') })}
+        />
+      </div>
+    ),
+    'freigabestatus': (
+      <div key="freigabestatus" className="space-y-1.5">
+        <Label htmlFor="freigabestatus">{fieldLabel('rechnungen', 'freigabestatus')}</Label>
+        <div role="radiogroup" className="flex flex-wrap gap-1.5">
+          <button
+            type="button"
+            role="radio"
+            aria-checked={lookupKey(fields.freigabestatus) === 'nicht_zugewiesen'}
+            onClick={() => setFields(f => ({ ...f, freigabestatus: (lookupKey(f.freigabestatus) === 'nicht_zugewiesen' ? undefined : 'nicht_zugewiesen') as any }))}
+            className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+              lookupKey(fields.freigabestatus) === 'nicht_zugewiesen'
+                ? 'bg-foreground text-background border-foreground'
+                : 'bg-background text-foreground border-input hover:bg-accent'
+            }`}
+          >
+            {lookupLabel('rechnungen', 'freigabestatus', 'nicht_zugewiesen') ?? 'Noch nicht zugewiesen'}
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={lookupKey(fields.freigabestatus) === 'ausstehend'}
+            onClick={() => setFields(f => ({ ...f, freigabestatus: (lookupKey(f.freigabestatus) === 'ausstehend' ? undefined : 'ausstehend') as any }))}
+            className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+              lookupKey(fields.freigabestatus) === 'ausstehend'
+                ? 'bg-foreground text-background border-foreground'
+                : 'bg-background text-foreground border-input hover:bg-accent'
+            }`}
+          >
+            {lookupLabel('rechnungen', 'freigabestatus', 'ausstehend') ?? 'Freigabe ausstehend'}
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={lookupKey(fields.freigabestatus) === 'freigegeben'}
+            onClick={() => setFields(f => ({ ...f, freigabestatus: (lookupKey(f.freigabestatus) === 'freigegeben' ? undefined : 'freigegeben') as any }))}
+            className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+              lookupKey(fields.freigabestatus) === 'freigegeben'
+                ? 'bg-foreground text-background border-foreground'
+                : 'bg-background text-foreground border-input hover:bg-accent'
+            }`}
+          >
+            {lookupLabel('rechnungen', 'freigabestatus', 'freigegeben') ?? 'Freigegeben'}
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={lookupKey(fields.freigabestatus) === 'abgelehnt'}
+            onClick={() => setFields(f => ({ ...f, freigabestatus: (lookupKey(f.freigabestatus) === 'abgelehnt' ? undefined : 'abgelehnt') as any }))}
+            className={`inline-flex items-center justify-center min-h-9 max-sm:min-h-11 max-sm:px-4 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+              lookupKey(fields.freigabestatus) === 'abgelehnt'
+                ? 'bg-foreground text-background border-foreground'
+                : 'bg-background text-foreground border-input hover:bg-accent'
+            }`}
+          >
+            {lookupLabel('rechnungen', 'freigabestatus', 'abgelehnt') ?? 'Abgelehnt'}
+          </button>
+        </div>
+      </div>
+    ),
+    'freigabedatum': (
+      <div key="freigabedatum" className="space-y-1.5">
+        <Label htmlFor="freigabedatum">{fieldLabel('rechnungen', 'freigabedatum')}</Label>
+        <DatePicker
+          id="freigabedatum"
+          placeholder=""
+          mode="date"
+          value={fields.freigabedatum ?? null}
+          onChange={v => setFields(f => ({ ...f, freigabedatum: v ?? undefined }))}
+        />
+      </div>
+    ),
+    'freigabekommentar': (
+      <div key="freigabekommentar" className="space-y-1.5">
+        <Label htmlFor="freigabekommentar">{fieldLabel('rechnungen', 'freigabekommentar')}</Label>
+        <Textarea
+          id="freigabekommentar"
+          placeholder=""
+          value={fields.freigabekommentar ?? ''}
+          onChange={e => setFields(f => ({ ...f, freigabekommentar: e.target.value }))}
+          rows={3}
+        />
+      </div>
+    ),
   };
   const orderedFields = applyFieldOrder(Object.keys(fieldBlocks), formEnhancements.fieldOrder);
   const orderedFieldsKey = orderedFields.map((it) => typeof it === 'string' ? it : it.row.join('+')).join(',');
@@ -787,13 +897,13 @@ export function RechnungenDialog({ open, onClose, onSubmit, defaultValues, recor
   //     kein passendes Backend-Feld in orderedFields) erscheinen NICHT als
   //     Input, sondern unten als kompakte 'Berechnungen'-Übersicht oder als
   //     Inline-Hint unter dem letzten beitragenden Input.
-  const FIELD_LABELS: Record<string, string> = {"rechnungsnummer": "Rechnungsnummer", "rechnungsdatum": "Rechnungsdatum", "faelligkeitsdatum": "Fälligkeitsdatum", "rechnungsstatus": "Rechnungsstatus", "abrechnungsmonat": "Abrechnungsmonat", "abrechnungsjahr": "Abrechnungsjahr", "nettobetrag": "Nettobetrag (€)", "mehrwertsteuer": "Mehrwertsteuer (%)", "gesamtbetrag": "Gesamtbetrag (€)", "zahlungseingang": "Zahlungseingang", "leistungspositionen": "Leistungspositionen", "notizen": "Notizen", "rechnungsdatei": "Rechnungsdokument (PDF)", "kunde": "Kunde", "projekt": "Projekt", "berater": "Beteiligte Berater/innen"};
+  const FIELD_LABELS: Record<string, string> = {"rechnungsnummer": "Rechnungsnummer", "rechnungsdatum": "Rechnungsdatum", "faelligkeitsdatum": "Fälligkeitsdatum", "rechnungsstatus": "Rechnungsstatus", "abrechnungsmonat": "Abrechnungsmonat", "abrechnungsjahr": "Abrechnungsjahr", "nettobetrag": "Nettobetrag (€)", "mehrwertsteuer": "Mehrwertsteuer (%)", "gesamtbetrag": "Gesamtbetrag (€)", "zahlungseingang": "Zahlungseingang", "leistungspositionen": "Leistungspositionen", "notizen": "Notizen", "rechnungsdatei": "Rechnungsdokument (PDF)", "kunde": "Kunde", "projekt": "Projekt", "berater": "Beteiligte Berater/innen", "freigabe_zustaendig": "Zur Freigabe zugewiesen an", "freigabestatus": "Freigabestatus", "freigabedatum": "Freigabedatum", "freigabekommentar": "Freigabekommentar"};
   const CURRENCY_KEYS = new Set<string>(["nettobetrag", "gesamtbetrag"]);
   // Applookup-Referenz-Labels: pro applookup-Feld in dieser Form (ownKey)
   // eine Map { lookupKey: label } für ALLE Felder des Target-Schemas. Wird
   // beim Render-Walk gefiltert auf die in der computed-Formel tatsächlich
   // referenzierten lookupKeys (siehe applookupRefs unten).
-  const APPLOOKUP_LABELS: Record<string, Record<string, string>> = {"kunde": {"kundenname": "Name / Firmenname", "kundentyp": "Kundentyp", "email": "E-Mail", "telefon": "Telefon", "strasse": "Straße", "hausnummer": "Hausnummer", "plz": "Postleitzahl", "ort": "Ort", "re_strasse": "Rechnungsstraße", "re_hausnummer": "Rechnungs-Hausnummer", "re_plz": "Rechnungs-Postleitzahl", "re_ort": "Rechnungs-Ort", "anlagedatum": "Anlagedatum", "ap_titel": "Titel Ansprechpartner", "ap_vorname": "Vorname Ansprechpartner", "ap_nachname": "Nachname Ansprechpartner", "ap_email": "E-Mail Ansprechpartner", "ap_telefon": "Telefon Ansprechpartner", "bevorzugte_kontaktart": "Bevorzugte Kontaktart", "letzter_kontakt_datum": "Datum letzter Kontakt", "letzter_kontakt_ansprechpartner": "Ansprechpartner beim letzten Kontakt", "notizen": "Notizen", "laufende_projekte": "Aktuell laufende Projekte"}, "projekt": {"projektkennung": "Projektkennung", "projektnummer": "Projektnummer (ganze Zahl)", "projektart": "Projektart", "projektstart_jahr": "Startjahr", "projektstart_monat": "Startmonat", "status": "Projektstatus", "ansprechpartner_kunde": "Ansprechpartner beim Kunden", "letzter_schritt": "Letzter Schritt / aktueller Stand", "projektende": "Geplantes Projektende", "notizen": "Notizen", "kunde": "Kunde", "projektleitung": "Projektleitung"}, "berater": {"nachname": "Nachname", "vorname": "Vorname", "titel": "Titel (optional)", "strasse": "Straße (privat)", "hausnummer": "Hausnummer (privat)", "plz": "Postleitzahl (privat)", "ort": "Ort (privat)", "email_beruflich": "E-Mail (beruflich)", "email_privat": "E-Mail (privat)", "telefon": "Telefon (privat)", "einstiegsdatum": "Einstiegsdatum", "status": "Status", "stundensatz": "Stundensatz (€/h)", "sonstiges_1": "Sonstige Anmerkungen (1)", "sonstiges_2": "Sonstige Anmerkungen (2)", "strasse_geschaeftlich": "Straße (geschäftlich)", "hausnummer_geschaeftlich": "Hausnummer (geschäftlich)", "plz_geschaeftlich": "Postleitzahl (geschäftlich)", "ort_geschaeftlich": "Ort (geschäftlich)", "telefon_geschaeftlich": "Telefon (geschäftlich)", "leistungen": "Durchführbare Leistungen", "projekte": "Aktuell zugewiesene Projekte"}};
+  const APPLOOKUP_LABELS: Record<string, Record<string, string>> = {"kunde": {"kundenname": "Name / Firmenname", "kundentyp": "Kundentyp", "email": "E-Mail", "telefon": "Telefon", "strasse": "Straße", "hausnummer": "Hausnummer", "plz": "Postleitzahl", "ort": "Ort", "re_strasse": "Rechnungsstraße", "re_hausnummer": "Rechnungs-Hausnummer", "re_plz": "Rechnungs-Postleitzahl", "re_ort": "Rechnungs-Ort", "anlagedatum": "Anlagedatum", "ap_titel": "Titel Ansprechpartner", "ap_vorname": "Vorname Ansprechpartner", "ap_nachname": "Nachname Ansprechpartner", "ap_email": "E-Mail Ansprechpartner", "ap_telefon": "Telefon Ansprechpartner", "bevorzugte_kontaktart": "Bevorzugte Kontaktart", "letzter_kontakt_datum": "Datum letzter Kontakt", "letzter_kontakt_ansprechpartner": "Ansprechpartner beim letzten Kontakt", "notizen": "Notizen", "laufende_projekte": "Aktuell laufende Projekte"}, "projekt": {"projektkennung": "Projektkennung", "projektnummer": "Projektnummer (ganze Zahl)", "projektart": "Projektart", "projektstart_jahr": "Startjahr", "projektstart_monat": "Startmonat", "status": "Projektstatus", "ansprechpartner_kunde": "Ansprechpartner beim Kunden", "letzter_schritt": "Letzter Schritt / aktueller Stand", "projektende": "Geplantes Projektende", "notizen": "Notizen", "kunde": "Kunde", "projektleitung": "Projektleitung"}, "berater": {"nachname": "Nachname", "vorname": "Vorname", "titel": "Titel (optional)", "strasse": "Straße (privat)", "hausnummer": "Hausnummer (privat)", "plz": "Postleitzahl (privat)", "ort": "Ort (privat)", "email_beruflich": "E-Mail (beruflich)", "email_privat": "E-Mail (privat)", "telefon": "Telefon (privat)", "einstiegsdatum": "Einstiegsdatum", "status": "Status", "stundensatz": "Stundensatz (€/h)", "sonstiges_1": "Sonstige Anmerkungen (1)", "sonstiges_2": "Sonstige Anmerkungen (2)", "strasse_geschaeftlich": "Straße (geschäftlich)", "hausnummer_geschaeftlich": "Hausnummer (geschäftlich)", "plz_geschaeftlich": "Postleitzahl (geschäftlich)", "ort_geschaeftlich": "Ort (geschäftlich)", "telefon_geschaeftlich": "Telefon (geschäftlich)", "leistungen": "Durchführbare Leistungen", "projekte": "Aktuell zugewiesene Projekte"}, "freigabe_zustaendig": {"nachname": "Nachname", "vorname": "Vorname", "titel": "Titel (optional)", "strasse": "Straße (privat)", "hausnummer": "Hausnummer (privat)", "plz": "Postleitzahl (privat)", "ort": "Ort (privat)", "email_beruflich": "E-Mail (beruflich)", "email_privat": "E-Mail (privat)", "telefon": "Telefon (privat)", "einstiegsdatum": "Einstiegsdatum", "status": "Status", "stundensatz": "Stundensatz (€/h)", "sonstiges_1": "Sonstige Anmerkungen (1)", "sonstiges_2": "Sonstige Anmerkungen (2)", "strasse_geschaeftlich": "Straße (geschäftlich)", "hausnummer_geschaeftlich": "Hausnummer (geschäftlich)", "plz_geschaeftlich": "Postleitzahl (geschäftlich)", "ort_geschaeftlich": "Ort (geschäftlich)", "telefon_geschaeftlich": "Telefon (geschäftlich)", "leistungen": "Durchführbare Leistungen", "projekte": "Aktuell zugewiesene Projekte"}};
   const inputFields = useMemo(() => flattenFieldOrder(orderedFields), [orderedFieldsKey]);
   const backendFieldSet = useMemo(() => new Set(inputFields), [inputFields.join(',')]);
   const virtualComputed = useMemo(

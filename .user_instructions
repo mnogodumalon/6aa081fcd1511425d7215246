@@ -118,3 +118,6 @@ Bitte mach das so das es kein Auswahlfeld ist, sondern zum Abhaken
 Die Auswahl erlaubt dann aber keine mehrfachauswahl. Wie mache ich diese Möglich?
 
 Bei Projekte bitte einmal die Projektnummer als ganze zahl, nicht als Kommazahl anlegen.
+
+Ich möchte einen Freigabeprozess, sowohl für Angebote als auch für Rechnungen. 
+Wenn ein Angebot erstellt wurde muss es zur Freigabe zugewiesen werden. Die Person der das Angebot zugewiesen wurde gibt es dann frei. Der selbe Prozess gilt auch für Rechnungen.

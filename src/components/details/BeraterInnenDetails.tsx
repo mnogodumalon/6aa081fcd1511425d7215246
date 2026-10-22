@@ -1,4 +1,4 @@
-import type { BeraterInnen, Leistungskatalog, Projekte, Zeiterfassung, Rechnungen } from '@/types/app';
+import type { BeraterInnen, Leistungskatalog, Projekte, Angebote, Zeiterfassung, Rechnungen } from '@/types/app';
 import { APP_IDS } from '@/types/app';
 import { extractRecordId } from '@/services/livingAppsService';
 import {
@@ -33,6 +33,12 @@ export interface BeraterInnenDetailsProps {
   onOpenProjekteProjektleitung: (record: Projekte) => void;
   /** Kontextuelles „+": öffnet den Projekte-Dialog mit diesem Record vorgesetzt. */
   onAddProjekteProjektleitung?: () => void;
+  /** 1:N „Angebote" (freigabe_zustaendig): VOLLE Liste — der Block filtert auf diesen Record. */
+  angeboteList: Angebote[];
+  /** Zeilen-Klick → overlay.push auf das Angebote-Detail (nie der Edit-Dialog). */
+  onOpenAngebote: (record: Angebote) => void;
+  /** Kontextuelles „+": öffnet den Angebote-Dialog mit diesem Record vorgesetzt. */
+  onAddAngebote?: () => void;
   /** 1:N „Zeiterfassung" (berater): VOLLE Liste — der Block filtert auf diesen Record. */
   zeiterfassungList: Zeiterfassung[];
   /** Zeilen-Klick → overlay.push auf das Zeiterfassung-Detail (nie der Edit-Dialog). */
@@ -40,13 +46,19 @@ export interface BeraterInnenDetailsProps {
   /** Kontextuelles „+": öffnet den Zeiterfassung-Dialog mit diesem Record vorgesetzt. */
   onAddZeiterfassung?: () => void;
   /** 1:N „Rechnungen" (berater): VOLLE Liste — der Block filtert auf diesen Record. */
-  rechnungenList: Rechnungen[];
+  rechnungenBeraterList: Rechnungen[];
   /** Zeilen-Klick → overlay.push auf das Rechnungen-Detail (nie der Edit-Dialog). */
-  onOpenRechnungen: (record: Rechnungen) => void;
+  onOpenRechnungenBerater: (record: Rechnungen) => void;
   /** Kontextuelles „+": öffnet den Rechnungen-Dialog mit diesem Record vorgesetzt. */
-  onAddRechnungen?: () => void;
+  onAddRechnungenBerater?: () => void;
   /** „Vorhandene wählen": Listenfeld-Rückbezug — hängt diesen Record an einen bestehenden Rechnungen-Datensatz. */
-  onPickRechnungen?: () => void;
+  onPickRechnungenBerater?: () => void;
+  /** 1:N „Rechnungen" (freigabe_zustaendig): VOLLE Liste — der Block filtert auf diesen Record. */
+  rechnungenFreigabeZustaendigList: Rechnungen[];
+  /** Zeilen-Klick → overlay.push auf das Rechnungen-Detail (nie der Edit-Dialog). */
+  onOpenRechnungenFreigabeZustaendig: (record: Rechnungen) => void;
+  /** Kontextuelles „+": öffnet den Rechnungen-Dialog mit diesem Record vorgesetzt. */
+  onAddRechnungenFreigabeZustaendig?: () => void;
 }
 
 export function BeraterInnenDetails({
@@ -60,13 +72,19 @@ export function BeraterInnenDetails({
   projekteProjektleitungList,
   onOpenProjekteProjektleitung,
   onAddProjekteProjektleitung,
+  angeboteList,
+  onOpenAngebote,
+  onAddAngebote,
   zeiterfassungList,
   onOpenZeiterfassung,
   onAddZeiterfassung,
-  rechnungenList,
-  onOpenRechnungen,
-  onAddRechnungen,
-  onPickRechnungen,
+  rechnungenBeraterList,
+  onOpenRechnungenBerater,
+  onAddRechnungenBerater,
+  onPickRechnungenBerater,
+  rechnungenFreigabeZustaendigList,
+  onOpenRechnungenFreigabeZustaendig,
+  onAddRechnungenFreigabeZustaendig,
 }: BeraterInnenDetailsProps) {
   // attachments are a write to this record — read-only without the platform right
   const perms = usePermissions();
@@ -117,6 +135,15 @@ export function BeraterInnenDetails({
       />
 
       <SatelliteSection
+        title={appLabel('angebote')}
+        items={angeboteList.filter(r => extractRecordId(r.fields.freigabe_zustaendig) === record.record_id)}
+        map={r => ({ name: r.fields.angebotsnummer ?? appLabel('angebote'), meta: r.fields.angebotsdatum })}
+        onOpen={onOpenAngebote}
+        onAdd={onAddAngebote}
+        getKey={r => r.record_id}
+      />
+
+      <SatelliteSection
         title={appLabel('zeiterfassung')}
         items={zeiterfassungList.filter(r => extractRecordId(r.fields.berater) === record.record_id)}
         map={r => ({ name: r.fields.jahr ?? appLabel('zeiterfassung'), meta: r.fields.datum })}
@@ -126,12 +153,21 @@ export function BeraterInnenDetails({
       />
 
       <SatelliteSection
-        title={appLabel('rechnungen')}
-        items={rechnungenList.filter(r => Array.isArray(r.fields.berater) && r.fields.berater.some((u: unknown) => extractRecordId(u) === record.record_id))}
+        title={`${appLabel('rechnungen')} · ${fieldLabel('rechnungen', 'berater')}`}
+        items={rechnungenBeraterList.filter(r => Array.isArray(r.fields.berater) && r.fields.berater.some((u: unknown) => extractRecordId(u) === record.record_id))}
         map={r => ({ name: r.fields.rechnungsnummer ?? appLabel('rechnungen'), meta: r.fields.rechnungsdatum })}
-        onOpen={onOpenRechnungen}
-        onAdd={onAddRechnungen}
-        onPick={onPickRechnungen}
+        onOpen={onOpenRechnungenBerater}
+        onAdd={onAddRechnungenBerater}
+        onPick={onPickRechnungenBerater}
+        getKey={r => r.record_id}
+      />
+
+      <SatelliteSection
+        title={`${appLabel('rechnungen')} · ${fieldLabel('rechnungen', 'freigabe_zustaendig')}`}
+        items={rechnungenFreigabeZustaendigList.filter(r => extractRecordId(r.fields.freigabe_zustaendig) === record.record_id)}
+        map={r => ({ name: r.fields.rechnungsnummer ?? appLabel('rechnungen'), meta: r.fields.rechnungsdatum })}
+        onOpen={onOpenRechnungenFreigabeZustaendig}
+        onAdd={onAddRechnungenFreigabeZustaendig}
         getKey={r => r.record_id}
       />
 

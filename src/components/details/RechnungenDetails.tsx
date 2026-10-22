@@ -21,7 +21,7 @@ export interface RechnungenDetailsProps {
   onOpenProjekte?: (record: Projekte) => void;
   /** N:1-Ziel „BeraterInnen": volle Liste (Hook-Array) — der Block löst Name + Schlüsselfelder selbst auf. */
   beraterInnenList: BeraterInnen[];
-  /** Reserviert — BeraterInnen ist hier nur über ein Mehrfach-Feld verknüpft (Text-Join, keine Einzel-Relation); Übergabe erlaubt, aber ohne Wirkung. */
+  /** Klick auf die BeraterInnen-Relation → overlay.push auf dessen Detail. */
   onOpenBeraterInnen?: (record: BeraterInnen) => void;
 }
 
@@ -32,11 +32,13 @@ export function RechnungenDetails({
   projekteList,
   onOpenProjekte,
   beraterInnenList,
+  onOpenBeraterInnen,
 }: RechnungenDetailsProps) {
   // attachments are a write to this record — read-only without the platform right
   const perms = usePermissions();
   const kundeTarget = kundenList.find(r => r.record_id === extractRecordId(record.fields.kunde));
   const projektTarget = projekteList.find(r => r.record_id === extractRecordId(record.fields.projekt));
+  const freigabe_zustaendigTarget = beraterInnenList.find(r => r.record_id === extractRecordId(record.fields.freigabe_zustaendig));
   return (
     <>
       <RecordSection title={t('details')} cols={2}>
@@ -58,6 +60,9 @@ export function RechnungenDetails({
           ) : '—'}
         </RecordField>
         <RecordField label={fieldLabel('rechnungen', 'berater')} value={Array.isArray(record.fields.berater) ? record.fields.berater.map((u: unknown) => beraterInnenList.find(t => t.record_id === extractRecordId(u))?.fields.nachname ?? '—').join(', ') : null} format="text" />
+        <RecordField label={fieldLabel('rechnungen', 'freigabestatus')} value={record.fields.freigabestatus} format="pill" />
+        <RecordField label={fieldLabel('rechnungen', 'freigabedatum')} value={record.fields.freigabedatum} format="date" />
+        <RecordField label={fieldLabel('rechnungen', 'freigabekommentar')} value={record.fields.freigabekommentar} format="longtext" className="md:col-span-2" />
       </RecordSection>
 
       {/* N:1 — verknüpfte Records: IMMER klickbar, nie eine Text-Sackgasse. */}
@@ -73,6 +78,12 @@ export function RechnungenDetails({
           name={projektTarget?.fields.projektkennung ?? '—'}
           meta={[projektTarget?.fields.projektstart_jahr, projektTarget?.fields.ansprechpartner_kunde].filter(Boolean).join(' · ') || undefined}
           onClick={projektTarget && onOpenProjekte ? () => onOpenProjekte!(projektTarget!) : undefined}
+        />
+        <RecordRelation
+          label={fieldLabel('rechnungen', 'freigabe_zustaendig')}
+          name={freigabe_zustaendigTarget?.fields.nachname ?? '—'}
+          meta={[freigabe_zustaendigTarget?.fields.email_beruflich, freigabe_zustaendigTarget?.fields.email_privat].filter(Boolean).join(' · ') || undefined}
+          onClick={freigabe_zustaendigTarget && onOpenBeraterInnen ? () => onOpenBeraterInnen!(freigabe_zustaendigTarget!) : undefined}
         />
       </RecordSection>
 
